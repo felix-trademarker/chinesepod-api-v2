@@ -3,7 +3,8 @@ let Users = require('../repositories/users')
 let _ = require('lodash')
 
 exports.getUser = async function(req, res, next) {
-
+  console.log("res ==> ", res)
+  console.log("req ==> ", req)
   let user = await res.app.locals.helpers.getCurrentUser()
   res.json(user);
 
