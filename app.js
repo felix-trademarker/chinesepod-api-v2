@@ -9,7 +9,6 @@ var app = express();
 
 // APP  CONTAINER =========== >> 
 let conn = require('./config/DbConnect');
-conn.connectToServer( function( err, client ) { // MAIN MONGO START
 conn.connectToServerAWS( function( err, client ) { // MAIN MONGO START
 conn.connectToServer158( function( err, client ) { // MAIN MONGO START
 
@@ -61,7 +60,6 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   
 }); // AWS MONGO CLOSE
 }); // AWS MONGO CLOSE
-}); // MAIN MONGO CLOSE
 
 
 
