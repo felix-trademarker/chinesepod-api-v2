@@ -9,6 +9,6 @@ var router = express.Router();
 router.get('/entrance/get-user', userController.getUser);
 
 router.get('/dashboard/get-info', userController.getInfo);
-
+ 
 
 module.exports = router;

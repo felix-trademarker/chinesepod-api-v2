@@ -3,9 +3,14 @@ require('dotenv').config()
 
 var createError = require('http-errors');
 var express = require('express');
+var cookieParser = require('cookie-parser');
+
+let userService = require('./services/userService')
 
 
 var app = express();
+
+app.use(cookieParser());
 
 // APP  CONTAINER =========== >> 
 let conn = require('./config/DbConnect');
@@ -31,6 +36,8 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
 
   var apiRouter = require('./routes/api');
   app.use('/api/v2', apiRouter);
+
+  userService.migrateSession()
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {

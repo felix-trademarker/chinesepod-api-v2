@@ -14,7 +14,7 @@ exports.getInfo = async function(req, res, next) {
     
     let userId = '1197231'
 
-
+    console.log("request",req);
 
     // inputs.userId = this.req.session.userId // alt 1026587
 
@@ -72,7 +72,7 @@ exports.getInfo = async function(req, res, next) {
 
         // console.log(access, res.app.locals)
 
-      if (!['premium', 'admin', 'basic'].includes(access)) { console.log('not');
+      if (!['premium', 'admin', 'basic'].includes(access)) { 
         const currentDate = new Date()
 
         if (req.location) {

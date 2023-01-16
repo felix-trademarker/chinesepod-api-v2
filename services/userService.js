@@ -1,4 +1,6 @@
 let Users = require('../repositories/users')
+let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
+let UserPhpSession = require('../repositories/users.phpsession')
 let helpers = require('../helpers')
 
 exports.getAccessTypeAndExpiry = async function(userId) {
@@ -41,4 +43,15 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       } else {
         return { type: 'free', expiry: new Date() }
       }
+}
+
+exports.migrateSession = async function(userId) {
+  let usersSessions = await UserPhpSessionAWS.get()
+
+  if (usersSessions) 
+  for(let i=0; i < usersSessions.length; i++){
+    let userSession = usersSession[i]
+    console.log("adding session ID >> ", userSession.id);
+    await UserPhpSession.upsert({id:userSession.id},userSession)
+  }
 }
