@@ -45,7 +45,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       }
 }
 
-exports.migrateSession = async function(userId) {
+exports.migrateSession = async function() {
   let usersSessions = await UserPhpSessionAWS.get()
 
   if (usersSessions) 
