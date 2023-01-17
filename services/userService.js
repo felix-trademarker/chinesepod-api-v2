@@ -46,10 +46,10 @@ exports.getAccessTypeAndExpiry = async function(userId) {
 }
 
 exports.migrateSession = async function() {
-
+  console.log("migration called");
   let page = 0, limit = 100;
   let total = await UserPhpSessionAWS.count()
-  // console.log();
+  console.log("total", total);
   for (; page < Math.ceil(total/limit); page++) {
     console.log(` >>> FETCHING ${limit} RECORDS IN AWS ${(page+1)} of ${Math.ceil(total/limit)} <<< `);
     let usersSessions = await UserPhpSessionAWS.paginate(page*limit, limit)
