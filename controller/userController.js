@@ -1,20 +1,36 @@
 let userService = require('../services/userService')
 let Users = require('../repositories/users')
+let Subscriptions = require('../repositories/subscriptions')
 let _ = require('lodash')
+// const cookie = require('cookie');
+// var cookieParser = require('cookie-parser');
 
 exports.getUser = async function(req, res, next) {
 
-  console.log("req ==> ", req.session)
-  // let user = await res.app.locals.helpers.getCurrentUser()
-  res.json(req);
+  // let secret = '71e0aba070df4892e7384da1828fbfff'
+  // console.log("req ==> ", req.signedCookies)
+  // let strCookie = req.cookies['cpod.sid']
+  // let test = cookieParser.JSONCookie(strCookie, secret)
+  // console.log(JSON.parse(strCookie))
+  // console.log(strCookie,test)
+  // console.log(cookie.parse(req.cookies['cpod.sid']));
+  let user = await res.app.locals.helpers.getCurrentUser()
+  res.json(user);
 
 }
 
 exports.getInfo = async function(req, res, next) {
     
-    let userId = '1197231'
+  let userId = ''
 
-    console.log("request",req);
+  // console.log(req.params)
+  if (req.params.userId) {
+    userId = req.params.userId
+  } else {
+    res.json({message:'No userID found'});
+  }
+
+    // console.log("request",req);
 
     // inputs.userId = this.req.session.userId // alt 1026587
 
@@ -188,5 +204,63 @@ exports.getInfo = async function(req, res, next) {
 
 
   
+}
+
+exports.getSubscriptions = async function(req, res, next) {
+  let userId = ''
+
+  // console.log(req.params)
+  if (req.params.userId) {
+    userId = req.params.userId
+  } else {
+    res.json({message:'No userID found'});
+  }
+
+  let subscriptions = await Subscriptions.getMysqlProduction(`
+    SELECT
+      id,
+      user_id as userId,
+      subscription_id as subscriptionId,
+      subscription_from as subscriptionFrom, 
+      subscription_type as subscriptionType, 
+      is_old as isOld, 
+      product_id as productId, 
+      product_length as productLength, 
+      status as status, 
+      receipt as receipt, 
+      date_cancelled as dateCancelled, 
+      date_created as dateCreated, 
+      next_billing_time as nextBillingTime, 
+      last_modified as lastModified, 
+      cc_num as ccNum, 
+      cc_exp as ccExp, 
+      paypal_email as paypalEmail 
+    FROM subscriptions 
+    WHERE user_id=${userId} and next_billing_time > '${res.app.locals.moment().format()}'
+  `);
+
+  console.log(subscriptions);
+
+  let userSubs = []
+
+  if(subscriptions)
+  for (let i=0; i < subscriptions.length; i++) {
+    let subscription = subscriptions[i]
+
+    let product = (await Subscriptions.getMysql2015(`
+      SELECT 
+      currency, list_price as listPrice, current_price as currentPrice, product_title as productTitle, description
+      FROM Products
+      WHERE product_id=${subscription.productId}
+    `))[0]
+    console.log(product)
+    subscription.product = product
+
+    userSubs.push(subscription)
+  }
+  
+  res.json(userSubs);
+
+  // next()
 }
   
