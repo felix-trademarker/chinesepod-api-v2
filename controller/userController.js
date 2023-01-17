@@ -5,8 +5,8 @@ let _ = require('lodash')
 exports.getUser = async function(req, res, next) {
 
   console.log("req ==> ", req.session)
-  let user = await res.app.locals.helpers.getCurrentUser()
-  res.json(user);
+  // let user = await res.app.locals.helpers.getCurrentUser()
+  res.json(req);
 
 }
 
