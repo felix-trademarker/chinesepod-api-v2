@@ -49,22 +49,24 @@ exports.accessMap = function(level) {
 exports.getCurrentUser = async function(req, res, next){
     
   // let currentUser = await fetch('https://www.chinesepod.com/api/v1/entrance/get-user')
-  let currentUser = await axios.get('https://www.chinesepod.com/api/v1/entrance/get-user')
-
   const url = "https://www.chinesepod.com/api/v1/entrance/get-user";
-https.get(url, res => {
-  let data = '';
-  // console.log(res.data);
-  res.on('data', chunk => {
-    data += chunk;
-  });
-  res.on('end', () => {
-    data = JSON.parse(data);
-    console.log("data",data);
-  })
-}).on('error', err => {
-  console.log(err.message);
-})
+  let currentUser = await axios.get(url)
+
+// https.get(url, res => {
+//   let data = '';
+//   // console.log(res.data);
+//   res.on('data', chunk => {
+//     data += chunk;
+//   });
+//   res.on('end', () => {
+//     data = JSON.parse(data);
+//     console.log("data",data);
+//   })
+// }).on('error', err => {
+//   console.log(err.message);
+// })
+
+console.log(currentUser);
 
   return currentUser.data
 

@@ -6,11 +6,14 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 
 let userService = require('./services/userService')
+// let cookieParser = require('cookie-parser')
 
 
 var app = express();
 
 app.use(cookieParser());
+
+app.set('view engine', 'ejs');
 
 // APP  CONTAINER =========== >> 
 let conn = require('./config/DbConnect');
