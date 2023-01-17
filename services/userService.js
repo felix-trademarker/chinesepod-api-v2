@@ -47,13 +47,19 @@ exports.getAccessTypeAndExpiry = async function(userId) {
 
 exports.migrateSession = async function() {
 
-  console.log(" >>> FETCHING RECORDS IN AWS <<< ");
-  let usersSessions = await UserPhpSessionAWS.get()
-
-  if (usersSessions) 
-  for(let i=0; i < usersSessions.length; i++){
-    let userSession = usersSession[i]
-    console.log("adding session ID >> ", userSession.id);
-    await UserPhpSession.upsert({id:userSession.id},userSession)
+  let page = 0, limit = 100;
+  let total = await UserPhpSessionAWS.count()
+  // console.log();
+  for (; page < Math.ceil(total/limit); page++) {
+    console.log(` >>> FETCHING ${limit} RECORDS IN AWS ${(page+1)} of ${Math.ceil(total/limit)} <<< `);
+    let usersSessions = await UserPhpSessionAWS.paginate(page*limit, limit)
+  
+    if (usersSessions) 
+    for(let i=0; i < usersSessions.length; i++){
+      let userSession = usersSession[i]
+      console.log("adding session ID >> ", userSession.id);
+      await UserPhpSession.upsert({id:userSession.id},userSession)
+    }
   }
+  
 }

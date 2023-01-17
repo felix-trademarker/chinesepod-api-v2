@@ -31,6 +31,9 @@ var conCpod2015 = mysql.createConnection({
 module.exports = {
 
     // BASE FUNCTIONS LOCATED IN defaultModel
+    count : async function() {
+        return await defaultModel.count()
+    },
     get : async function() {
         return await defaultModel.get()
     },
@@ -39,6 +42,9 @@ module.exports = {
 	},
 	findQuery : async function(query) {
         return await defaultModel.findQuery(query)
+    },
+    paginate : async function(skip,limit) {
+        return await defaultModel.paginate(skip,limit)
 	},
 	update : async function(id,data) {
         return await defaultModel.update(id,data)

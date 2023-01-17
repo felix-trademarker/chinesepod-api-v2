@@ -4,6 +4,23 @@ class Model{
         this.table = table
     }
 
+    count() {
+        var this_ = this
+        return new Promise(function(resolve, reject) {
+            
+            this_.db.getDbAWS().collection(this_.table).find().count(function(err, result) {
+					
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result);
+				}
+
+			});
+
+        });
+    }
+
     get() {
         var this_ = this
         return new Promise(function(resolve, reject) {
@@ -48,6 +65,25 @@ class Model{
             
 			
 			this_.db.getDbAWS().collection(this_.table).find(query).toArray(function(err, result) {
+					
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result);
+				}
+
+			});
+
+        });
+    }
+
+    paginate(skip,limit) {
+        var this_ = this
+        let ObjectID = require('mongodb').ObjectID;
+        return new Promise(function(resolve, reject) {
+            
+			
+			this_.db.getDbAWS().collection(this_.table).find().skip(skip).limit(limit).toArray(function(err, result) {
 					
 				if (err) {
 					reject(err);
