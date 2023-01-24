@@ -4,14 +4,22 @@ require('dotenv').config()
 var createError = require('http-errors');
 var express = require('express');
 var cookieParser = require('cookie-parser');
+var session = require('express-session')
 
+let middleware = require('./middleware')
 let userService = require('./services/userService')
-// let cookieParser = require('cookie-parser')
 
 
 var app = express();
 
 app.use(cookieParser());
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'qweasdzxcrtyfghvbn',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}))
 
 app.set('view engine', 'ejs');
 
@@ -38,7 +46,7 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   console.log("APP RUNNING...");
 
   var apiRouter = require('./routes/api');
-  app.use('/api/v2', apiRouter);
+  app.use('/api/v2',middleware.checkAuth, apiRouter);
 
   // userService.migrateSession()
 

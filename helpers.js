@@ -48,26 +48,29 @@ exports.accessMap = function(level) {
 
 exports.getCurrentUser = async function(req, res, next){
     
-  // let currentUser = await fetch('https://www.chinesepod.com/api/v1/entrance/get-user')
-  const url = "https://www.chinesepod.com/api/v1/entrance/get-user";
-  let currentUser = await axios.get(url)
+  var options = {
+    'headers': {
+      'Cookie': req.headers.cookie
+    }
+  };
+  let url = 'https://www.chinesepod.com/api/v1/entrance/get-user'
 
-// https.get(url, res => {
-//   let data = '';
-//   // console.log(res.data);
-//   res.on('data', chunk => {
-//     data += chunk;
-//   });
-//   res.on('end', () => {
-//     data = JSON.parse(data);
-//     console.log("data",data);
-//   })
-// }).on('error', err => {
-//   console.log(err.message);
-// })
-
-console.log(currentUser);
+  let currentUser = await axios.get(url,options)
 
   return currentUser.data
 
+}
+
+exports.extractToken = function(req){
+    
+  let token = req.headers.authorization
+  token = token.replace("Bearer ","")
+
+  let data =  JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+  return data.data
+
+}
+
+exports.getDomain = function(){
+  return "https://www.chinesepod.com"
 }

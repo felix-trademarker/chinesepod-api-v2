@@ -3,6 +3,7 @@ let Users = require('../repositories/users')
 let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
 let UserPhpSession = require('../repositories/users.phpsession')
 let helpers = require('../helpers')
+let axios = require('axios');
 
 exports.getAccessTypeAndExpiry = async function(userId) {
     
@@ -48,19 +49,65 @@ exports.getAccessTypeAndExpiry = async function(userId) {
 
 exports.migrateSession = async function() {
   console.log("migration called");
-  let page = 0, limit = 100;
-  let total = await UserPhpSessionAWS.count()
-  console.log("total", total);
-  for (; page < Math.ceil(total/limit); page++) {
-    console.log(` >>> FETCHING ${limit} RECORDS IN AWS ${(page+1)} of ${Math.ceil(total/limit)} <<< `);
-    let usersSessions = await UserPhpSessionAWS.paginate(page*limit, limit)
+
+  //  =========== working function below commented out since in aws mongo return empty
+  // let page = 0, limit = 100;
+  // let total = await UserPhpSessionAWS.count()
+  // console.log("total", total);
+  // for (; page < Math.ceil(total/limit); page++) {
+  //   console.log(` >>> FETCHING ${limit} RECORDS IN AWS ${(page+1)} of ${Math.ceil(total/limit)} <<< `);
+  //   let usersSessions = await UserPhpSessionAWS.paginate(page*limit, limit)
   
-    if (usersSessions) 
-    for(let i=0; i < usersSessions.length; i++){
-      let userSession = usersSession[i]
-      console.log("adding session ID >> ", userSession.id);
-      await UserPhpSession.upsert({id:userSession.id},userSession)
-    }
+  //   if (usersSessions) 
+  //   for(let i=0; i < usersSessions.length; i++){
+  //     let userSession = usersSession[i]
+  //     console.log("adding session ID >> ", userSession.id);
+  //     await UserPhpSession.upsert({id:userSession.id},userSession)
+  //   }
+  // }
+  
+}
+
+exports.getRequestAPI = async function(req, res, next) {
+
+  try {
+    var options = {
+      'headers': {
+        'Authorization': "Bearer " + req.session.token,
+        'Cookie': req.headers.cookie,
+      }
+    };
+  
+    let path = req.originalUrl.replace("v2", "v1")
+    let url = res.app.locals.helpers.getDomain() + path
+    let data = await axios.get(url,options)
+    
+    return data
+
+  } catch (err) {
+    // console.log(err.response)
+    return err.response
   }
   
 }
+
+// exports.getUserEntrance = async function(req, res, next) {
+//   try {
+//     var options = {
+//       'headers': {
+//         'Authorization': "Bearer " + req.session.token,
+//         'Cookie': req.headers.cookie,
+//       }
+//     };
+  
+//     let path = req.originalUrl.replace("v2", "v1")
+//     let url = res.app.locals.helpers.getDomain() + path
+//     let data = await axios.get(url,options)
+    
+//     return data
+
+//   } catch (err) {
+//     console.log(err.response)
+//     return err.response
+//   }
+// }

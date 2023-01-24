@@ -2,42 +2,48 @@ let userService = require('../services/userService')
 let Users = require('../repositories/users')
 let Subscriptions = require('../repositories/subscriptions')
 let _ = require('lodash')
+let axios = require('axios');
 // const cookie = require('cookie');
 // var cookieParser = require('cookie-parser');
 
 exports.getUser = async function(req, res, next) {
 
-  // let secret = '71e0aba070df4892e7384da1828fbfff'
-  // console.log("req ==> ", req.signedCookies)
-  // let strCookie = req.cookies['cpod.sid']
-  // let test = cookieParser.JSONCookie(strCookie, secret)
-  // console.log(JSON.parse(strCookie))
-  // console.log(strCookie,test)
-  // console.log(cookie.parse(req.cookies['cpod.sid']));
-  let user = await res.app.locals.helpers.getCurrentUser()
-  res.json(user);
+  let response = await userService.getRequestAPI(req, res, next)
+  // console.log("this", response.data);
+  if (response.status == 404){
+    res.json(response.statusText)
+  }
+  else{
+    // TODO CREATE DYNAMIC FUNCTION TO DETERMINE EACH PATH AND SAVE TO CORRESPONDING COLLECTION
+
+    // SEND API RESPONSE
+    res.json(response.data)
+  }
+
+  // THIS IS TO DECRYPT TOKEN
+  // COMMENT OUT BELOW FOR TEST ONLY
+  // let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXJJZCI6MTE5NzIzMSwiaXNUZWFtIjpmYWxzZX0sImlhdCI6MTY3MzM0NjQ0NywiZXhwIjoxNjczNDMyODQ3fQ.j_HA4pcVw908D93n6kxC36nwi4PU0e_tPeeNn68RVgQ"
+  // var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+
+  // FETCH COOKIES AND INCLUDE IN HEADERS REQUEST
+  // var options = {
+  //   'headers': {
+  //     'Cookie': req.headers.cookie
+  //   }
+  // };
+  // let url = 'https://www.chinesepod.com/api/v1/entrance/get-user'
+
+  // let currentUser = await axios.get(url,options)
+
+  // res.json(currentUser.data);
 
 }
 
 exports.getInfo = async function(req, res, next) {
     
-  let userId = ''
+  let userId = req.session.userId
 
-  // console.log(req.params)
-  if (req.params.userId) {
-    userId = req.params.userId
-  } else {
-    res.json({message:'No userID found'});
-  }
-
-    // console.log("request",req);
-
-    // inputs.userId = this.req.session.userId // alt 1026587
-
-    if (!userId || typeof userId === 'undefined') {
-        throw 'invalid'
-    }
-
+  if(userId) {
     let returnData = {}
 
     let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
@@ -201,66 +207,104 @@ exports.getInfo = async function(req, res, next) {
     } catch (e) {
       console.log(e);
     }
-
+  } else {
+    res.json({})
+  }
 
   
 }
 
+exports.getStats = async function(req, res, next) {
+
+  let response = await userService.getRequestAPI(req, res, next)
+
+  res.json(response.data)
+}
+
 exports.getSubscriptions = async function(req, res, next) {
-  let userId = ''
+  let userId = req.session.userId
 
-  // console.log(req.params)
-  if (req.params.userId) {
-    userId = req.params.userId
+  // console.log(req.cookies)
+  // let cpodSid = req.cookies['cpod.sid']
+  // console.log(cpodSid);
+  // if (req.params.userId) {
+  //   userId = req.params.userId
+  // } else if (req.headers && req.headers.authorization) {
+  //   let userDataToken = res.app.locals.helpers.extractToken(req)
+  //   userId = userDataToken.userId
+  // }
+
+  console.log(userId);
+
+  // console.log(req.headers)
+
+  if (userId) {
+
+    let subscriptions = await Subscriptions.getMysqlProduction(`
+      SELECT
+        id,
+        user_id as userId,
+        subscription_id as subscriptionId,
+        subscription_from as subscriptionFrom, 
+        subscription_type as subscriptionType, 
+        is_old as isOld, 
+        product_id as productId, 
+        product_length as productLength, 
+        status as status, 
+        receipt as receipt, 
+        date_cancelled as dateCancelled, 
+        date_created as dateCreated, 
+        next_billing_time as nextBillingTime, 
+        last_modified as lastModified, 
+        cc_num as ccNum, 
+        cc_exp as ccExp, 
+        paypal_email as paypalEmail 
+      FROM subscriptions 
+      WHERE user_id=${userId} and next_billing_time > '${res.app.locals.moment().format()}'
+    `);
+
+    console.log(subscriptions);
+
+    let userSubs = []
+
+    if(subscriptions)
+    for (let i=0; i < subscriptions.length; i++) {
+      let subscription = subscriptions[i]
+
+      let product = (await Subscriptions.getMysql2015(`
+        SELECT 
+        currency, list_price as listPrice, current_price as currentPrice, product_title as productTitle, description
+        FROM Products
+        WHERE product_id=${subscription.productId}
+      `))[0]
+      console.log(product)
+      subscription.product = product
+
+      userSubs.push(subscription)
+    }
+    
+    res.json(userSubs);
   } else {
-    res.json({message:'No userID found'});
+    res.json({});
+
   }
-
-  let subscriptions = await Subscriptions.getMysqlProduction(`
-    SELECT
-      id,
-      user_id as userId,
-      subscription_id as subscriptionId,
-      subscription_from as subscriptionFrom, 
-      subscription_type as subscriptionType, 
-      is_old as isOld, 
-      product_id as productId, 
-      product_length as productLength, 
-      status as status, 
-      receipt as receipt, 
-      date_cancelled as dateCancelled, 
-      date_created as dateCreated, 
-      next_billing_time as nextBillingTime, 
-      last_modified as lastModified, 
-      cc_num as ccNum, 
-      cc_exp as ccExp, 
-      paypal_email as paypalEmail 
-    FROM subscriptions 
-    WHERE user_id=${userId} and next_billing_time > '${res.app.locals.moment().format()}'
-  `);
-
-  console.log(subscriptions);
-
-  let userSubs = []
-
-  if(subscriptions)
-  for (let i=0; i < subscriptions.length; i++) {
-    let subscription = subscriptions[i]
-
-    let product = (await Subscriptions.getMysql2015(`
-      SELECT 
-      currency, list_price as listPrice, current_price as currentPrice, product_title as productTitle, description
-      FROM Products
-      WHERE product_id=${subscription.productId}
-    `))[0]
-    console.log(product)
-    subscription.product = product
-
-    userSubs.push(subscription)
-  }
-  
-  res.json(userSubs);
 
   // next()
+}
+
+exports.serveAPI = async function(req, res, next) {
+
+  let response = await userService.getRequestAPI(req, res, next)
+
+  if (response.status == 404){
+    res.json(response.statusText)
+  }
+  else{
+    // TODO CREATE DYNAMIC FUNCTION TO DETERMINE EACH PATH AND SAVE TO CORRESPONDING COLLECTION
+
+    // SEND API RESPONSE
+    res.json(response.data)
+  }
+
 }
   
