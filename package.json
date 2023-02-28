@@ -7,6 +7,7 @@
     "dev": "nodemon ./bin/apiV2"
   },
   "dependencies": {
+    "aws-sdk": "^2.1321.0",
     "axios": "^1.2.2",
     "bower": "^1.8.12",
     "bull": "^4.10.2",
