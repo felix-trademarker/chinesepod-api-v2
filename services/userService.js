@@ -1,4 +1,5 @@
 let Users = require('../repositories/users')
+let UsersApi = require('../repositories/users.api')
 
 let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
 let UserPhpSession = require('../repositories/users.phpsession')
@@ -70,25 +71,86 @@ exports.migrateSession = async function() {
 
 exports.getRequestAPI = async function(req, res, next) {
 
+  console.log("method",req.headers)
+  // console.log("method",req.params)
   try {
-    var options = {
-      'headers': {
-        'Authorization': "Bearer " + req.session.token,
-        'Cookie': req.headers.cookie,
-      }
-    };
-  
     let path = req.originalUrl.replace("v2", "v1")
     let url = res.app.locals.helpers.getDomain() + path
-    let data = await axios.get(url,options)
+
+    // clean auth string
+    let token = req.headers.authorization 
+    if (token){
+      token = token.replace("Bearer","").trim()
+    } else {
+      token = req.session.token
+    }
+
+    var options = {
+      'method': req.method,
+      'url': url,
+      'headers': {
+        'Authorization': 'Bearer ' + token,
+        'Cookie': req.headers.cookie,
+        'Content-Type': 'text/plain; charset=utf-8',
+      },
+      'body': JSON.stringify(req.body) 
+    };
+
+    console.log("options",options);
+
+
+    // CHECK REQUEST TYPE
+
+    let data = await axios(options)
+    // switch(req.method) {
+    //   case 'POST': 
+    //     data = await axios.post(url,options)
+    //   break;
+    //   case 'PUT': 
+    //   data = await axios.put(url,options)
+    //   break;
+    //   case 'PATCH': 
+    //   data = await axios.patch(url,options)
+    //   break;
+    //   case 'DELETE': 
+    //   data = await axios.delete(url,options)
+    //   break;
+    //   default: 
+    //     data = await axios.get(url,options)
+    //   break;
+    // }
     
     return data
 
   } catch (err) {
-    // console.log(err.response)
+    console.log("API ERROR",err)
     return err.response
   }
   
+}
+
+exports.recordServe = async function(req, response) {
+
+  let path = req.originalUrl.replace("v2", "v1")
+
+  let modelObj = helpers.getCollectionFromUrl(path)
+  
+  console.log("check path and return corresponding collection name", modelObj)
+  if (modelObj && modelObj.action)  
+  switch(modelObj.action){
+    case 'history' : 
+    case 'bookmarks' : 
+    case 'courses' : 
+    case 'stats' : 
+    case 'info' : 
+      // update user fetch userId from session token
+      let data = {
+        userId: req.session.userId
+      }
+      data[modelObj.action] = response.data
+      Users.upsert({userId: req.session.userId}, data)
+    break
+  }
 }
 
 // exports.getUserEntrance = async function(req, res, next) {

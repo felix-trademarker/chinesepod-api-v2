@@ -3,7 +3,7 @@ let axios = require('axios')
 exports.checkAuth = async function(req, res, next){
     
     let path = req.originalUrl.replace("v2", "v1")
-    console.log('checking',path);
+    // console.log('checking',path);
 
     if (req.params.userId) {
         req.session.userId = req.params.userId
@@ -25,6 +25,7 @@ exports.checkAuth = async function(req, res, next){
           let url = 'https://www.chinesepod.com/api/v1/entrance/get-user'
         
           let currentUser = await axios.get(url,options)
+        //   console.log(currentUser)
           req.session.token = currentUser.data.token
           req.session.userId= currentUser.data.userId
     }

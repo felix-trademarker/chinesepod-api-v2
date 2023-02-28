@@ -43,6 +43,8 @@ exports.getInfo = async function(req, res, next) {
     
   let userId = req.session.userId
 
+  if (req.params.userId) userId = req.params.userId 
+
   if(userId) {
     let returnData = {}
 
@@ -212,7 +214,7 @@ exports.getInfo = async function(req, res, next) {
   }
 
   
-}
+} 
 
 exports.getStats = async function(req, res, next) {
 
@@ -292,17 +294,153 @@ exports.getSubscriptions = async function(req, res, next) {
   // next()
 }
 
+exports.popularRecapLessons = async function(req, res, next) {
+
+  console.log('test etstsetset >>>>>>>>>> ');
+  const groupBy = key => array =>
+  array.reduce((objectsByKeyValue, obj) => {
+    const value = obj[key];
+    objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+    return objectsByKeyValue;
+  }, {});
+
+  let period = 30;
+  // period = inputs.days <= 30 ? inputs.days : 30;
+  // if (inputs.days) {
+  //   period = inputs.days <= 30 ? inputs.days : 30;
+  // }
+
+  var AwsS3 = require ('aws-sdk/clients/s3');
+  const s3 = new AwsS3 ({
+    accessKeyId: process.env.awsKey,
+    secretAccessKey: process.env.awsSecret,
+    region: 'us-east-1',
+  });
+
+  const listDirectories = params => {
+    return new Promise ((resolve, reject) => {
+      const s3params = {
+        Bucket: 'chinesepod-recap',
+        MaxKeys: 1000,
+        Delimiter: '/',
+      };
+      s3.listObjectsV2 (s3params, (err, data) => {
+        if (err) {
+          reject (err);
+        }
+        resolve (data);
+      });
+    });
+  };
+
+  let recapList = [];
+
+  await listDirectories()
+    .then((response) => {
+      response['CommonPrefixes'].forEach((item,i) => {
+        recapList[i] = item['Prefix'].split('/')[0];
+      });
+    });
+
+  let relevantLogs = [];
+
+  let baseUrls = ['https://www.chinesepod.com/api/v1/lessons/get-dialogue?lessonId=', ];
+
+  recapList.forEach((lesson) => {
+    baseUrls.forEach((url) => relevantLogs.push(url + lesson))
+  });
+
+  // let newLogs = await Logging.find({
+  //   where: {
+  //     id: {
+  //       '!=': 'NONE'
+  //     },
+  //     accesslog_url: {
+  //       in: relevantLogs
+  //     },
+  //     createdAt: {
+  //       '>': new Date(Date.now() - period * 24 * 60 * 60 * 1000)
+  //     }
+  //   },
+  //   select: ['id', 'accesslog_url']
+  // });
+
+  console.log(relevantLogs);
+
+  let newLogs = await Users.getMysqlLogging(`Select accesslog_user as id,accesslog_url From cp_accesslog 
+                                              WHERE accesslog_url IN ( "https://www.chinesepod.com/api/v1/lessons/get-dialogue?lessonId=0001","https://www.chinesepod.com/api/v1/lessons/get-dialogue?lessonId=0002" ) 
+                                              AND accesslog_user <> 'NONE'
+                                              AND accesslog_time > '${res.app.locals.moment().subtract(period,'days')}'
+                                              `);
+
+  newLogs.forEach((log) => log.lessonId = log.accesslog_url.split('lessonId=')[1]);
+
+  // let oldLogs = await Logging.find({
+  //   where: {
+  //     id: {
+  //       '!=': 'NONE'
+  //     },
+  //     accesslog_urlbase: {
+  //       'in': [
+  //         'https://chinesepod.com/lessons/api',
+  //         'https://ws.chinesepod.com:444/1.0.0/instances/prod/lessons/get-lesson-detail',
+  //         'https://server4.chinesepod.com:444/1.0.0/instances/prod/lessons/get-dialogue'
+  //       ]
+  //     },
+  //     createdAt: {
+  //       '>': new Date(Date.now() - period * 24 * 60 * 60 * 1000)
+  //     }
+  //   },
+  //   select: ['id', 'accesslog_url']
+  // });
+
+  let oldLogs = await Users.getMysqlLogging(`Select accesslog_user as id,accesslog_url From cp_accesslog 
+                                              WHERE accesslog_url IN ( 'https://chinesepod.com/lessons/api',
+                                              'https://ws.chinesepod.com:444/1.0.0/instances/prod/lessons/get-lesson-detail',
+                                              'https://server4.chinesepod.com:444/1.0.0/instances/prod/lessons/get-dialogue' ) 
+                                              AND accesslog_user <> 'NONE'
+                                              AND accesslog_time > ${res.app.locals.moment().subtract(period,'days')}
+                                              `);
+
+  oldLogs.forEach((log) => log.lessonId = log.accesslog_url.split('v3_id=')[1].split('&')[0]);
+
+  let allLogs = [...newLogs, ...oldLogs];
+
+  const groupByLessonId = groupBy('lessonId');
+
+  let groupedLogs = groupByLessonId(allLogs);
+
+  let returnList = [];
+
+  Object.keys(groupedLogs).map((i) => {
+    let users = [];
+    groupedLogs[i].forEach((log) => users.push(log.id));
+    returnList.push({
+      lessonId: i,
+      users: users,
+      views: users.length
+    })
+  });
+
+  // return returnList.sort((a, b) => b.views - a.views)
+  res.json(returnList.sort((a, b) => b.views - a.views))
+}
+
+// DYNAMIC FUNCTION
 exports.serveAPI = async function(req, res, next) {
 
+  // console.log("serve",req.headers)
   let response = await userService.getRequestAPI(req, res, next)
-
-  if (response.status == 404){
+  console.log(response)
+  // return response;
+  if (response && response.status == 404){
     res.json(response.statusText)
   }
   else{
     // TODO CREATE DYNAMIC FUNCTION TO DETERMINE EACH PATH AND SAVE TO CORRESPONDING COLLECTION
-
+    userService.recordServe(req, response)
     // SEND API RESPONSE
+    // console.log(response)
     res.json(response.data)
   }
 

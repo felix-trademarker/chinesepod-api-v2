@@ -13,6 +13,7 @@ let userService = require('./services/userService')
 var app = express();
 
 app.use(cookieParser());
+app.use(express.json())
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
   secret: 'qweasdzxcrtyfghvbn',
