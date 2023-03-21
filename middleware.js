@@ -3,7 +3,7 @@ let axios = require('axios')
 exports.checkAuth = async function(req, res, next){
     
     let path = req.originalUrl.replace("v2", "v1")
-    // console.log('checking',path);
+    console.log('headers INFO >>>> ',req.headers);
 
     if (req.params.userId) {
         req.session.userId = req.params.userId
