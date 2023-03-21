@@ -77,6 +77,10 @@ exports.getDomain = function(){
 }
 
 exports.getCollectionFromUrl = function(url) {
+
+  let uri = url.split(":")
+  console.log(uri)
+
   let collectionPath = [
     // AUTH config/routes 367 - 394
     { url: '/api/v1/auth/facebook', action: 'facebookAuth' },
@@ -170,8 +174,10 @@ exports.getCollectionFromUrl = function(url) {
     //Dashboard Routes
     { url: '/api/v1/dashboard/history',action: 'history' },
     { url: '/api/v1/dashboard/bookmarks',action: 'bookmarks' },
-    { url: '/api/v1/dashboard/get-course',action: 'dashboard/get-course' },
     { url: '/api/v1/dashboard/user-courses',action: 'courses' },
+    { url: '/api/v1/dashboard/get-stats',action: 'stats' },
+    { url: '/api/v1/dashboard/get-info',action: 'info' },
+    { url: '/api/v1/dashboard/get-course',action: 'dashboard/get-course' },
     { url: '/api/v1/dashboard/set-course-as-main', action: 'dashboard/set-course-as-main'},
     { url: '/api/v1/dashboard/more-courses',action: 'dashboard/more-courses' },
     { url: '/api/v1/dashboard/course-lessons',action: 'dashboard/course-lessons' },
@@ -184,8 +190,6 @@ exports.getCollectionFromUrl = function(url) {
     { url: '/api/v1/dashboard/toggle-saved',action: 'dashboard/toggle-saved' },
     { url: '/api/v1/dashboard/toggle-studied', action: 'dashboard/toggle-studied' },
     { url: '/api/v1/dashboard/toggle-course',action: 'dashboard/toggle-course' },
-    { url: '/api/v1/dashboard/get-stats',action: 'stats' },
-    { url: '/api/v1/dashboard/get-info',action: 'info' },
     { url: '/api/v1/dashboard/onboarding/questions', action: 'dashboard/onboarding/get-onboarding-questions' },
     { url: '/api/v1/dashboard/onboarding/questions', action: 'dashboard/onboarding/put-onboarding-questions' },
     { url: '/api/v1/dashboard/get-suggestions', action: 'dashboard/get-suggestions' },

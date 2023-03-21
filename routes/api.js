@@ -8,7 +8,7 @@ var router = express.Router();
 
 // router.get('/entrance/get-user', userController.getUser);
 
-// router.get('/dashboard/get-info', userController.getInfo);
+router.get('/dashboard/get-info', userController.getInfo);
 router.get('/dashboard/get-info/:userId', userController.getInfo);
 
 // router.get('/dashboard/get-stats', userController.getStats);
@@ -22,10 +22,10 @@ router.get('/account/subscription/subscriptions/:userId', userController.getSubs
 
  
 // DYNAMIC ROUTE TO CATCH ALL FORWARDED API
-router.get('/*', userController.serveAPI);
-router.post('/*', userController.serveAPI);
-router.put('/*', userController.serveAPI);
-router.delete('/*', userController.serveAPI);
+// router.get('/*', userController.serveAPI);
+// router.post('/*', userController.serveAPI);
+// router.put('/*', userController.serveAPI);
+// router.delete('/*', userController.serveAPI);
 
 
 module.exports = router;
