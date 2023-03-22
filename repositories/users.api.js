@@ -4,29 +4,6 @@ var defaultModel = new Model(_table)
 
 let conn = require('../config/DbConnect');
 
-var mysql = require('mysql');
-
-var conCpodProduction = mysql.createConnection({
-  host: process.env.DBHOST,
-  user: process.env.DBUSER,
-  password: process.env.DBPASS,
-  database: process.env.DBNAME,
-});
-
-var conCpodLogging = mysql.createConnection({
-    host: process.env.DBHOST,
-    user: process.env.DBUSER,
-    password: process.env.DBPASS,
-    database: "chinesepod_logging",
-});
-
-var conCpod2015 = mysql.createConnection({
-    host: process.env.DBHOST,
-    user: process.env.DBUSER,
-    password: process.env.DBPASS,
-    database: "chinesepod2015",
-});
-
 // module.exports = { baseModel.get }
 module.exports = {
 
@@ -63,15 +40,15 @@ module.exports = {
     // ==================================================
 
 	getMysqlProduction : async function(query){
-        return await defaultModel.getMysql(conCpodProduction,query)
+        return await defaultModel.getMysql(conn.getDbMySqlProduction(),query)
     },
     
     getMysqlLogging : async function(query){
-        return await defaultModel.getMysql(conCpodLogging,query)
+        return await defaultModel.getMysql(conn.getDbMySqlLogging(),query)
     },
     
     getMysql2015 : async function(query){
-        return await defaultModel.getMysql(conCpod2015,query)
+        return await defaultModel.getMysql(conn.getDbMySql2015(),query)
     },
     
     // ADD CUSTOM FUNCTION BELOW ========================

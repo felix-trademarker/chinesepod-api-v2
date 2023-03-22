@@ -1,4 +1,4 @@
-let _table = "users.phpsessions";
+let _table = "crm.users";
 var Model = require('./_modelAWS')
 var defaultModel = new Model(_table)
 

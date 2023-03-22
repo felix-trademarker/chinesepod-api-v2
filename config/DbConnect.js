@@ -1,9 +1,31 @@
 const MongoClient = require( 'mongodb' ).MongoClient;
 const mongoose = require('mongoose');
 const _variables = require( './variables' );
+var mysql = require('mysql');
 
 var _db158,_dbAWS;
-console.log(_variables.mongoURL);
+
+var conCpodProduction = mysql.createConnection({
+  host: process.env.DBHOST,
+  user: process.env.DBUSER,
+  password: process.env.DBPASS,
+  database: process.env.DBNAME,
+});
+
+var conCpodLogging = mysql.createConnection({
+    host: process.env.DBHOST,
+    user: process.env.DBUSER,
+    password: process.env.DBPASS,
+    database: "chinesepod_logging",
+});
+
+var conCpod2015 = mysql.createConnection({
+    host: process.env.DBHOST,
+    user: process.env.DBUSER,
+    password: process.env.DBPASS,
+    database: "chinesepod2015",
+});
+
 module.exports = {
 
   connectToServer158: function( callback ) {
@@ -26,6 +48,19 @@ module.exports = {
 
   getDbAWS: function() {
     return _dbAWS;
+  },
+
+
+  getDbMySqlProduction: function() {
+    return conCpodProduction;
+  },
+
+  getDbMySqlLogging: function() {
+    return conCpodLogging;
+  },
+
+  getDbMySql2015: function() {
+    return conCpod2015;
   }
 
 
