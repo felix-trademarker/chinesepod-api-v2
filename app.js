@@ -5,15 +5,18 @@ var createError = require('http-errors');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var session = require('express-session')
-
+var bodyParser = require('body-parser')
 let middleware = require('./middleware')
 let userService = require('./services/userService')
 
 
 var app = express();
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 app.use(cookieParser());
-app.use(express.json())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
   secret: 'qweasdzxcrtyfghvbn',

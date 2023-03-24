@@ -9,13 +9,17 @@ var router = express.Router();
 // router.get('/entrance/get-user', userController.getUser);
 
 router.get('/dashboard/get-info', userController.getInfo);
-router.get('/dashboard/get-info/:userId', userController.getInfo);
-
+// router.get('/dashboard/get-info/:userId', userController.getInfo);
 router.get('/dashboard/get-stats', userController.getStats);
 // router.get('/dashboard/get-stats/:userId', userController.getStats);
+// router.get('/account/subscription/subscriptions/:userId', userController.getSubscriptions);
+router.get('/dashboard/course-lessons', userController.courseLessons);
+router.get('/dashboard/user-courses', userController.userCourses);
+router.get('/dashboard/history', userController.history);
+router.get('/dashboard/bookmarks', userController.bookmarks);
 
-// router.get('/account/subscription/subscriptions', userController.getSubscriptions);
-router.get('/account/subscription/subscriptions/:userId', userController.getSubscriptions);
+
+router.get('/account/subscription/subscriptions', userController.getSubscriptions);
 
 // BASED ON LIVE API
 // router.get('/recap/get-popular-recap-lessons', userController.popularRecapLessons);
