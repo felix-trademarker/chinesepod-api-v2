@@ -2,11 +2,13 @@ let axios = require('axios')
 
 exports.checkAuth = async function(req, res, next){
     
+    console.log(">>", req.originalUrl);
     let path = req.originalUrl.replace("v2", "v1")
-    console.log('headers INFO >>>> ',req.headers);
 
     if (req.params.userId) {
         req.session.userId = req.params.userId
+    } else if (req.query.userId) {
+        req.session.userId = req.query.userId 
     } else if (req.headers && req.headers.authorization) {
         let userDataToken = res.app.locals.helpers.extractToken(req)
         req.session.userId = userDataToken.userId
@@ -36,7 +38,9 @@ exports.checkAuth = async function(req, res, next){
 exports.getCurrentUser = async function(req, res, next){
     
     // let currentUser = await fetch('https://www.chinesepod.com/api/v1/entrance/get-user')
-    let currentUser = await axios.get('https://www.chinesepod.com/api/v1/entrance/get-user')
+    let currentUser = req.session;
+
+    return currentUser;
 
 }
 

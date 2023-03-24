@@ -1,5 +1,6 @@
 let userService = require('../services/userService')
 let Users = require('../repositories/users')
+let Lessons = require('../repositories/lessons')
 let crmUsersMongoAws = require('../repositories/crmUsersMongoAWS')
 let Subscriptions = require('../repositories/subscriptions')
 let _ = require('lodash')
@@ -379,20 +380,6 @@ exports.getStats = async function(req, res, next) {
 exports.getSubscriptions = async function(req, res, next) {
   let userId = req.session.userId
 
-  // console.log(req.cookies)
-  // let cpodSid = req.cookies['cpod.sid']
-  // console.log(cpodSid);
-  // if (req.params.userId) {
-  //   userId = req.params.userId
-  // } else if (req.headers && req.headers.authorization) {
-  //   let userDataToken = res.app.locals.helpers.extractToken(req)
-  //   userId = userDataToken.userId
-  // }
-
-  console.log(userId);
-
-  // console.log(req.headers)
-
   if (userId) {
 
     let subscriptions = await Subscriptions.getMysqlProduction(`
@@ -437,6 +424,8 @@ exports.getSubscriptions = async function(req, res, next) {
 
       userSubs.push(subscription)
     }
+
+    Users.upsert({id:userId},{ subscriptions: userSubs });
     
     res.json(userSubs);
   } else {
@@ -446,6 +435,165 @@ exports.getSubscriptions = async function(req, res, next) {
 
   // next()
 }
+
+exports.courseLessons = async function(req, res, next) {
+    
+  let userId = req.session.userId
+
+  if (req.params.userId) userId = req.params.userId 
+
+  if (req.query.userId) userId = req.query.userId 
+
+  let courseId = req.query.courseId;
+  let exclude = req.query.exclude;
+  let limit = req.query.limit;
+  let all = req.query.all;
+
+
+
+  if (!userId || !courseId) {
+    res.json({err:'Invalid'})
+  } else {
+
+    if(userId && courseId) {
+      
+      // FETCH USER CONTENTS
+      let columns = res.app.locals.helpers.getLessonColumns()
+      let courseData = await Users.getMysqlProduction(`
+        SELECT ${columns.join(',')}  
+        FROM course_contents AS cc
+        LEFT JOIN contents AS c
+        ON cc.v3_id = c.v3_id
+        WHERE cc.course_id=${courseId}
+        ORDER BY displaysort ASC
+      `);
+
+      let returnData = []
+
+      for (let i=0; i < courseData.length; i++) {
+        let lesson = courseData[i]
+
+        lesson.userContents = await Users.getMysqlProduction(`
+        SELECT saved, studied FROM user_contents WHERE user_id=${userId} AND lesson_type=0 AND v3_id='${lesson.id}'
+        `)
+
+        if (lesson.userContents[0]) {
+          lesson.saved = lesson.userContents[0].saved
+          lesson.studied = lesson.userContents[0].studied
+          delete lesson.userContents
+          returnData.push(lesson)
+        } else {
+          lesson.saved = 0
+          lesson.studied = 0
+          returnData.push(lesson)
+        }
+      }
+
+      if (all) {
+        res.json(returnData)
+      } else {
+
+        Users.upsert({id:userId},{ courseLessons: returnData });
+
+        res.json(returnData
+          .filter((lesson) => {
+            return (
+              lesson.studied !== 1 &&
+              (exclude ? !exclude.includes(lesson.id) : true)
+            )
+          })
+          .slice(0, limit))
+      }
+
+      
+    } else {
+      res.json({})
+    }
+  }
+  
+} 
+
+exports.userCourses = async function(req, res, next) {
+    
+  let userId = req.session.userId
+
+  if (req.params.userId) userId = req.params.userId 
+
+  if (req.query.userId) userId = req.query.userId 
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+
+    let userCourses = await Users.getMysqlProduction(`
+          SELECT default_status, course_id, user_course_id as id
+          FROM user_courses 
+          WHERE user_id=${userId}
+          ORDER BY last_modified DESC
+        `)
+
+    let returnedData = []
+    for(let i=0; i < userCourses.length; i++) {
+      let courseData = userCourses[i]
+      let course = (await Users.getMysqlProduction(`
+          SELECT channel_id, course_image, course_introduction, course_title, hash_code, course_id as id 
+          FROM course_detail 
+          WHERE course_id=${courseData.course_id}
+        `))[0]
+
+      courseData.course = course
+
+      returnedData.push(courseData)
+    }
+
+    Users.upsert({id:userId},{ userCourses: returnedData });
+
+    res.json(returnedData);
+  }
+  
+} 
+
+exports.history = async function(req, res, next) {
+    
+  let userId = req.session.userId
+  let limit = req.query.limit
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+
+    let userLessons = await Users.getMysqlProduction(`
+      SELECT saved, studied, v3_id, created_at as updatedAt
+      FROM user_contents 
+      WHERE user_id=${userId} AND lesson_type=0 AND studied=1
+      ORDER BY created_at DESC
+      LIMIT ${limit? limit : 10}
+    `)
+    let columns = res.app.locals.helpers.getLessonColumns()
+    columns[0] = "v3_id as id"
+
+    let retArr = []
+    for (let i=0; i < userLessons.length; i++) {
+      let userLesson = userLessons[i]
+      let lesson = (await Users.getMysqlProduction(`
+        SELECT ${columns.join(',')}  
+        FROM contents
+        WHERE v3_id='${userLesson.v3_id}'
+      `))[0];
+
+      lesson.saved = userLesson.saved
+      lesson.studied = userLesson.studied
+      // Lessons.upsert({id:lesson.id},lesson);
+      retArr.push(lesson)
+    }
+
+    Users.upsert({id:userId},{ history: retArr });
+
+    res.json(retArr)
+
+  }
+  
+} 
 
 exports.popularRecapLessons = async function(req, res, next) {
 
@@ -503,21 +651,6 @@ exports.popularRecapLessons = async function(req, res, next) {
     baseUrls.forEach((url) => relevantLogs.push(url + lesson))
   });
 
-  // let newLogs = await Logging.find({
-  //   where: {
-  //     id: {
-  //       '!=': 'NONE'
-  //     },
-  //     accesslog_url: {
-  //       in: relevantLogs
-  //     },
-  //     createdAt: {
-  //       '>': new Date(Date.now() - period * 24 * 60 * 60 * 1000)
-  //     }
-  //   },
-  //   select: ['id', 'accesslog_url']
-  // });
-
   console.log(relevantLogs);
 
   let newLogs = await Users.getMysqlLogging(`Select accesslog_user as id,accesslog_url From cp_accesslog 
@@ -527,25 +660,6 @@ exports.popularRecapLessons = async function(req, res, next) {
                                               `);
 
   newLogs.forEach((log) => log.lessonId = log.accesslog_url.split('lessonId=')[1]);
-
-  // let oldLogs = await Logging.find({
-  //   where: {
-  //     id: {
-  //       '!=': 'NONE'
-  //     },
-  //     accesslog_urlbase: {
-  //       'in': [
-  //         'https://chinesepod.com/lessons/api',
-  //         'https://ws.chinesepod.com:444/1.0.0/instances/prod/lessons/get-lesson-detail',
-  //         'https://server4.chinesepod.com:444/1.0.0/instances/prod/lessons/get-dialogue'
-  //       ]
-  //     },
-  //     createdAt: {
-  //       '>': new Date(Date.now() - period * 24 * 60 * 60 * 1000)
-  //     }
-  //   },
-  //   select: ['id', 'accesslog_url']
-  // });
 
   let oldLogs = await Users.getMysqlLogging(`Select accesslog_user as id,accesslog_url From cp_accesslog 
                                               WHERE accesslog_url IN ( 'https://chinesepod.com/lessons/api',
@@ -575,27 +689,50 @@ exports.popularRecapLessons = async function(req, res, next) {
     })
   });
 
-  // return returnList.sort((a, b) => b.views - a.views)
   res.json(returnList.sort((a, b) => b.views - a.views))
 }
 
-// DYNAMIC FUNCTION
-exports.serveAPI = async function(req, res, next) {
+exports.bookmarks = async function(req, res, next) {
 
-  // console.log("serve",req.headers)
-  let response = await userService.getRequestAPI(req, res, next)
-  console.log(response)
-  // return response;
-  if (response && response.status == 404){
-    res.json(response.statusText)
+  let userId = req.session.userId
+  let limit = req.query.limit
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+
+    let userLessons = await Users.getMysqlProduction(`
+      SELECT saved, studied, v3_id, created_at as updatedAt
+      FROM user_contents 
+      WHERE user_id=${userId} AND lesson_type=0 AND saved=1
+      ORDER BY created_at DESC
+      LIMIT ${limit? limit : 10}
+    `)
+    let columns = res.app.locals.helpers.getLessonColumns()
+    columns[0] = "v3_id as id"
+
+    let retArr = []
+    for (let i=0; i < userLessons.length; i++) {
+      let userLesson = userLessons[i]
+      let lesson = (await Users.getMysqlProduction(`
+        SELECT ${columns.join(',')}  
+        FROM contents
+        WHERE v3_id='${userLesson.v3_id}'
+      `))[0];
+
+      lesson.saved = userLesson.saved
+      lesson.studied = userLesson.studied
+      // Lessons.upsert({id:lesson.id},lesson);
+      retArr.push(lesson)
+    }
+
+    Users.upsert({id:userId},{ bookmarks: retArr });
+
+    res.json(retArr)
+
   }
-  else{
-    // TODO CREATE DYNAMIC FUNCTION TO DETERMINE EACH PATH AND SAVE TO CORRESPONDING COLLECTION
-    userService.recordServe(req, response)
-    // SEND API RESPONSE
-    // console.log(response)
-    res.json(response.data)
-  }
+
+
 
 }
   
