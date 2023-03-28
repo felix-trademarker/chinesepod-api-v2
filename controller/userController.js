@@ -406,7 +406,7 @@ exports.getSubscriptions = async function(req, res, next) {
       WHERE user_id=${userId} and next_billing_time > '${res.app.locals.moment().format()}'
     `);
 
-    console.log(subscriptions);
+    // console.log(subscriptions);
 
     let userSubs = []
 
@@ -420,7 +420,7 @@ exports.getSubscriptions = async function(req, res, next) {
         FROM Products
         WHERE product_id=${subscription.productId}
       `))[0]
-      console.log(product)
+      // console.log(product)
       subscription.product = product
 
       userSubs.push(subscription)
@@ -823,7 +823,7 @@ exports.allLessons = async function(req, res, next) {
           ${queryAddOn}
         `)
     
-    console.log(rawData);
+    // console.log(rawData);
     let cleanData = []
     for (let i=0; i < rawData.length; i++) { let lesson = rawData[i]
       lesson.userContents = await Users.getMysqlProduction(`
@@ -1056,7 +1056,7 @@ exports.getSuggestions = async function(req, res, next) {
   if (!userId) {
     res.json({err:'Invalid'})
   } else {
-    console.log("test");
+    // console.log("test");
     let userOptionsObj = await Users.getMysqlProduction(`
       SELECT * 
       FROM user_options 
@@ -1087,7 +1087,7 @@ exports.getSuggestions = async function(req, res, next) {
 
       let interests = userOptions.interests.split(', ')
 
-      console.log(interests)
+      // console.log(interests)
 
       let relevantCourseIds = []
 
