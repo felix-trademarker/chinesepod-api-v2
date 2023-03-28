@@ -13,7 +13,7 @@ exports.toObject = function(arr) {
 }
 
 exports.intToLevel = function(levelId) {
-  switch (levelId) {
+  switch (levelId*1) {
     case 1:
       return 'newbie';
     case 2:
@@ -30,6 +30,45 @@ exports.intToLevel = function(levelId) {
       return 'newbie'
   }
 }
+
+exports.oneLevelHigher = function(level) {
+
+  switch (level) {
+    case 'newbie':
+      return 'elementary';
+    case 'elementary':
+      return 'preInt';
+    case 'preInt':
+      return 'intermediate';
+    case 'intermediate':
+      return 'upperInt';
+    case 'upperInt':
+      return 'advanced';
+    case 'advanced':
+      return 'media';
+  }
+
+}
+
+exports.levelToChannelId = function(level) {
+  switch (level) {
+    case 'newbie':
+      return 34;
+    case 'elementary':
+      return 35;
+    case 'intermediate':
+      return 36;
+    case 'upperInt':
+      return 37;
+    case 'advanced':
+      return 38;
+    case 'preInt':
+      return 180;
+    default:
+      return '34';
+  }
+}
+
 
 exports.accessMap = function(level) {
   switch (level) {
@@ -79,3 +118,4 @@ exports.getLessonColumns = function(){
   ];
 
 }
+

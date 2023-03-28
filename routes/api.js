@@ -17,6 +17,14 @@ router.get('/dashboard/course-lessons', userController.courseLessons);
 router.get('/dashboard/user-courses', userController.userCourses);
 router.get('/dashboard/history', userController.history);
 router.get('/dashboard/bookmarks', userController.bookmarks);
+router.get('/dashboard/more-courses', userController.moreCourses);
+router.get('/dashboard/all-lessons', userController.allLessons);
+router.get('/dashboard/get-bookmarked-lessons', userController.getBookMarkedLessons);
+router.get('/dashboard/get-studied-lessons', userController.getStudiedLessons);
+router.get('/dashboard/all-courses', userController.allCourses);
+router.get('/dashboard/all-playlists', userController.allPlaylists);
+router.get('/dashboard/onboarding/questions', userController.onboardingQuestions);
+router.get('/dashboard/get-suggestions', userController.getSuggestions);
 
 
 router.get('/account/subscription/subscriptions', userController.getSubscriptions);
