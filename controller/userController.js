@@ -547,7 +547,7 @@ exports.userCourses = async function(req, res, next) {
       returnedData.push(courseData)
     }
 
-    Users.upsert({id:userId},{ userCourses: returnedData });
+    // Users.upsert({id:userId},{ userCourses: returnedData });
 
     res.json(returnedData);
   }
