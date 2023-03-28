@@ -4,7 +4,8 @@ let Lessons = require('../repositories/lessons')
 let crmUsersMongoAws = require('../repositories/crmUsersMongoAWS')
 let Subscriptions = require('../repositories/subscriptions')
 let _ = require('lodash')
-let axios = require('axios');
+const sanitizeHtml = require('sanitize-html')
+// let axios = require('axios');
 // const cookie = require('cookie');
 // var cookieParser = require('cookie-parser');
 
@@ -735,4 +736,472 @@ exports.bookmarks = async function(req, res, next) {
 
 
 }
+
+exports.moreCourses = async function(req, res, next) {
+
+  let userId = req.session.userId
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+
+    let userOptions = (await Users.getMysqlProduction(`Select option_value From user_options 
+                                                        WHERE user_id=${userId} 
+                                                        AND option_key='level'`))[0];
+
+    let levelInt = 1
+
+    if (userOptions && userOptions.option_value) {
+      levelInt = userOptions.option_value
+    }
+
+    let userLevel = res.app.locals.helpers.intToLevel(levelInt)
+    let levelHigher = res.app.locals.helpers.oneLevelHigher(userLevel)
+
+    let userCourses = await Users.getMysqlProduction(`
+          SELECT user_course_id as id, course_id as course
+          FROM user_courses 
+          WHERE user_id=${userId}
+          ORDER BY last_modified DESC
+        `)
+    let enrolledCourses = userCourses.map((course) => course.course)
+
+    let channelIds = [res.app.locals.helpers.levelToChannelId(userLevel), res.app.locals.helpers.levelToChannelId(levelHigher)]
+
+    let leveledCourses = await Users.getMysqlProduction(`
+          SELECT course_introduction, course_title, course_id as id 
+          FROM course_detail 
+          WHERE pubstatus=1 
+          AND is_private=0
+          AND order_id >= 1000
+          AND course_id NOT IN (${enrolledCourses.join(',')})
+          AND channel_id IN (${channelIds.join(',')})
+        `)
+
+        // console.log(leveledCourses);
+
+    leveledCourses.forEach((course) => {
+      course.course_introduction = sanitizeHtml(course.course_introduction, {
+        allowedTags: [],
+        allowedAttributes: {},
+      })
+    })
+
+    Users.upsert({id:userId},{ moreCourses: leveledCourses });
+
+    res.json(leveledCourses)
+  }
+
+}
+
+exports.allLessons = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  let queryAddOn = []
   
+  if (inputs && inputs.limit) {
+    queryAddOn.push("LIMIT " + inputs.limit)
+  }
+  if (inputs && inputs.skip) {
+    queryAddOn.push("OFFSET " + inputs.skip)
+  }
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+
+    let selectContents = res.app.locals.helpers.getLessonColumns()
+    selectContents[0] = 'v3_id as id'
+    let rawData = await Users.getMysqlProduction(`
+          SELECT ${selectContents}
+          FROM contents 
+          WHERE publication_timestamp <= '${new Date()}' 
+          AND status_published='publish'
+          ORDER BY publication_timestamp DESC
+          ${queryAddOn}
+        `)
+    
+    console.log(rawData);
+    let cleanData = []
+    for (let i=0; i < rawData.length; i++) { let lesson = rawData[i]
+      lesson.userContents = await Users.getMysqlProduction(`
+          SELECT *
+          FROM user_contents 
+          WHERE user_id=${userId} 
+          AND v3_id='${lesson.id}'
+        `)
+
+      if (lesson.userContents[0]) {
+        lesson.saved = lesson.userContents[0].saved
+          ? lesson.userContents[0].saved
+          : 0
+        lesson.studied = lesson.userContents[0].studied
+          ? lesson.userContents[0].studied
+          : 0
+        delete lesson.userContents
+        cleanData.push(lesson)
+      } else {
+        delete lesson.userContents
+        cleanData.push(lesson)
+      }
+    }
+
+    res.json(cleanData);
+  }
+
+}
+
+exports.getBookMarkedLessons = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  let queryAddOn = []
+  
+  if (inputs && inputs.limit) {
+    queryAddOn.push("LIMIT " + inputs.limit)
+  }
+  if (inputs && inputs.skip) {
+    queryAddOn.push("OFFSET " + inputs.skip)
+  }
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+    let count = (await Users.getMysqlProduction(`
+      SELECT COUNT(*) as count
+      FROM user_contents 
+      WHERE user_id=${userId} 
+      AND saved=1
+      AND lesson_type=0
+    `))[0]
+
+    let userLessons = await Users.getMysqlProduction(`
+      SELECT saved, studied, v3_id, created_at as updatedAt
+      FROM user_contents 
+      WHERE user_id=${userId} AND lesson_type=0 AND saved=1
+      ORDER BY created_at DESC
+      ${queryAddOn.join("\n")}
+    `)
+
+    let columns = res.app.locals.helpers.getLessonColumns()
+    columns[0] = "v3_id as id"
+
+    let retArr = []
+    for (let i=0; i < userLessons.length; i++) {
+      let userLesson = userLessons[i]
+      let lesson = (await Users.getMysqlProduction(`
+        SELECT ${columns.join(',')}  
+        FROM contents
+        WHERE v3_id='${userLesson.v3_id}'
+      `))[0];
+
+      lesson.saved = userLesson.saved
+      lesson.studied = userLesson.studied
+      // Lessons.upsert({id:lesson.id},lesson);
+      retArr.push(lesson)
+    }
+
+    Users.upsert({id:userId},{ bookmarkedLessons: retArr });
+
+    res.json({count: count.count, lessons: retArr})
+  }
+
+}
+
+exports.getStudiedLessons = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  let queryAddOn = []
+  
+  if (inputs && inputs.limit) {
+    queryAddOn.push("LIMIT " + inputs.limit)
+  }
+  if (inputs && inputs.skip) {
+    queryAddOn.push("OFFSET " + inputs.skip)
+  }
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+    let count = (await Users.getMysqlProduction(`
+      SELECT COUNT(*) as count
+      FROM user_contents 
+      WHERE user_id=${userId} 
+      AND studied=1
+      AND lesson_type=0
+    `))[0]
+
+    let userLessons = await Users.getMysqlProduction(`
+      SELECT saved, studied, v3_id, created_at as updatedAt
+      FROM user_contents 
+      WHERE user_id=${userId} AND lesson_type=0 AND studied=1
+      ORDER BY created_at DESC
+      ${queryAddOn.join("\n")}
+    `)
+
+    let columns = res.app.locals.helpers.getLessonColumns()
+    columns[0] = "v3_id as id"
+
+    let retArr = []
+    for (let i=0; i < userLessons.length; i++) {
+      let userLesson = userLessons[i]
+      let lesson = (await Users.getMysqlProduction(`
+        SELECT ${columns.join(',')}  
+        FROM contents
+        WHERE v3_id='${userLesson.v3_id}'
+      `))[0];
+
+      lesson.saved = userLesson.saved
+      lesson.studied = userLesson.studied
+      // Lessons.upsert({id:lesson.id},lesson);
+      retArr.push(lesson)
+    }
+
+    Users.upsert({id:userId},{ studiedLessons: retArr });
+
+    res.json({count: count.count, lessons: retArr})
+  }
+
+}
+
+exports.allCourses = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+    let courses = await Users.getMysqlProduction(`
+          SELECT channel_id, course_image, course_introduction, course_title, hash_code, course_id as id 
+          FROM course_detail 
+          WHERE pubstatus=1
+          AND is_private=0
+          AND order_id >= 1000
+          ORDER BY order_id DESC
+        `)
+    res.json(courses)
+  }
+
+}
+
+exports.allPlaylists = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+    let courses = await Users.getMysqlProduction(`
+          SELECT channel_id, course_image, course_introduction, course_title, hash_code, course_id as id 
+          FROM course_detail 
+          WHERE pubstatus=1
+          AND is_private=0
+          AND order_id >= 1000
+          ORDER BY order_id DESC
+        `)
+    res.json(courses)
+  }
+
+}
+
+exports.onboardingQuestions = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  const questions = require('../lib/onboarding.json')
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+    let userOptions = await Users.getMysqlProduction(`
+      SELECT * 
+      FROM user_options 
+      WHERE user_id=${userId}
+    `)
+    let userOptionsArr = {}
+    for (let i=0; i < userOptions.length; i++) { let entry = userOptions[i]
+      userOptionsArr[entry.option_key] = entry.option_value
+    }
+
+    let toAsk = []
+
+    questions.forEach((question) => {
+      if (!userOptionsArr[question.key]) {
+        toAsk.push(question)
+      }
+    })
+
+    res.json({
+      completeness: (questions.length - toAsk.length) / questions.length,
+      questions: toAsk,
+    })
+
+  }
+
+}
+
+exports.getSuggestions = async function(req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
+    console.log("test");
+    let userOptionsObj = await Users.getMysqlProduction(`
+      SELECT * 
+      FROM user_options 
+      WHERE user_id=${userId}
+    `)
+
+    let userOptions = {}
+    for (let i=0; i < userOptionsObj.length; i++) { let entry = userOptionsObj[i]
+      userOptions[entry.option_key] = entry.option_value
+    }
+    // console.log(userOptions.interests);
+
+    // STOP IF NO USER INTERESTS
+    // if (!userOptions.interests) {
+    //   res.json({})
+    // }
+
+    // //STOP IF NO USER LEVEL
+    // if (!userOptions.level) {
+    //   res.json({})
+    // }
+
+    if (!userOptions.level || !userOptions.interests) {
+      res.json({})
+    } else {
+
+      let level = res.app.locals.helpers.intToLevel(userOptions.level)
+
+      let interests = userOptions.interests.split(', ')
+
+      console.log(interests)
+
+      let relevantCourseIds = []
+
+      let logic = {
+        business: function businessSuggestions(level) {
+          switch (level) {
+            case 'newbie':
+            case 'elementary':
+              return [927, 37]
+            case 'preInt':
+            case 'intermediate':
+              return [965, 36, 22]
+            case 'upperInt':
+            case 'advanced':
+              return [38, 925, 926]
+            default:
+              return []
+          }
+        },
+
+        sports: function sportsSuggestions(level) {
+          return [918, 931]
+        },
+
+        movies: function moviesSuggestions(level) {
+          switch (level) {
+            case 'newbie':
+            case 'elementary':
+            case 'preInt':
+            case 'intermediate':
+              return [930]
+            case 'upperInt':
+              return [967]
+            case 'advanced':
+              return [968]
+            default:
+              return []
+          }
+        },
+
+        technology: function technologySuggestions(level) {
+          switch (level) {
+            case 'newbie':
+            case 'elementary':
+              return [969]
+            case 'preInt':
+            case 'intermediate':
+              return [970]
+            case 'upperInt':
+              return [971]
+            case 'advanced':
+              return [972]
+            default:
+              return []
+          }
+        },
+
+        history: function historySuggestions(level) {
+          switch (level) {
+            case 'upperInt':
+            case 'advanced':
+              return [973]
+            default:
+              return []
+          }
+        },
+
+        literature: function literatureSuggestions(level) {
+          switch (level) {
+            case 'newbie':
+            case 'elementary':
+              return [963, 962]
+            case 'preInt':
+            case 'intermediate':
+              return [963, 962, 966]
+            case 'upperInt':
+              return [974]
+            case 'advanced':
+              return [975]
+            default:
+              return []
+          }
+        },
+      }
+
+      interests.forEach((interest) => {
+        relevantCourseIds = relevantCourseIds.concat(logic[interest](level))
+      })
+
+      let userCourses = await Users.getMysqlProduction(`
+            SELECT default_status, course_id, user_course_id as id
+            FROM user_courses
+            WHERE user_id=${userId}
+          `)
+      let relevantCourses = await Users.getMysqlProduction(`
+          SELECT course_introduction, course_title, course_id as id 
+          FROM course_detail 
+          WHERE pubstatus=1
+          AND is_private=0
+          AND course_id IN (${relevantCourseIds})
+          AND course_id NOT IN (${userCourses.map((course) => course.course)})
+        `)
+
+      res.json({
+        suggestions: relevantCourses.length > 0,
+        courses: relevantCourses,
+      })
+    }
+
+  }
+
+}
+
+
+
+
+

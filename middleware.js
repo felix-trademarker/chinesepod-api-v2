@@ -19,29 +19,25 @@ exports.checkAuth = async function(req, res, next){
     }
 
     if (!req.session.token) {
-        var options = {
-            'headers': {
-              'Cookie': req.headers.cookie
-            }
-          };
-          let url = 'https://www.chinesepod.com/api/v1/entrance/get-user'
-        
-          let currentUser = await axios.get(url,options)
-        //   console.log(currentUser)
-          req.session.token = currentUser.data.token
-          req.session.userId= currentUser.data.userId
+
+        var token = req.headers.authorization.replace("Bearer ","")
+        var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+
+        if (token) {
+            req.session.token = token
+            req.session.userId= jsonPayload.data.userId
+        }
+
     }
+
+    if (req.query) {
+        req.session.inputs = req.query
+    }
+
+
 
     next()
 }
 
-exports.getCurrentUser = async function(req, res, next){
-    
-    // let currentUser = await fetch('https://www.chinesepod.com/api/v1/entrance/get-user')
-    let currentUser = req.session;
-
-    return currentUser;
-
-}
 
 

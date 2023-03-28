@@ -1,0 +1,167 @@
+[
+  {
+    "id": 1,
+    "key": "level",
+    "multipleChoice": false,
+    "branching": false,
+    "question": "What's Your Chinese Proficiency?",
+    "answers": [
+      {
+        "label": "newbie",
+        "id": 1,
+        "description": "Trying to learn some survival Chinese"
+      },
+      {
+        "label": "elementary",
+        "id": 2,
+        "description": "Trying to have basic conversations in Chinese"
+      },
+      {
+        "label": "pre-intermediate",
+        "id": 6,
+        "description": "You have the basics, but need to build up vocabulary."
+      },
+      {
+        "label": "intermediate",
+        "id": 3,
+        "description": ""
+      },
+      {
+        "label": "upper-intermediate",
+        "id": 4,
+        "description": ""
+      },
+      {
+        "label": "advanced",
+        "id": 5,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "key": "studyMethod",
+    "multipleChoice": false,
+    "branching": false,
+    "question": "How Do You Prefer to Study?",
+    "answers": [
+      {
+        "label": "podcast",
+        "id": "podcast",
+        "description": "Listening to Podcasts"
+      },
+      {
+        "label": "video",
+        "id": "video",
+        "description": "Watching Videos"
+      },
+      {
+        "label": "both",
+        "id": "both",
+        "description": "Both Podcasts and Videos"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "key": "studyAmount",
+    "multipleChoice": false,
+    "branching": false,
+    "question": "How much time do you spend on Chinese per week?",
+    "answers": [
+      {
+        "label": "<1 hour",
+        "id": 1,
+        "description": "Lessons about Chinese Business culture and vocabulary"
+      },
+      {
+        "label": "few hours",
+        "id": 2,
+        "description": "Lessons about sports in China and sports vocabulary"
+      },
+      {
+        "label": "5+ hours",
+        "id": 3,
+        "description": "Lessons about China tech and technological vocabulary"
+      },
+      {
+        "label": "10+ hours",
+        "id": 4,
+        "description": "Lessons about Chinese literature and traditional culture"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "key": "studyHistory",
+    "multipleChoice": false,
+    "branching": false,
+    "question": "How long have you been learning Chinese?",
+    "answers": [
+      {
+        "label": "0-3 months",
+        "id": 1,
+        "description": "0-3 months"
+      },
+      {
+        "label": "<1 yr",
+        "id": 2,
+        "description":  "<1 year"
+      },
+      {
+        "label": "1-2 yr",
+        "id": 3,
+        "description": "1-2 yr"
+      },
+      {
+        "label": "2-4 yr",
+        "id": 4,
+        "description": "2-4 yr"
+      },
+      {
+        "label": "4+ yr",
+        "id": 5,
+        "description": "4+ yr"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "key": "interests",
+    "multipleChoice": true,
+    "branching": false,
+    "question": "What topics are you interested in?",
+    "answers": [
+      {
+        "label": "business",
+        "id": "business",
+        "description": "Lessons about Chinese Business culture and vocabulary"
+      },
+      {
+        "label": "sports",
+        "id": "sports",
+        "description": "Lessons about sports in China and sports vocabulary"
+      },
+      {
+        "label": "technology",
+        "id": "technology",
+        "description": "Lessons about China tech and technological vocabulary"
+      },
+      {
+        "label": "literature",
+        "id": "literature",
+        "description": "Lessons about Chinese literature"
+      },
+      {
+        "label": "movies",
+        "id": "movies",
+        "description": "Lessons about Chinese movies and movie culture in China"
+      },
+      {
+        "label": "history",
+        "id": "history",
+        "description": "Lessons about Chinese history"
+      }
+    ]
+  }
+]
