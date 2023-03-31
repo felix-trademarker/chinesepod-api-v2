@@ -1,6 +1,7 @@
 let userService = require('../services/userService')
 let Users = require('../repositories/users')
 let Lessons = require('../repositories/lessons')
+let Course = require('../repositories/courses')
 let crmUsersMongoAws = require('../repositories/crmUsersMongoAWS')
 let Subscriptions = require('../repositories/subscriptions')
 let _ = require('lodash')
@@ -547,7 +548,7 @@ exports.userCourses = async function(req, res, next) {
       returnedData.push(courseData)
     }
 
-    // Users.upsert({id:userId},{ userCourses: returnedData });
+    Users.upsert({id:userId},{ userCourses: returnedData });
 
     res.json(returnedData);
   }
@@ -584,7 +585,6 @@ exports.history = async function(req, res, next) {
 
       lesson.saved = userLesson.saved
       lesson.studied = userLesson.studied
-      // Lessons.upsert({id:lesson.id},lesson);
       retArr.push(lesson)
     }
 
@@ -723,8 +723,8 @@ exports.bookmarks = async function(req, res, next) {
 
       lesson.saved = userLesson.saved
       lesson.studied = userLesson.studied
-      // Lessons.upsert({id:lesson.id},lesson);
       retArr.push(lesson)
+      Lessons.upsert({id:lesson.id},lesson)
     }
 
     Users.upsert({id:userId},{ bookmarks: retArr });
@@ -846,6 +846,8 @@ exports.allLessons = async function(req, res, next) {
         delete lesson.userContents
         cleanData.push(lesson)
       }
+
+      // Lessons.upsert({id:lesson.id},rawData[i])
     }
 
     res.json(cleanData);
@@ -900,7 +902,6 @@ exports.getBookMarkedLessons = async function(req, res, next) {
 
       lesson.saved = userLesson.saved
       lesson.studied = userLesson.studied
-      // Lessons.upsert({id:lesson.id},lesson);
       retArr.push(lesson)
     }
 
@@ -958,7 +959,6 @@ exports.getStudiedLessons = async function(req, res, next) {
 
       lesson.saved = userLesson.saved
       lesson.studied = userLesson.studied
-      // Lessons.upsert({id:lesson.id},lesson);
       retArr.push(lesson)
     }
 
@@ -985,6 +985,11 @@ exports.allCourses = async function(req, res, next) {
           AND order_id >= 1000
           ORDER BY order_id DESC
         `)
+
+    // courses.forEach(course => {
+    //   console.log(course)
+    //   Course.upsert({id:course.id});
+    // })
     res.json(courses)
   }
 
