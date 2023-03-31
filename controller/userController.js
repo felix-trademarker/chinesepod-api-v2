@@ -847,7 +847,7 @@ exports.allLessons = async function(req, res, next) {
         cleanData.push(lesson)
       }
 
-      // Lessons.upsert({id:lesson.id},rawData[i])
+      Lessons.upsert({id:lesson.id},rawData[i])
     }
 
     res.json(cleanData);
@@ -986,10 +986,10 @@ exports.allCourses = async function(req, res, next) {
           ORDER BY order_id DESC
         `)
 
-    // courses.forEach(course => {
-    //   console.log(course)
-    //   Course.upsert({id:course.id});
-    // })
+    courses.forEach(course => {
+      // console.log(course)
+      Course.upsert({id:course.id},course);
+    })
     res.json(courses)
   }
 

@@ -1,4 +1,4 @@
-let _table = "users.api";
+let _table = "api.users";
 var Model = require('./_model158')
 var defaultModel = new Model(_table)
 
