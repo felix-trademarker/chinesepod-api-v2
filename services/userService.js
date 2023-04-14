@@ -48,6 +48,15 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       }
 }
 
+exports.getUser = async function(userId) {
+    
+    
+  let user = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
+
+  return user;
+
+}
+
 exports.migrateSession = async function() {
   console.log("migration called");
 
