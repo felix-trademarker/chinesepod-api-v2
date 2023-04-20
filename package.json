@@ -19,6 +19,7 @@
     "email-templates": "^10.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
+    "geoip-country": "^4.1.50",
     "geoip-lite": "^1.4.6",
     "lodash.capitalize": "^4.2.1",
     "mailgun-js": "^0.22.0",

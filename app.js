@@ -52,7 +52,7 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   var apiRouter = require('./routes/api');
   app.use('/api/v2',middleware.checkAuth, apiRouter);
 
-  // userService.migrateSession()
+  // userService.udpateLessonFiles()
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {

@@ -5,6 +5,8 @@ exports.checkAuth = async function(req, res, next){
     console.log(">>", req.originalUrl);
     let path = req.originalUrl.replace("v2", "v1")
 
+    req.session.inputs = req.params
+
     if (req.params.userId) {
         req.session.userId = req.params.userId
     } else if (req.query.userId) {
