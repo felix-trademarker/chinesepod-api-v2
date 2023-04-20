@@ -1,5 +1,7 @@
 let Users = require('../repositories/users')
 let UsersApi = require('../repositories/users.api')
+let LessonFile = require('../repositories/lessonFiles')
+let Lesson = require('../repositories/lessons')
 
 let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
 let UserPhpSession = require('../repositories/users.phpsession')
@@ -182,3 +184,42 @@ exports.recordServe = async function(req, response) {
 //     return err.response
 //   }
 // }
+
+// test
+exports.udpateLessonFiles = async function() {
+  let lessons = await Lesson.getMysqlProduction(`
+                SELECT v3_id as id, video
+                FROM contents 
+                WHERE video <> ''
+              `)
+
+  console.log(lessons.length);
+
+  // 6hmajyyou7.mp4
+  // let source = await LessonFile.findDynamoDB('srcVideo', 'eid339jkty.mp4', 1)
+  // console.log(source);
+
+  // return;
+  for (let i=0; i < lessons.length; i++) {
+    let lesson = lessons[i]
+
+    let source = (await LessonFile.findDynamoDB('srcVideo', lesson.video + '.mp4'))[0]
+
+    // source.id = lesson.id
+
+    let sourceData = {
+      id: lesson.id,
+      videoId: lesson.video,
+      srcVideo: source ? source.srcVideo : ''
+    }
+
+    if (!source)
+    sourceData.srcVideo = "https://d3glhinmyc42ep.cloudfront.net/2cc1a95f-a5b3-4642-b9e6-73823d3b7e9c/hls/"+lesson.video+".m3u8"
+
+    LessonFile.upsert({id: sourceData.id}, sourceData)
+    console.log(lesson.video,source)
+  }
+
+  console.log("-end-")
+
+}

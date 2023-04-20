@@ -347,11 +347,12 @@ exports.getLesson = async function(req, res, next) {
 
             // console.log("this", test);
             const assets = (
-              await LessonFiles.find('srcVideo', lesson.video + '.mp4', 1)
+              await LessonFiles.findQuery({id:lesson.id})
             )[0]
-
-            if (assets && assets.hlsUrl && assets.mp4Urls) {
-              lesson.sources['hls'] = { simplified: assets.hlsUrl }
+              
+            console.log(assets)
+            if (assets && assets.srcVideo) {
+              lesson.sources['hls'] = { simplified: assets.srcVideo }
               // lesson.sources['mp4'] = { simplified: assets.mp4Urls }
             }
           }
