@@ -1,20 +1,10 @@
-let _table = "api.lessons.source.hls";
+let _table = "api.lessons.new.sources";
 var Model = require('./_model158')
 var defaultModel = new Model(_table)
 
 let conn = require('../config/DbConnect');
 
-const AWS = require('aws-sdk');
-
-let config = {
-    accessKeyId: process.env.awsKey,
-    secretAccessKey: process.env.awsSecret,
-    region: 'us-east-1',
-}
-
-AWS.config.update(config);
-const docClient = new AWS.DynamoDB.DocumentClient();
-
+// module.exports = { baseModel.get }
 module.exports = {
 
     // BASE FUNCTIONS LOCATED IN defaultModel
@@ -63,47 +53,6 @@ module.exports = {
     
     // ADD CUSTOM FUNCTION BELOW ========================
     // ==================================================
-
-
-	findDynamoDB : async function(field,value){
-
-        const params = {
-            TableName: 'chinesepod-video-streaming',
-            FilterExpression: field+'=:video',
-            ExpressionAttributeValues: {
-                ':video': value
-            }
-        };
-        return new Promise(function(resolve, reject) {
-
-            docClient.scan(params, function (err, data) {
-
-                if (err) {
-                    reject(err);
-
-                } else {
-                    const { Items } = data;
-                    resolve(Items)
-                }
-            });
-        })
-
-    },
-
-    findAWSFile: async function(key) {
-
-        console.log("finding aws file");
-
-        const s3 = new AWS.S3();
-        const params = {Bucket: 'chinesepod-video-streaming-source-19hfqsxjwkkgv', Key: key}
-        const response = await s3.getObject(params).promise() // await the promise
-        // const fileContent = response.Body.toString('utf-8');
-
-        console.log("this",response)
-    }
-    
-    
-
 
 
 

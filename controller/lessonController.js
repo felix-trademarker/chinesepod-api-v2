@@ -3,6 +3,7 @@ let LessonsDialogue = require('../repositories/lessonDialogue')
 let LessonsVocabulary = require('../repositories/lessonVocabulary')
 let LessonsExpansion = require('../repositories/lessonExpansion')
 let LessonSources = require('../repositories/lessonSources')
+let LessonNewSources = require('../repositories/lessonNewSources')
 let LessonFiles = require('../repositories/lessonFiles')
 
 
@@ -350,7 +351,7 @@ exports.getLesson = async function(req, res, next) {
               await LessonFiles.findQuery({id:lesson.id})
             )[0]
               
-            console.log(assets)
+            // console.log(assets)
             if (assets && assets.srcVideo) {
               lesson.sources['hls'] = { simplified: assets.srcVideo }
               // lesson.sources['mp4'] = { simplified: assets.mp4Urls }
@@ -360,6 +361,14 @@ exports.getLesson = async function(req, res, next) {
           console.log(e)
           // sails.hooks.bugsnag.notify(e)
           // sails.log.error(e)
+        }
+
+        // check if no HLS / get new hls links
+        let newHls = (await LessonNewSources.findQuery({v3_id:lesson.id }))[0]
+
+        if (newHls) {
+          // set hls link to the new URL
+          lesson.sources['hls'] = { simplified: newHls.src }
         }
 
         if (
