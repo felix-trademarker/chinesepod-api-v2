@@ -52,7 +52,8 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   var apiRouter = require('./routes/api');
   app.use('/api/v2',middleware.checkAuth, apiRouter);
 
-  // userService.udpateLessonFiles()
+  // userService.udpateLessonFiles();
+  // userService.findAWSFile('0bv22rnq8c.mp4')
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {

@@ -213,8 +213,8 @@ exports.udpateLessonFiles = async function() {
       srcVideo: source ? source.srcVideo : ''
     }
 
-    if (!source)
-    sourceData.srcVideo = "https://d3glhinmyc42ep.cloudfront.net/2cc1a95f-a5b3-4642-b9e6-73823d3b7e9c/hls/"+lesson.video+".m3u8"
+    // if (!source)
+    // sourceData.srcVideo = "https://d3glhinmyc42ep.cloudfront.net/2cc1a95f-a5b3-4642-b9e6-73823d3b7e9c/hls/"+lesson.video+".m3u8"
 
     LessonFile.upsert({id: sourceData.id}, sourceData)
     console.log(lesson.video,source)
@@ -222,4 +222,8 @@ exports.udpateLessonFiles = async function() {
 
   console.log("-end-")
 
+}
+
+exports.findAWSFile = async function(key) {
+  let data = await LessonFile.findAWSFile(key);
 }
