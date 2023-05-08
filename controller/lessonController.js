@@ -805,6 +805,17 @@ exports.getExpansion = async function(req, res, next) {
   }
 }
 
+exports.getLessonURLNew = async function(req, res, next) {
+
+  let inputs = req.session.inputs
+
+  console.log(req.params.v3Id);
+  // console.log(req.body);
+  let newHls = (await LessonNewSources.findQuery({v3_id:req.params.v3Id }))[0]
+
+  res.json(newHls)
+}
+
 
 
 

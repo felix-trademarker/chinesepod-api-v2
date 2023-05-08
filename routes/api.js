@@ -38,9 +38,6 @@ router.get('/lessons/get-downloads', lessonController.getDownloads);
 router.get('/lessons/get-expansion', lessonController.getExpansion);
 
 
-
-
-
 router.get('/account/subscription/subscriptions', dashboardController.getSubscriptions);
 
 // BASED ON LIVE API

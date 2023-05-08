@@ -50,6 +50,8 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   console.log("APP RUNNING...");
 
   var apiRouter = require('./routes/api');
+  var apiRouter2 = require('./routes/apiCustom');
+  app.use('/api/v2/custom', apiRouter2);
   app.use('/api/v2',middleware.checkAuth, apiRouter);
 
   // userService.udpateLessonFiles();
