@@ -253,7 +253,7 @@ exports.getLesson = async function(req, res, next) {
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
                                     WHERE user_id=${userId} 
-                                    AND v3_id=${lesson.id}
+                                    AND v3_id='${lesson.id}'
                                     ORDER BY created_at DESC
                                     LIMIT ${inputs.limit ? inputs.limit : 10}
                                 `); 
