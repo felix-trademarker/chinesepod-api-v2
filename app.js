@@ -9,9 +9,11 @@ var bodyParser = require('body-parser')
 let middleware = require('./middleware')
 let userService = require('./services/userService')
 
+var cors = require('cors')
 
 var app = express();
 
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(cookieParser());
