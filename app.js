@@ -53,8 +53,13 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
 
   var apiRouter = require('./routes/api');
   var apiRouter2 = require('./routes/apiCustom');
+  var apiProxyRouter = require('./routes/proxy');
   app.use('/api/v2/custom', apiRouter2);
+  app.use('/api/v2/proxy', apiProxyRouter);
+
   app.use('/api/v2',middleware.checkAuth, apiRouter);
+
+
 
   // userService.udpateLessonFiles();
   // userService.findAWSFile('0bv22rnq8c.mp4')
