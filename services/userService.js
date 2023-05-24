@@ -82,11 +82,13 @@ exports.migrateSession = async function() {
 
 exports.getRequestAPI = async function(req, res, next) {
 
-  console.log("method",req.headers)
+  // console.log("method",req.headers)
   // console.log("method",req.params)
   try {
-    let path = req.originalUrl.replace("v2", "v1")
-    let url = res.app.locals.helpers.getDomain() + path
+    let path = req.originalUrl ? req.originalUrl.replace("v2", "v1") : req.originalUrl;
+    path = path.replace("proxy/","")
+    console.log(req.headers);
+    let url = "https://www.chinesepod.com" + path
 
     // clean auth string
     let token = req.headers.authorization 
@@ -96,16 +98,30 @@ exports.getRequestAPI = async function(req, res, next) {
       token = req.session.token
     }
 
-    var options = {
-      'method': req.method,
-      'url': url,
-      'headers': {
-        'Authorization': 'Bearer ' + token,
-        'Cookie': req.headers.cookie,
-        'Content-Type': 'text/plain; charset=utf-8',
-      },
-      'body': JSON.stringify(req.body) 
-    };
+    var options;
+
+    if (path == "/api/v1/entrance/get-user") {
+      options = {
+        'method': req.method,
+        'url': url,
+        'headers': {
+          'Cookie': req.headers.cookies,
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+        'redirect': 'follow'
+      };
+    } else {
+      options = {
+        'method': req.method,
+        'url': url,
+        'headers': {
+          'Authorization': 'Bearer ' + token,
+          'Cookie': req.headers.cookies,
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+        'body': JSON.stringify(req.body) 
+      };
+    }
 
     console.log("options",options);
 

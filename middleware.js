@@ -3,7 +3,7 @@ let axios = require('axios')
 exports.checkAuth = async function(req, res, next){
     
     console.log(">>", req.originalUrl);
-    let path = req.originalUrl.replace("v2", "v1")
+    let path = req.originalUrl ? req.originalUrl.replace("v2", "v1") : req.originalUrl;
 
     req.session.inputs = req.params
 
@@ -22,10 +22,13 @@ exports.checkAuth = async function(req, res, next){
 
     if (!req.session.token) {
 
-        var token = req.headers.authorization.replace("Bearer ","")
-        var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+        var token = req.headers.authorization ? req.headers.authorization.replace("Bearer ","") : []
+        
 
-        if (token) {
+        if (token && token.length > 0) {
+            console.log(token);
+            var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+
             req.session.token = token
             req.session.userId= jsonPayload.data.userId
         }
