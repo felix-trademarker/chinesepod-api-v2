@@ -276,7 +276,7 @@ exports.getLesson = async function(req, res, next) {
             : lessonRoot + lessonData.image
         )
       }
-      console.log("dialogue data", lessonData.mp3_dialogue);
+      // console.log("dialogue data", lessonData.mp3_dialogue);
       if (lessonData.mp3_dialogue) {
         if (lessonData.mp3_dialogue != 'mp3/') {
           lesson.mp3_dialogue = cleanLink(
@@ -388,7 +388,7 @@ exports.getLesson = async function(req, res, next) {
         }
       }
 
-      console.log("return dialogue", lesson.mp3_dialogue);
+      console.log("**return dialogue", lesson.mp3_dialogue);
 
       res.json(lesson)
     } else {
