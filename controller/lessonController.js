@@ -277,7 +277,7 @@ exports.getLesson = async function(req, res, next) {
         )
       }
       console.log("dialogue data", lessonData.mp3_dialogue);
-      if (lessonData.mp3_dialogue) {
+      if (lessonData.mp3_dialogue && lessonData.mp3_dialogue != 'mp3/') {
         lessonData.mp3_dialogue = cleanLink(
           lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
             ? lessonData.mp3_dialogue
