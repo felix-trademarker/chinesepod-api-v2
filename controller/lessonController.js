@@ -388,6 +388,8 @@ exports.getLesson = async function(req, res, next) {
         }
       }
 
+      console.log("return dialogue", lesson.mp3_dialogue);
+
       res.json(lesson)
     } else {
       throw 'invalid'
