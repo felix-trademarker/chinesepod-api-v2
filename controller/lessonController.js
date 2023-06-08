@@ -277,12 +277,17 @@ exports.getLesson = async function(req, res, next) {
         )
       }
       console.log("dialogue data", lessonData.mp3_dialogue);
-      if (lessonData.mp3_dialogue && lessonData.mp3_dialogue != 'mp3/') {
-        lesson.mp3_dialogue = cleanLink(
-          lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
-            ? lessonData.mp3_dialogue
-            : lessonRoot + lessonData.mp3_dialogue
-        )
+      if (lessonData.mp3_dialogue) {
+        if (lessonData.mp3_dialogue != 'mp3/') {
+          lesson.mp3_dialogue = cleanLink(
+            lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
+              ? lessonData.mp3_dialogue
+              : lessonRoot + lessonData.mp3_dialogue
+          )
+        } else {
+          lesson.mp3_dialogue = '';
+        }
+        
       }
       if (lessonData.mp3_public) {
         lesson.mp3_public = cleanLink(
