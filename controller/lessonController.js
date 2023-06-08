@@ -269,8 +269,8 @@ exports.getLesson = async function(req, res, next) {
       let lessonRoot = `https://s3contents.chinesepod.com/${
         lessonData.type === 'extra' ? 'extra/' : ''
       }${lessonData.id}/${lessonData.hash_code}/`
-      if (lessonData.image) {
-        lessonData.image = cleanLink(
+      if (lesson.image) {
+        lesson.image = cleanLink(
           lessonData.image && lessonData.image.startsWith('http')
             ? lessonData.image
             : lessonRoot + lessonData.image
@@ -278,42 +278,42 @@ exports.getLesson = async function(req, res, next) {
       }
       console.log("dialogue data", lessonData.mp3_dialogue);
       if (lessonData.mp3_dialogue && lessonData.mp3_dialogue != 'mp3/') {
-        lessonData.mp3_dialogue = cleanLink(
+        lesson.mp3_dialogue = cleanLink(
           lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
             ? lessonData.mp3_dialogue
             : lessonRoot + lessonData.mp3_dialogue
         )
       }
       if (lessonData.mp3_public) {
-        lessonData.mp3_public = cleanLink(
+        lesson.mp3_public = cleanLink(
           lessonData.mp3_public && lessonData.mp3_public.startsWith('http')
             ? lessonData.mp3_public
             : lessonRoot + lessonData.mp3_public
         )
       }
       if (lessonData.mp3_private) {
-        lessonData.mp3_private = cleanLink(
+        lesson.mp3_private = cleanLink(
           lessonData.mp3_private && lessonData.mp3_private.startsWith('http')
             ? lessonData.mp3_private
             : lessonRoot + lessonData.mp3_private
         )
       }
       if (lessonData.mp3_thefix) {
-        lessonData.mp3_thefix = cleanLink(
+        lesson.mp3_thefix = cleanLink(
           lessonData.mp3_thefix && lessonData.mp3_thefix.startsWith('http')
             ? lessonData.mp3_thefix
             : lessonRoot + lessonData.mp3_thefix
         )
       }
       if (lessonData.pdf1) {
-        lessonData.pdf1 = cleanLink(
+        lesson.pdf1 = cleanLink(
           lessonData.pdf1 && lessonData.pdf1.startsWith('http')
             ? lessonData.pdf1
             : lessonRoot + lessonData.pdf1
         )
       }
       if (lessonData.pdf2) {
-        lessonData.pdf2 = cleanLink(
+        lesson.pdf2 = cleanLink(
           lessonData.pdf2 && lessonData.pdf2.startsWith('http')
             ? lessonData.pdf2
             : lessonRoot + lessonData.pdf2
