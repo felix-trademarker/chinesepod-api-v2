@@ -409,8 +409,6 @@ exports.getLesson = async function(req, res, next) {
         }
       }
 
-      console.log("**return dialogue", lesson.mp3_dialogue);
-
       Lessons.upsert({id:lesson.id}, lesson);
 
       res.json(lesson)
@@ -548,10 +546,14 @@ exports.getDialogue = async function(req, res, next) {
 
     dialogueData.e = dialogueData.row_2
 
-    res.json( {
+    let returnedData = {
       speakers: speakers,
       dialogue: dialogueData,
-    })
+    }
+
+    Lessons.upsert({id:inputs.lessonId}, {dialogue: returnedData});
+
+    res.json( returnedData )
     
   }
 }
