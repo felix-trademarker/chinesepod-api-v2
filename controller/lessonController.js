@@ -411,6 +411,8 @@ exports.getLesson = async function(req, res, next) {
 
       console.log("**return dialogue", lesson.mp3_dialogue);
 
+      Lessons.upsert({id:lesson.id});
+
       res.json(lesson)
     } else {
       throw 'invalid'
