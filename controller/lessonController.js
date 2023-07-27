@@ -685,6 +685,7 @@ exports.getDownloads = async function(req, res, next) {
             : lessonRoot + lessonData.mp3_dialogue
         )
       }
+      console.log("=============== here >>");
       if (lessonData.mp3_thefix) {
         returnData.downloads.review = cleanLink(
           lessonData.mp3_thefix && lessonData.mp3_thefix.startsWith('http')
@@ -722,7 +723,7 @@ exports.getDownloads = async function(req, res, next) {
         )
       }
     }
-
+    console.log("=============== end here >>");
     Lessons.upsert({id:inputs.lessonId}, {downloads: returnData});
 
     res.json(returnData);
