@@ -597,9 +597,13 @@ exports.getVocab = async function(req, res, next) {
       await LessonsVocabulary.upsert({ id: word.id }, { ...word, lesson: word['v3_id'] })
     })
 
-    res.json(returnData.map((item) =>
-      _.pick(item, ['id', 's', 't', 'p', 'en', 'audio', 'vocabulary_class'])
-    ))
+    let returnedData = returnData.map((item) =>
+                          _.pick(item, ['id', 's', 't', 'p', 'en', 'audio', 'vocabulary_class'])
+                        );
+
+    Lessons.upsert({id:inputs.lessonId}, {vocabulary: returnedData});
+
+    res.json(returnedData)
   }
 }
 
