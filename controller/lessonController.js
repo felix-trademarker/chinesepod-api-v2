@@ -723,6 +723,8 @@ exports.getDownloads = async function(req, res, next) {
       }
     }
 
+    Lessons.upsert({id:inputs.lessonId}, {downloads: returnData});
+
     res.json(returnData);
   }
 }
@@ -838,6 +840,9 @@ exports.getExpansion = async function(req, res, next) {
         examples: groupedData[expansion],
       })
     })
+
+    Lessons.upsert({id:inputs.lessonId}, {expansion: returnData});
+
     res.json(returnData);
   }
 }
