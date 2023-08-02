@@ -729,6 +729,7 @@ exports.getDownloads = async function(req, res, next) {
       lessonId : inputs.lessonId,
       downloads: returnData
     }
+    console.log(saveData);
     LessonDownloads.upsert({lessonId:inputs.lessonId}, saveData);
 
     res.json(returnData);
