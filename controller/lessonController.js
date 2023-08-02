@@ -5,6 +5,7 @@ let LessonsExpansion = require('../repositories/lessonExpansion')
 let LessonSources = require('../repositories/lessonSources')
 let LessonNewSources = require('../repositories/lessonNewSources')
 let LessonFiles = require('../repositories/lessonFiles')
+let LessonDownloads = require('../repositories/lessonDownloads')
 
 
 let userService = require('../services/userService')
@@ -724,7 +725,11 @@ exports.getDownloads = async function(req, res, next) {
       }
     }
     console.log("=============== end here >>");
-    Lessons.upsert({id:inputs.lessonId}, {downloads: returnData});
+    let saveData = {
+      lessonId : inputs.lessonId,
+      downloads: returnData
+    }
+    LessonDownloads.upsert({lessonId:inputs.lessonId}, saveData);
 
     res.json(returnData);
   }
