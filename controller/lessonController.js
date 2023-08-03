@@ -609,7 +609,7 @@ exports.getVocab = async function(req, res, next) {
 }
 
 exports.getDownloads = async function(req, res, next) {
-
+console.log('dl');
   let response = await userService.getRequestAPI(req, res, next)
   let userId = req.session.userId
   let inputs = req.session.inputs
@@ -729,7 +729,7 @@ exports.getDownloads = async function(req, res, next) {
   //   console.log("=============== end here >>");
     let saveData = response
     saveData.lessonId = inputs.lessonId
-  //   console.log(saveData);
+    console.log(saveData);
     LessonDownloads.upsert({lessonId:inputs.lessonId}, saveData);
 
     res.json(response);
