@@ -87,7 +87,7 @@ exports.getRequestAPI = async function(req, res, next) {
   try {
     let path = req.originalUrl ? req.originalUrl.replace("v2", "v1") : req.originalUrl;
     path = path.replace("proxy/","")
-    console.log(req.headers);
+    // console.log(req.headers);
     let url = "https://www.chinesepod.com" + path
 
     // clean auth string
@@ -123,7 +123,7 @@ exports.getRequestAPI = async function(req, res, next) {
       };
     }
 
-    console.log("options",options);
+    // console.log("options",options);
 
 
     // CHECK REQUEST TYPE
