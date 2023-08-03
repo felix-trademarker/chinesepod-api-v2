@@ -611,8 +611,8 @@ exports.getVocab = async function(req, res, next) {
 exports.getDownloads = async function(req, res, next) {
 
   let response = await userService.getRequestAPI(req, res, next)
-  // let userId = req.session.userId
-  // let inputs = req.session.inputs
+  let userId = req.session.userId
+  let inputs = req.session.inputs
 
   // let queryAddOn = []
   
