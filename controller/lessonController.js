@@ -609,129 +609,131 @@ exports.getVocab = async function(req, res, next) {
 }
 
 exports.getDownloads = async function(req, res, next) {
-  let userId = req.session.userId
-  let inputs = req.session.inputs
 
-  let queryAddOn = []
+  let response = await userService.getRequestAPI(req, res, next)
+  // let userId = req.session.userId
+  // let inputs = req.session.inputs
+
+  // let queryAddOn = []
   
-  if (inputs && inputs.limit) {
-    queryAddOn.push("LIMIT " + inputs.limit)
-  }
-  if (inputs && inputs.skip) {
-    queryAddOn.push("OFFSET " + inputs.skip)
-  }
+  // if (inputs && inputs.limit) {
+  //   queryAddOn.push("LIMIT " + inputs.limit)
+  // }
+  // if (inputs && inputs.skip) {
+  //   queryAddOn.push("OFFSET " + inputs.skip)
+  // }
 
-  if (!userId) {
-    res.json({err:'Invalid'})
-  } else {
+  // if (!userId) {
+  //   res.json({err:'Invalid'})
+  // } else {
 
-    const cleanLink = (link) => {
-      if (!link) {
-        return ''
-      }
-      link = link.replace('http:', 'https:')
-      return link
-    }
+  //   const cleanLink = (link) => {
+  //     if (!link) {
+  //       return ''
+  //     }
+  //     link = link.replace('http:', 'https:')
+  //     return link
+  //   }
 
-    // let access = await sails.helpers.users.getAccessType(inputs.userId)
+  //   // let access = await sails.helpers.users.getAccessType(inputs.userId)
 
-    let accessInfo = await userService.getAccessTypeAndExpiry(userId)
-    let access = accessInfo.type
+  //   let accessInfo = await userService.getAccessTypeAndExpiry(userId)
+  //   let access = accessInfo.type
 
-    let user = await userService.getUser(userId)
+  //   let user = await userService.getUser(userId)
 
-    if (
-      user &&
-      user.email &&
-      user.email.split('@')[1] === 'chinesepod.com'
-    ) {
-      access = 'premium'
-    }
+  //   if (
+  //     user &&
+  //     user.email &&
+  //     user.email.split('@')[1] === 'chinesepod.com'
+  //   ) {
+  //     access = 'premium'
+  //   }
 
-    let lessonData = (await Lessons.getMysqlProduction(`
-                        SELECT *
-                        FROM contents 
-                        WHERE v3_id='${inputs.lessonId}'
-                      `))[0]
+  //   let lessonData = (await Lessons.getMysqlProduction(`
+  //                       SELECT *
+  //                       FROM contents 
+  //                       WHERE v3_id='${inputs.lessonId}'
+  //                     `))[0]
 
-    let returnData = {
-      type: access,
-      downloads: {},
-    }
+  //   let returnData = {
+  //     type: access,
+  //     downloads: {},
+  //   }
 
-    let lessonRoot = `https://s3.amazonaws.com/chinesepod.com/${
-      lessonData.type === 'extra' ? 'extra/' : ''
-    }${lessonData.id}/${lessonData.hash_code}/`
+  //   let lessonRoot = `https://s3.amazonaws.com/chinesepod.com/${
+  //     lessonData.type === 'extra' ? 'extra/' : ''
+  //   }${lessonData.id}/${lessonData.hash_code}/`
 
-    if (access === 'premium' || access === 'admin') {
-      if (lessonData.video) {
-        const awsSources = (
-          await LessonFiles.find('srcVideo', lessonData.video + '.mp4'))[0]
+  //   if (access === 'premium' || access === 'admin') {
+  //     if (lessonData.video) {
+  //       const awsSources = (
+  //         await LessonFiles.find('srcVideo', lessonData.video + '.mp4'))[0]
         
-        if (awsSources && awsSources['mp4Urls']) {
-          returnData.downloads.video = awsSources['mp4Urls'][0]
-        }
-      }
-      if (lessonData.mp3_private) {
-        returnData.downloads.lesson = cleanLink(
-          lessonData.mp3_private && lessonData.mp3_private.startsWith('http')
-            ? lessonData.mp3_private
-            : lessonRoot + lessonData.mp3_private
-        )
-      }
-      if (lessonData.mp3_dialogue) {
-        returnData.downloads.dialogue = cleanLink(
-          lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
-            ? lessonData.mp3_dialogue
-            : lessonRoot + lessonData.mp3_dialogue
-        )
-      }
-      console.log("=============== here >>");
-      if (lessonData.mp3_thefix) {
-        returnData.downloads.review = cleanLink(
-          lessonData.mp3_thefix && lessonData.mp3_thefix.startsWith('http')
-            ? lessonData.mp3_thefix
-            : lessonRoot + lessonData.mp3_thefix
-        )
-      }
-      if (lessonData.pdf1) {
-        returnData.downloads.pdf1 = cleanLink(
-          lessonData.pdf1 && lessonData.pdf1.startsWith('http')
-            ? lessonData.pdf1
-            : lessonRoot + lessonData.pdf1
-        )
-      }
-      if (lessonData.pdf2) {
-        returnData.downloads.pdf2 = cleanLink(
-          lessonData.pdf2 && lessonData.pdf2.startsWith('http')
-            ? lessonData.pdf2
-            : lessonRoot + lessonData.pdf2
-        )
-      }
-    } else if (access === 'basic') {
-      if (lessonData.pdf1) {
-        returnData.downloads.pdf1 = cleanLink(
-          lessonData.pdf1 && lessonData.pdf1.startsWith('http')
-            ? lessonData.pdf1
-            : lessonRoot + lessonData.pdf1
-        )
-      }
-      if (lessonData.pdf2) {
-        returnData.downloads.pdf2 = cleanLink(
-          lessonData.pdf2 && lessonData.pdf2.startsWith('http')
-            ? lessonData.pdf2
-            : lessonRoot + lessonData.pdf2
-        )
-      }
-    }
-    console.log("=============== end here >>");
-    let saveData = returnData
+  //       if (awsSources && awsSources['mp4Urls']) {
+  //         returnData.downloads.video = awsSources['mp4Urls'][0]
+  //       }
+  //     }
+  //     if (lessonData.mp3_private) {
+  //       returnData.downloads.lesson = cleanLink(
+  //         lessonData.mp3_private && lessonData.mp3_private.startsWith('http')
+  //           ? lessonData.mp3_private
+  //           : lessonRoot + lessonData.mp3_private
+  //       )
+  //     }
+  //     if (lessonData.mp3_dialogue) {
+  //       returnData.downloads.dialogue = cleanLink(
+  //         lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
+  //           ? lessonData.mp3_dialogue
+  //           : lessonRoot + lessonData.mp3_dialogue
+  //       )
+  //     }
+  //     console.log("=============== here >>");
+  //     if (lessonData.mp3_thefix) {
+  //       returnData.downloads.review = cleanLink(
+  //         lessonData.mp3_thefix && lessonData.mp3_thefix.startsWith('http')
+  //           ? lessonData.mp3_thefix
+  //           : lessonRoot + lessonData.mp3_thefix
+  //       )
+  //     }
+  //     if (lessonData.pdf1) {
+  //       returnData.downloads.pdf1 = cleanLink(
+  //         lessonData.pdf1 && lessonData.pdf1.startsWith('http')
+  //           ? lessonData.pdf1
+  //           : lessonRoot + lessonData.pdf1
+  //       )
+  //     }
+  //     if (lessonData.pdf2) {
+  //       returnData.downloads.pdf2 = cleanLink(
+  //         lessonData.pdf2 && lessonData.pdf2.startsWith('http')
+  //           ? lessonData.pdf2
+  //           : lessonRoot + lessonData.pdf2
+  //       )
+  //     }
+  //   } else if (access === 'basic') {
+  //     if (lessonData.pdf1) {
+  //       returnData.downloads.pdf1 = cleanLink(
+  //         lessonData.pdf1 && lessonData.pdf1.startsWith('http')
+  //           ? lessonData.pdf1
+  //           : lessonRoot + lessonData.pdf1
+  //       )
+  //     }
+  //     if (lessonData.pdf2) {
+  //       returnData.downloads.pdf2 = cleanLink(
+  //         lessonData.pdf2 && lessonData.pdf2.startsWith('http')
+  //           ? lessonData.pdf2
+  //           : lessonRoot + lessonData.pdf2
+  //       )
+  //     }
+  //   }
+  //   console.log("=============== end here >>");
+    let saveData = response
     saveData.lessonId = inputs.lessonId
-    console.log(saveData);
+  //   console.log(saveData);
     LessonDownloads.upsert({lessonId:inputs.lessonId}, saveData);
 
-    res.json(returnData);
-  }
+    res.json(response);
+  // }
 }
 
 exports.getExpansion = async function(req, res, next) {
