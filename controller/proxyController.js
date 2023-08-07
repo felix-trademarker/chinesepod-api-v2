@@ -7,15 +7,20 @@ exports.serveAPI = async function(req, res, next) {
 
   // console.log(req)
   let response = await userService.getRequestAPI(req, res, next)
-
+  // console.log(response);
   let path = req.originalUrl.replace("v2", "v1")
 
   // let modelObj = helpers.getCollectionFromUrl(path)
 
   console.log(path);
   let uri = path.split("/")
-  let reqName = (uri[uri.length - 1].split("?"))[0]
-  let lessonId = (uri[uri.length - 1].split("?"))[1].split("=")[1]
+  let reqRoute = (uri[uri.length - 1].split("?"))
+  let reqName = reqRoute[0]
+  let lessonId = ""
+  if (reqRoute.length > 1) {
+    let lessonData = reqRoute[1].split("=")
+    lessonId = lessonData.length > 1 ? lessonData[1] : '';
+  }
   console.log(reqName, lessonId);
 
   if (reqName && lessonId) {

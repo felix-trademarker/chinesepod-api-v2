@@ -150,7 +150,7 @@ exports.getRequestAPI = async function(req, res, next) {
     return data
 
   } catch (err) {
-    console.log("API ERROR",err)
+    console.log("API ERROR")
     return err.response
   }
   
