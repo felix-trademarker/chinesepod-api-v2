@@ -52,7 +52,7 @@ exports.getInfo = async function(req, res, next) {
   if (!userId) {
     throw 'invalid'
   }
-  userId= "1210621"
+  // userId= "1210621"
   if(userId) {
     let returnData = {}
 
@@ -233,7 +233,7 @@ exports.getStats = async function(req, res, next) {
 
   if (req.params.userId) userId = req.params.userId 
 
-  userId= "1210621"
+  // userId= "1210621"
   let returnData = {}
 
   let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]

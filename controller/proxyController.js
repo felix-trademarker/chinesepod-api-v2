@@ -28,6 +28,7 @@ exports.serveAPI = async function(req, res, next) {
     let saveData = response.data
 
     if (reqName == "get-downloads") {
+      if(saveData.type == "premium")
       Lessons.upsert({id:lessonId},{downloads: saveData.downloads})
     } else if (reqName == "get-grammar") {
       Lessons.upsert({id:lessonId},{grammar: saveData})
