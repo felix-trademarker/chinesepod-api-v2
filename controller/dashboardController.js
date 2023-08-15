@@ -988,6 +988,9 @@ exports.allCourses = async function(req, res, next) {
 
     courses.forEach(course => {
       // console.log(course)
+      if (course && course.course_image) {
+        course.course_image = "/images/courses/"+course.id+"/"+course.course_image
+      }
       Course.upsert({id:course.id},course);
     })
     res.json(courses)
