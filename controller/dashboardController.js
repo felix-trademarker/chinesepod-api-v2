@@ -992,7 +992,6 @@ exports.allCourses = async function(req, res, next) {
           SELECT channel_title
           FROM channel_detail 
           WHERE channel_id=${course.channel_id}
-          ORDER BY order_id DESC
         `)
       if (channels && channels.length > 0) {
         course.channel_title = channels[0].channel_title
