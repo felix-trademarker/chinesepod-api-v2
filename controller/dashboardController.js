@@ -986,7 +986,7 @@ exports.allCourses = async function(req, res, next) {
           ORDER BY order_id DESC
         `)
 
-    courses.forEach(course => {
+    courses.forEach( async (course) => {
       
       let channels = await Users.getMysqlProduction(`
           SELECT channel_title
