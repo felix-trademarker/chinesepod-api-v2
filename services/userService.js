@@ -243,3 +243,7 @@ exports.udpateLessonFiles = async function() {
 exports.findAWSFile = async function(key) {
   let data = await LessonFile.findAWSFile(key);
 }
+
+exports.cleanupRecords = function(obj) {
+  
+}

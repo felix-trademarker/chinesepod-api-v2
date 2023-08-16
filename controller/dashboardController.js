@@ -111,7 +111,7 @@ exports.getInfo = async function(req, res, next) {
           } catch (e) {}
         }
 
-        if (userData.email.split('@')[1] === 'chinesepod.com') {
+        if (false && userData.email.split('@')[1] === 'chinesepod.com') {
           // if (false) {
 
           access = 'premium'
@@ -987,7 +987,17 @@ exports.allCourses = async function(req, res, next) {
         `)
 
     courses.forEach(course => {
-      // console.log(course)
+      
+      let channels = await Users.getMysqlProduction(`
+          SELECT channel_title
+          FROM channel_detail 
+          WHERE channel_id=${course.channel_id}
+          ORDER BY order_id DESC
+        `)
+      if (channels && channels.length > 0) {
+        course.channel_title = channels[0].channel_title
+      }
+
       if (course && course.course_image) {
         course.course_image = "/images/courses/"+course.id+"/"+course.course_image
       }
