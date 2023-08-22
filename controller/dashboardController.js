@@ -373,8 +373,8 @@ exports.getStats = async function(req, res, next) {
   }
 
   // SAVE IN MONGO
-  userData.stats = retData
-  Users.upsert({id:userData.id},userData);
+  // userData.stats = retData
+  // Users.upsert({id:userData.id},userData);
 
   res.json(retData);
 }
