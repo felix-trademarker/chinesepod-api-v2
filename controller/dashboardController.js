@@ -212,7 +212,8 @@ exports.getInfo = async function(req, res, next) {
 
       // SAVE IN MONGO
       userData.info = contents
-      // Users.upsert({id:userData.id},userData);
+      Users.upsert({id:userData.id},userData);
+      console.log("API USER GET INFO");
 
 
       // console.log("contents", userData);
@@ -375,6 +376,7 @@ exports.getStats = async function(req, res, next) {
   // SAVE IN MONGO
   // userData.stats = retData
   // Users.upsert({id:userData.id},userData);
+  console.log("API USER GET STATS");
 
   res.json(retData);
 }
