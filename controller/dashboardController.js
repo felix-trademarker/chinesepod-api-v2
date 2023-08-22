@@ -212,7 +212,7 @@ exports.getInfo = async function(req, res, next) {
 
       // SAVE IN MONGO
       userData.info = contents
-      Users.upsert({id:userData.id},userData);
+      // Users.upsert({id:userData.id},userData);
 
 
       // console.log("contents", userData);
