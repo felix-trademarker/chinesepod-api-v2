@@ -214,6 +214,19 @@ exports.getInfo = async function(req, res, next) {
       userData.info = contents
       // cleanup records
       delete userData.admin_note
+      delete userData.age_id
+      delete userData.birthday
+      delete userData.ltsm
+      delete userData.ltv
+      delete userData.mailing_address1
+      delete userData.mailing_address2
+      delete userData.mailing_city
+      delete userData.mailing_country
+      delete userData.mailing_postal_code
+      delete userData.mailing_state
+      delete userData.msn
+
+
 
       Users.upsert({id:userData.id},userData);
       console.log("API USER GET INFO");
