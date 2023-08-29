@@ -111,7 +111,7 @@ exports.getInfo = async function(req, res, next) {
           } catch (e) {}
         }
 
-        if (false && userData.email.split('@')[1] === 'chinesepod.com') {
+        if (userData.email.split('@')[1] === 'chinesepod.com') {
           // if (false) {
 
           access = 'premium'
@@ -212,6 +212,9 @@ exports.getInfo = async function(req, res, next) {
 
       // SAVE IN MONGO
       userData.info = contents
+      // cleanup records
+      delete userData.admin_note
+
       Users.upsert({id:userData.id},userData);
       console.log("API USER GET INFO");
 
