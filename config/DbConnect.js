@@ -30,6 +30,7 @@ var conCpod2015 = mysql.createConnection({
 var redisClient = redis.createClient({
   host: process.env.REDISHOST,
   port: process.env.REDISPORT,
+  password: process.env.REDISPASS
 });
 
 
@@ -75,7 +76,7 @@ module.exports = {
 
     await redisClient.connect();
     return redisClient;
-    
+
   },
 
 
