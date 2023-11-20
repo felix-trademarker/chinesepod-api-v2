@@ -204,7 +204,8 @@ exports.getLesson = async function(req, res, next) {
     let lesson = await redisClientLesson.get(inputs.slug)
     // let lesson = {}
     // if has saved data get user info and return
-    if (lesson) {
+    console.log(lesson);
+    if (lesson && lesson.id != '123') {
 
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
