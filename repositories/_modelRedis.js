@@ -11,6 +11,7 @@ class Model{
             // console.log(this_.db.getRedisConn());
             let client = await this_.db.getRedisConn();
             let value = await client.get(this_.table+":"+key)
+            await client.disconnect();
             resolve(JSON.parse(value));
 
         });
@@ -21,8 +22,9 @@ class Model{
         return new Promise(async function(resolve, reject) {
 
             let client = await this_.db.getRedisConn();
-
-            resolve(await client.set(this_.table+":"+key, value));
+            let val = await client.set(this_.table+":"+key, value)
+            await client.disconnect();
+            resolve(val);
 
         });
     }

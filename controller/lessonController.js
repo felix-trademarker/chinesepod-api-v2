@@ -8,7 +8,7 @@ let LessonFiles = require('../repositories/lessonFiles')
 let LessonDownloads = require('../repositories/lessonDownloads')
 
 var ModelRedis = require('../repositories/_modelRedis')
-// let redisClientLesson = new ModelRedis('lessons')
+let redisClientLesson = new ModelRedis('lessons')
 
 let userService = require('../services/userService')
 
@@ -175,7 +175,7 @@ exports.getLesson = async function(req, res, next) {
 
   // test REDIS
   
-  // await redisClientLesson.set(inputs.slug, JSON.stringify({id:123,slug:inputs.slug}))
+  await redisClientLesson.set(inputs.slug, JSON.stringify({id:123,slug:inputs.slug}))
   
 
   if (!userId) {
@@ -207,30 +207,30 @@ exports.getLesson = async function(req, res, next) {
     }
 
     // fetch redis records here
-    // let lesson = await redisClientLesson.get(inputs.slug)
+    let lesson = await redisClientLesson.get(inputs.slug)
 
     // if has saved data get user info and return
-    // if (lesson) {
+    if (lesson) {
 
-    //   let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
-    //                                 From user_contents 
-    //                                 WHERE user_id=${userId} 
-    //                                 AND v3_id='${lesson.id}'
-    //                                 ORDER BY created_at DESC
-    //                                 LIMIT ${inputs.limit ? inputs.limit : 10}
-    //                             `); 
+      let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
+                                    From user_contents 
+                                    WHERE user_id=${userId} 
+                                    AND v3_id='${lesson.id}'
+                                    ORDER BY created_at DESC
+                                    LIMIT ${inputs.limit ? inputs.limit : 10}
+                                `); 
 
-    //   if (userLessons[0]) {
-    //     lesson.studied = userLessons[0].studied ? userLessons[0].studied : false
-    //     lesson.saved = userLessons[0].saved ? userLessons[0].saved : false
-    //   } else {
-    //     lesson.studied = false
-    //     lesson.saved = false
-    //   }
+      if (userLessons[0]) {
+        lesson.studied = userLessons[0].studied ? userLessons[0].studied : false
+        lesson.saved = userLessons[0].saved ? userLessons[0].saved : false
+      } else {
+        lesson.studied = false
+        lesson.saved = false
+      }
 
-    //   res.json(lesson)
+      res.json(lesson)
 
-    // }
+    }
 
     let lessonData = {}
     let columns = res.app.locals.helpers.getLessonColumns()
@@ -255,7 +255,7 @@ exports.getLesson = async function(req, res, next) {
 
     if (lessonData && lessonData.slug) {
 
-      let lesson = lessonData
+      lesson = lessonData
       lesson.introduction = sanitizeHtml(lesson.introduction, sanitizeOptions)
 
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
@@ -418,7 +418,7 @@ exports.getLesson = async function(req, res, next) {
       }
 
       Lessons.upsert({id:lesson.id}, lesson);
-      // await redisClientLesson.set(inputs.slug, JSON.stringify(lesson))
+      await redisClientLesson.set(inputs.slug, JSON.stringify(lesson))
 
       res.json(lesson)
     } else {
