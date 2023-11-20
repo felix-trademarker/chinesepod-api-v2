@@ -2,6 +2,7 @@ const MongoClient = require( 'mongodb' ).MongoClient;
 const mongoose = require('mongoose');
 const _variables = require( './variables' );
 var mysql = require('mysql');
+const redis = require('redis');
 
 var _db158,_dbAWS;
 
@@ -25,6 +26,13 @@ var conCpod2015 = mysql.createConnection({
     password: process.env.DBPASS,
     database: "chinesepod2015",
 });
+
+var redisClient = redis.createClient({
+  host: process.env.REDISHOST,
+  port: process.env.REDISPORT,
+});
+
+
 
 module.exports = {
 
@@ -61,7 +69,14 @@ module.exports = {
 
   getDbMySql2015: function() {
     return conCpod2015;
-  }
+  },
+
+  getRedisConn: async function() {
+
+    await redisClient.connect();
+    return redisClient;
+    
+  },
 
 
 };

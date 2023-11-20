@@ -7,6 +7,8 @@ let LessonNewSources = require('../repositories/lessonNewSources')
 let LessonFiles = require('../repositories/lessonFiles')
 let LessonDownloads = require('../repositories/lessonDownloads')
 
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClientLesson = new ModelRedis('lessons')
 
 let userService = require('../services/userService')
 
@@ -170,6 +172,12 @@ exports.getLesson = async function(req, res, next) {
   let userId = req.session.userId
   let inputs = req.session.inputs
 
+
+  // test REDIS
+  
+  
+  
+
   if (!userId) {
     res.json({err:'Invalid'})
   } else {
@@ -198,6 +206,32 @@ exports.getLesson = async function(req, res, next) {
       throw 'invalid'
     }
 
+    // fetch redis records here
+    let lesson = await redisClient.get(inputs.slug)
+
+    // if has saved data get user info and return
+    if (lesson) {
+
+      let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
+                                    From user_contents 
+                                    WHERE user_id=${userId} 
+                                    AND v3_id='${lesson.id}'
+                                    ORDER BY created_at DESC
+                                    LIMIT ${inputs.limit ? inputs.limit : 10}
+                                `); 
+
+      if (userLessons[0]) {
+        lesson.studied = userLessons[0].studied ? userLessons[0].studied : false
+        lesson.saved = userLessons[0].saved ? userLessons[0].saved : false
+      } else {
+        lesson.studied = false
+        lesson.saved = false
+      }
+
+      res.json(lesson)
+
+    }
+
     let lessonData = {}
     let columns = res.app.locals.helpers.getLessonColumns()
     columns[0] = "v3_id as id"
@@ -209,17 +243,9 @@ exports.getLesson = async function(req, res, next) {
         FROM contents 
         WHERE slug='${encodeURI(inputs.slug)}'
       `))[0]
-      // if (inputs.comments) {
-      //   lessonData = await LessonData.findOne({
-      //     slug: encodeURI(inputs.slug),
-      //   }).populate('comments', { where: { type: 'lesson' } })
-      // } else {
-      //   lessonData = await LessonData.findOne({ slug: encodeURI(inputs.slug) })
-      // }
+
     } else {
-      // lessonData = await LessonData.findOne({
-      //   id: inputs.lessonId,
-      // }).populate('comments', { where: { type: 'lesson' } })
+
       lessonData = (await Lessons.getMysqlProduction(`
         SELECT ${columns.join(',')}
         FROM contents 
@@ -229,28 +255,9 @@ exports.getLesson = async function(req, res, next) {
 
     if (lessonData && lessonData.slug) {
 
-      // try {
-      //   await LessonDataMongo.updateOrCreate(
-      //     { id: lessonData.id },
-      //     { ...lessonData }
-      //   )
-      // } catch (e) {
-      //   sails.hooks.bugsnag.notify(e)
-      // }
-
-      let lesson = lessonData
+      lesson = lessonData
       lesson.introduction = sanitizeHtml(lesson.introduction, sanitizeOptions)
-      // console.log(lesson)
-      // let userLessons = await UserContents.find({
-      //   where: {
-      //     lesson: lessonData.id,
-      //     user_id: inputs.userId,
-      //     lesson_type: 0,
-      //   },
-      //   select: ['lesson', 'saved', 'studied', 'updatedAt'], //  'title', 'slug', 'image', 'hash_code', 'publication_timestamp'
-      //   sort: 'updatedAt DESC',
-      //   limit: inputs.limit ? inputs.limit : 10,
-      // })
+
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
                                     WHERE user_id=${userId} 
@@ -411,6 +418,7 @@ exports.getLesson = async function(req, res, next) {
       }
 
       Lessons.upsert({id:lesson.id}, lesson);
+      await redisClient.set(inputs.slug, JSON.stringify(lesson))
 
       res.json(lesson)
     } else {

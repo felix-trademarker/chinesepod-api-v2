@@ -9,6 +9,7 @@ var bodyParser = require('body-parser')
 let middleware = require('./middleware')
 let userService = require('./services/userService')
 
+
 var cors = require('cors')
 
 var app = express();
@@ -38,6 +39,13 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   if (err) console.log(err);
   // start the rest of your app here
   
+  // test block start
+  // var ModelRedis = require('./repositories/_modelRedis')
+  // let redisClient = new ModelRedis('lessons')
+  // console.log(await redisClient.get('mykey'))
+
+  // test block end
+
   // Create our number formatter.
   var formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -50,6 +58,7 @@ conn.connectToServer158( function( err, client ) { // MAIN MONGO START
   app.locals.variables = require('./config/variables');
 
   console.log("APP RUNNING...");
+
 
   var apiRouter = require('./routes/api');
   var apiRouter2 = require('./routes/apiCustom');
