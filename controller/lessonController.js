@@ -207,10 +207,10 @@ exports.getLesson = async function(req, res, next) {
     }
 
     // fetch redis records here
-    let lesson = await redisClientLesson.get(inputs.slug)
+    // let lesson = await redisClientLesson.get(inputs.slug)
 
     // if has saved data get user info and return
-    if (lesson) {
+    if (false && lesson) {
 
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
@@ -255,7 +255,7 @@ exports.getLesson = async function(req, res, next) {
 
     if (lessonData && lessonData.slug) {
 
-      lesson = lessonData
+      let lesson = lessonData
       lesson.introduction = sanitizeHtml(lesson.introduction, sanitizeOptions)
 
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
