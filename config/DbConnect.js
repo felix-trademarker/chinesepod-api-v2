@@ -29,8 +29,7 @@ var conCpod2015 = mysql.createConnection({
 
 var redisClient = redis.createClient({
   host: process.env.REDISHOST,
-  port: process.env.REDISPORT,
-  password: process.env.REDISPASS
+  port: process.env.REDISPORT
 });
 
 
