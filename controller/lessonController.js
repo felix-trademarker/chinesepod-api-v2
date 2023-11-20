@@ -8,7 +8,7 @@ let LessonFiles = require('../repositories/lessonFiles')
 let LessonDownloads = require('../repositories/lessonDownloads')
 
 var ModelRedis = require('../repositories/_modelRedis')
-let redisClientLesson = new ModelRedis('lessons')
+// let redisClientLesson = new ModelRedis('lessons')
 
 let userService = require('../services/userService')
 
@@ -175,7 +175,7 @@ exports.getLesson = async function(req, res, next) {
 
   // test REDIS
   
-  await redisClientLesson.set(inputs.slug, JSON.stringify({id:123,slug:inputs.slug}))
+  // await redisClientLesson.set(inputs.slug, JSON.stringify({id:123,slug:inputs.slug}))
   
 
   if (!userId) {
@@ -207,10 +207,10 @@ exports.getLesson = async function(req, res, next) {
     }
 
     // fetch redis records here
-    let lesson = await redisClientLesson.get(inputs.slug)
-
+    // let lesson = await redisClientLesson.get(inputs.slug)
+    let lesson = {}
     // if has saved data get user info and return
-    if (lesson) {
+    if (false && lesson) {
 
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
@@ -418,7 +418,7 @@ exports.getLesson = async function(req, res, next) {
       }
 
       Lessons.upsert({id:lesson.id}, lesson);
-      await redisClientLesson.set(inputs.slug, JSON.stringify(lesson))
+      // await redisClientLesson.set(inputs.slug, JSON.stringify(lesson))
 
       res.json(lesson)
     } else {
