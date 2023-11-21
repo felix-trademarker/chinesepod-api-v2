@@ -11,6 +11,7 @@ var ModelRedis = require('../repositories/_modelRedis')
 let redisClientLesson = new ModelRedis('lessons')
 let redisClientDialogue = new ModelRedis('dialogue')
 let redisClientVocab = new ModelRedis('vocab')
+let redisClientExpansion = new ModelRedis('expansions')
 
 let userService = require('../services/userService')
 
@@ -207,7 +208,7 @@ exports.getLesson = async function(req, res, next) {
     // let lesson = {}
     // if has saved data get user info and return
     if (lesson && lesson.id != '123') {
-      console.log("Return lesson data from redis");
+      console.log(">>>>>>>>>>> Return lesson data from redis");
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
                                     WHERE user_id=${userId} 
@@ -447,7 +448,7 @@ exports.getDialogue = async function(req, res, next) {
     let dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
 
     if (dialogueRedisData) {
-      console.log("Return dialogue data from redis");
+      console.log(">>>>>>>>>>> Return dialogue data from redis");
       res.json( dialogueRedisData )
 
     } else {
@@ -588,9 +589,10 @@ exports.getVocab = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    let lessonVocab = await redisClientLesson.get(inputs.lessonId)
+    let lessonVocab = await redisClientVocab.get(inputs.lessonId)
     if (lessonVocab){
 
+      console.log(">>>>>>>>>>> Return Vocab data from redis");
       res.json(lessonVocab)
 
     } else {
@@ -622,7 +624,7 @@ exports.getVocab = async function(req, res, next) {
             );
 
       Lessons.upsert({id:inputs.lessonId}, {vocabulary: returnedData});
-      await redisClientLesson.set(inputs.lessonId, JSON.stringify(returnedData))
+      await redisClientVocab.set(inputs.lessonId, JSON.stringify(returnedData))
 
       res.json(returnedData)
     }
@@ -776,104 +778,116 @@ exports.getExpansion = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    const groupBy = (key) => (array) =>
-      array.reduce((objectsByKeyValue, obj) => {
-        const value = obj[key]
-        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj)
-        return objectsByKeyValue
-      }, {})
+    let lessonExpansion = await redisClientExpansion.get(inputs.slug)
 
-    const groupByVocab = groupBy('vocabulary')
+    if (lessonExpansion) {
 
-    // All done.
+      console.log(">>>>>>>>>>> Return Expansion data from redis");
+      res.json(lessonExpansion);
 
-    let rawExpansions = await LessonsExpansion.getMysqlProduction(`
-                          SELECT vocabulary, row_1, row_2, audio
-                          FROM content_expansions 
-                          WHERE v3_id='${inputs.lessonId}'
-                          ORDER BY display_order ASC
-                        `)
+    } else {
+      const groupBy = (key) => (array) =>
+        array.reduce((objectsByKeyValue, obj) => {
+          const value = obj[key]
+          objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj)
+          return objectsByKeyValue
+        }, {})
 
-    await asyncForEach(rawExpansions, async (expansion) => {
+      const groupByVocab = groupBy('vocabulary')
 
-      LessonsExpansion.upsert({id: expansion.id}, {...expansion});
+      // All done.
 
-      expansion.sentence = []
-      expansion['target'] = expansion['row_2']
-      expansion['en'] = expansion['row_2']
-      expansion.p = ''
-      expansion.s = ''
-      expansion.t = ''
-      expansion['row_1'].replace(
-        /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
-        function (A, B, C, D, E, F, G, H) {
-          let d = ''
-          let e = ''
-          let c = ''
-          let b = ''
-          let g = ''
+      let rawExpansions = await LessonsExpansion.getMysqlProduction(`
+                            SELECT vocabulary, row_1, row_2, audio
+                            FROM content_expansions 
+                            WHERE v3_id='${inputs.lessonId}'
+                            ORDER BY display_order ASC
+                          `)
 
-          try {
-            d = decodeURI(D)
-          } catch (err) {
-            d = D
-          }
-          try {
-            e = decodeURI(E)
-          } catch (err) {
-            e = E
-          }
-          try {
-            c = decodeURI(C)
-          } catch (err) {
-            c = C
-          }
-          try {
-            b = decodeURI(B)
-          } catch (err) {
-            b = B
-          }
+      await asyncForEach(rawExpansions, async (expansion) => {
 
-          expansion.sentence.push({
-            s: d,
-            t: e,
-            p: c,
-            en: b,
-          })
+        LessonsExpansion.upsert({id: expansion.id}, {...expansion});
 
-          expansion.p += c + ' '
-          expansion.s += d
-          expansion.t += e
+        expansion.sentence = []
+        expansion['target'] = expansion['row_2']
+        expansion['en'] = expansion['row_2']
+        expansion.p = ''
+        expansion.s = ''
+        expansion.t = ''
+        expansion['row_1'].replace(
+          /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
+          function (A, B, C, D, E, F, G, H) {
+            let d = ''
+            let e = ''
+            let c = ''
+            let b = ''
+            let g = ''
 
-          if (G) {
             try {
-              g = decodeURI(G)
+              d = decodeURI(D)
             } catch (err) {
-              g = G
+              d = D
             }
-            expansion.sentence.push(g)
-            expansion.p += g
-            expansion.s += g
-            expansion.t += g
+            try {
+              e = decodeURI(E)
+            } catch (err) {
+              e = E
+            }
+            try {
+              c = decodeURI(C)
+            } catch (err) {
+              c = C
+            }
+            try {
+              b = decodeURI(B)
+            } catch (err) {
+              b = B
+            }
+
+            expansion.sentence.push({
+              s: d,
+              t: e,
+              p: c,
+              en: b,
+            })
+
+            expansion.p += c + ' '
+            expansion.s += d
+            expansion.t += e
+
+            if (G) {
+              try {
+                g = decodeURI(G)
+              } catch (err) {
+                g = G
+              }
+              expansion.sentence.push(g)
+              expansion.p += g
+              expansion.s += g
+              expansion.t += g
+            }
           }
-        }
-      )
+        )
 
-      delete expansion['row_1']
-      delete expansion['row_2']
-    })
-    let groupedData = groupByVocab(rawExpansions)
-    let returnData = []
-    Object.keys(groupedData).forEach((expansion) => {
-      returnData.push({
-        phrase: expansion,
-        examples: groupedData[expansion],
+        delete expansion['row_1']
+        delete expansion['row_2']
       })
-    })
+      let groupedData = groupByVocab(rawExpansions)
+      let returnData = []
+      Object.keys(groupedData).forEach((expansion) => {
+        returnData.push({
+          phrase: expansion,
+          examples: groupedData[expansion],
+        })
+      })
 
-    Lessons.upsert({id:inputs.lessonId}, {expansion: returnData});
+      Lessons.upsert({id:inputs.lessonId}, {expansion: returnData});
+      await redisClientExpansion.set(inputs.lessonId, JSON.stringify(returnData))
 
-    res.json(returnData);
+      res.json(returnData);
+    }
+
+    
   }
 }
 
