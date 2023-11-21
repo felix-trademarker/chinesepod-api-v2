@@ -778,7 +778,7 @@ exports.getExpansion = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    let lessonExpansion = await redisClientExpansion.get(inputs.slug)
+    let lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
 
     if (lessonExpansion) {
 
