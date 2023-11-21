@@ -9,6 +9,7 @@ let LessonDownloads = require('../repositories/lessonDownloads')
 
 var ModelRedis = require('../repositories/_modelRedis')
 let redisClientLesson = new ModelRedis('lessons')
+let redisClientDialogue = new ModelRedis('dialogue')
 
 let userService = require('../services/userService')
 
@@ -204,9 +205,8 @@ exports.getLesson = async function(req, res, next) {
     let lesson = await redisClientLesson.get(inputs.slug)
     // let lesson = {}
     // if has saved data get user info and return
-    console.log(lesson);
     if (lesson && lesson.id != '123') {
-
+      console.log("Return lesson data from redis");
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
                                     WHERE user_id=${userId} 
@@ -443,28 +443,32 @@ exports.getDialogue = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    // let rawDialogues = await ContentDialogues.find({
-    //   v3_id: inputs.lessonId,
-    // }).sort('display_order ASC')
+    let dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
 
-    let rawDialogues = await Lessons.getMysqlProduction(`
-                        SELECT *
-                        FROM content_dialogues 
-                        WHERE v3_id='${inputs.lessonId}'
-                        ORDER BY display_order ASC
-                      `)
+    if (dialogueRedisData) {
+      console.log("Return dialogue data from redis");
+      res.json( dialogueRedisData )
 
-    let dialogueData = []
-    let speakers = []
-    //
-    // sails.log.info(rawDialogues)
+    } else {
 
-    await asyncForEach(rawDialogues, async (dialogue) => {
-      
+      let rawDialogues = await Lessons.getMysqlProduction(`
+            SELECT *
+            FROM content_dialogues 
+            WHERE v3_id='${inputs.lessonId}'
+            ORDER BY display_order ASC
+          `)
+
+      let dialogueData = []
+      let speakers = []
+      //
+      // sails.log.info(rawDialogues)
+
+      await asyncForEach(rawDialogues, async (dialogue) => {
+
       LessonsDialogue.upsert({id:dialogue.id}, dialogue);
 
       if (dialogue.speaker) {
-        speakers.push(dialogue.speaker)
+      speakers.push(dialogue.speaker)
       }
       dialogue.vocabulary = []
       dialogue.sentence = []
@@ -473,94 +477,96 @@ exports.getDialogue = async function(req, res, next) {
       dialogue.s = ''
       dialogue.t = ''
       dialogue['row_1'].replace(
-        /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
-        function (A, B, C, D, E, F, G, H) {
-          let d = ''
-          let e = ''
-          let c = ''
-          let b = ''
-          let g = ''
+      /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
+      function (A, B, C, D, E, F, G, H) {
+      let d = ''
+      let e = ''
+      let c = ''
+      let b = ''
+      let g = ''
 
-          try {
-            d = decodeURI(D)
-          } catch (err) {
-            d = D
-          }
-          try {
-            e = decodeURI(E)
-          } catch (err) {
-            e = E
-          }
-          try {
-            c = decodeURI(C)
-          } catch (err) {
-            c = C
-          }
-          try {
-            b = decodeURI(B)
-          } catch (err) {
-            b = B
-          }
+      try {
+      d = decodeURI(D)
+      } catch (err) {
+      d = D
+      }
+      try {
+      e = decodeURI(E)
+      } catch (err) {
+      e = E
+      }
+      try {
+      c = decodeURI(C)
+      } catch (err) {
+      c = C
+      }
+      try {
+      b = decodeURI(B)
+      } catch (err) {
+      b = B
+      }
 
-          dialogue.sentence.push({
-            s: d,
-            t: e,
-            p: c,
-            en: b,
-          })
+      dialogue.sentence.push({
+      s: d,
+      t: e,
+      p: c,
+      en: b,
+      })
 
-          dialogue.p += c + ' '
-          dialogue.s += d
-          dialogue.t += e
+      dialogue.p += c + ' '
+      dialogue.s += d
+      dialogue.t += e
 
-          if (G) {
-            try {
-              g = decodeURI(G)
-            } catch (err) {
-              g = G
-            }
-            dialogue.sentence.push(g)
-            dialogue.p += g
-            dialogue.s += g
-            dialogue.t += g
-          }
+      if (G) {
+      try {
+      g = decodeURI(G)
+      } catch (err) {
+      g = G
+      }
+      dialogue.sentence.push(g)
+      dialogue.p += g
+      dialogue.s += g
+      dialogue.t += g
+      }
 
-          dialogue.vocabulary.push({
-            s: d ? d : '',
-            t: e ? e : '',
-            p: c ? c : '',
-            en: b ? b : '',
-          })
-        }
+      dialogue.vocabulary.push({
+      s: d ? d : '',
+      t: e ? e : '',
+      p: c ? c : '',
+      en: b ? b : '',
+      })
+      }
       )
       dialogueData.push(
-        _.pick(dialogue, [
-          'display_order',
-          'speaker',
-          'row_2',
-          'audio',
-          'v3_id',
-          'vocabulary',
-          'sentence',
-          'en',
-          'p',
-          't',
-          's',
-        ])
+      _.pick(dialogue, [
+      'display_order',
+      'speaker',
+      'row_2',
+      'audio',
+      'v3_id',
+      'vocabulary',
+      'sentence',
+      'en',
+      'p',
+      't',
+      's',
+      ])
       )
-    })
+      })
 
-    dialogueData.e = dialogueData.row_2
+      dialogueData.e = dialogueData.row_2
 
-    let returnedData = {
+      let returnedData = {
       speakers: speakers,
       dialogue: dialogueData,
+      }
+
+      Lessons.upsert({id:inputs.lessonId}, {dialogue: returnedData});
+      await redisClientDialogue.set(inputs.lessonId, JSON.stringify(returnedData))
+
+      res.json( returnedData )
     }
 
-    Lessons.upsert({id:inputs.lessonId}, {dialogue: returnedData});
-
-    res.json( returnedData )
-    
   }
 }
 
