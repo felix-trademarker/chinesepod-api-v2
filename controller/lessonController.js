@@ -10,6 +10,7 @@ let LessonDownloads = require('../repositories/lessonDownloads')
 var ModelRedis = require('../repositories/_modelRedis')
 let redisClientLesson = new ModelRedis('lessons')
 let redisClientDialogue = new ModelRedis('dialogue')
+let redisClientVocab = new ModelRedis('vocab')
 
 let userService = require('../services/userService')
 
@@ -587,35 +588,46 @@ exports.getVocab = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    let vocab = await LessonsVocabulary.getMysqlProduction(`
-                        SELECT *
-                        FROM vocabulary 
-                        WHERE v3_id='${inputs.lessonId}'
-                        AND vocabulary_class in ('Key Vocabulary', 'Supplementary')
-                        ORDER BY vocabulary_class, display_order ASC
-                      `)
+    let lessonVocab = await redisClientLesson.get(inputs.lessonId)
+    if (lessonVocab){
+
+      res.json(lessonVocab)
+
+    } else {
+
+      let vocab = await LessonsVocabulary.getMysqlProduction(`
+            SELECT *
+            FROM vocabulary 
+            WHERE v3_id='${inputs.lessonId}'
+            AND vocabulary_class in ('Key Vocabulary', 'Supplementary')
+            ORDER BY vocabulary_class, display_order ASC
+          `)
 
 
-    let returnData = []
-    _.each(vocab, function (item) {
+      let returnData = []
+      _.each(vocab, function (item) {
       item['s'] = item.column_1
       item['p'] = item.column_2
       item['en'] = item.column_3
       item['t'] = item.column_4
       returnData.push(item)
-    })
+      })
 
-    await asyncForEach(returnData, async (word) => {
+      await asyncForEach(returnData, async (word) => {
       await LessonsVocabulary.upsert({ id: word.id }, { ...word, lesson: word['v3_id'] })
-    })
+      })
 
-    let returnedData = returnData.map((item) =>
-                          _.pick(item, ['id', 's', 't', 'p', 'en', 'audio', 'vocabulary_class'])
-                        );
+      let returnedData = returnData.map((item) =>
+              _.pick(item, ['id', 's', 't', 'p', 'en', 'audio', 'vocabulary_class'])
+            );
 
-    Lessons.upsert({id:inputs.lessonId}, {vocabulary: returnedData});
+      Lessons.upsert({id:inputs.lessonId}, {vocabulary: returnedData});
+      await redisClientLesson.set(inputs.lessonId, JSON.stringify(returnedData))
 
-    res.json(returnedData)
+      res.json(returnedData)
+    }
+
+    
   }
 }
 
