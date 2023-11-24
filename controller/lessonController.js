@@ -450,7 +450,13 @@ exports.getDialogue = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    let dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
+    // let dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
+    let dialogueRedisData = {}
+    try{
+      dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
+    } catch(err) {
+      console.log("==== Redis ERROR Dialogue ====", err);
+    }
 
     if (dialogueRedisData) {
       console.log(">>>>>>>>>>> Return dialogue data from redis");
@@ -594,7 +600,13 @@ exports.getVocab = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    let lessonVocab = await redisClientVocab.get(inputs.lessonId)
+    // let lessonVocab = await redisClientVocab.get(inputs.lessonId)
+    let lessonVocab = {}
+    try{
+      lessonVocab = await redisClientVocab.get(inputs.lessonId)
+    } catch(err) {
+      console.log("==== Redis ERROR Vocab ====", err);
+    }
     if (lessonVocab){
 
       console.log(">>>>>>>>>>> Return Vocab data from redis");
@@ -783,7 +795,13 @@ exports.getExpansion = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    let lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
+    // let lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
+    let lessonExpansion = {}
+    try{
+      lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
+    } catch(err) {
+      console.log("==== Redis ERROR Vocab ====", err);
+    }
 
     if (lessonExpansion) {
 
