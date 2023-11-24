@@ -33,9 +33,10 @@ app.set('view engine', 'ejs');
 // APP  CONTAINER =========== >> 
 let conn = require('./config/DbConnect');
 conn.connectToServerAWS( function( err, client ) { // MAIN MONGO START
-conn.connectToServer158( function( err, client ) { // MAIN MONGO START
+conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
-
+  await conn.prepareRedisConn();
+  
   if (err) console.log(err);
   // start the rest of your app here
   

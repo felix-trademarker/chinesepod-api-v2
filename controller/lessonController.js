@@ -175,6 +175,8 @@ exports.getLesson = async function(req, res, next) {
   let userId = req.session.userId
   let inputs = req.session.inputs
 
+  // console.log(await redisClientLesson.get(inputs.slug))
+
   if (!userId) {
     res.json({err:'Invalid'})
   } else {

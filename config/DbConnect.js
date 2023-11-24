@@ -73,9 +73,14 @@ module.exports = {
 
   getRedisConn: async function() {
 
-    await redisClient.connect();
     return redisClient;
 
+  },
+
+  prepareRedisConn: async function() {
+
+    await redisClient.connect();
+    console.log("connected!");
   },
 
 
