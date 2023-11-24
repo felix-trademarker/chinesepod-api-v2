@@ -204,7 +204,12 @@ exports.getLesson = async function(req, res, next) {
     }
 
     // fetch redis records here
-    let lesson = await redisClientLesson.get(inputs.slug)
+    let lesson = {}
+    try{
+      lesson = await redisClientLesson.get(inputs.slug)
+    } catch(err) {
+      console.log("==== Redis ERROR ====", err);
+    }
     // let lesson = {}
     // if has saved data get user info and return
     if (lesson && lesson.id != '123') {
