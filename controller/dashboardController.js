@@ -474,7 +474,7 @@ exports.courseLessons = async function(req, res, next) {
   if (!userId || !courseId) {
     res.json({err:'Invalid'})
   } else {
-
+    console.log(" == courses == ");
     if(userId && courseId) {
       
       // FETCH USER CONTENTS
