@@ -1,5 +1,6 @@
 var express = require('express');
 var dashboardController = require('../controller/dashboardController')
+var labelController = require('../controller/labelController')
 var lessonController = require('../controller/lessonController')
 var middleware = require('../middleware')
 
@@ -39,6 +40,8 @@ router.get('/lessons/get-expansion', lessonController.getExpansion);
 
 
 router.get('/account/subscription/subscriptions', dashboardController.getSubscriptions);
+
+router.get('/labels/gift-packages', labelController.giftPackages);
 
 // BASED ON LIVE API
 // router.get('/recap/get-popular-recap-lessons', userController.popularRecapLessons);

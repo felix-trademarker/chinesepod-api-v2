@@ -918,13 +918,26 @@ exports.getExpansion = async function(req, res, next) {
 
 exports.getLessonURLNew = async function(req, res, next) {
 
-  let inputs = req.session.inputs
+  // let inputs = req.session.inputs
+  let redisClientLessonVideos = new ModelRedis('lessonVideos')
 
-  console.log(req.params.v3Id);
+  let lessonVideos = await redisClientLessonVideos.get(req.params.v3Id)
+
+  if (lessonVideos) {
+
+    res.json(lessonVideos)
+    
+  } else {
+
+    let newHls = (await LessonNewSources.findQuery({v3_id:req.params.v3Id }))[0]
+    await redisClientExpansion.set(req.params.v3Id, JSON.stringify(returnData))
+  
+    res.json(newHls)
+  }
+
+  // console.log(req.params.v3Id);
   // console.log(req.body);
-  let newHls = (await LessonNewSources.findQuery({v3_id:req.params.v3Id }))[0]
-
-  res.json(newHls)
+  
 }
 
 
