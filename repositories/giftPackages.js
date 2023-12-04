@@ -1,5 +1,5 @@
-let _table = "api.gift.packages";
-var Model = require('./_model158')
+let _table = "giftLabels";
+var Model = require('./_model158BF')
 var defaultModel = new Model(_table)
 
 let conn = require('../config/DbConnect');

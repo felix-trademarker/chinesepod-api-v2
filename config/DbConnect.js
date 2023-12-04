@@ -4,7 +4,7 @@ const _variables = require( './variables' );
 var mysql = require('mysql');
 const redis = require('redis');
 
-var _db158,_dbAWS;
+var _db158,_db158BF,_dbAWS;
 
 var conCpodProduction = mysql.createConnection({
   host: process.env.DBHOST,
@@ -39,12 +39,17 @@ module.exports = {
   connectToServer158: function( callback ) {
     MongoClient.connect( _variables.mongoURL158 ,  _variables.mongoOptions, function( err, client ) {
       _db158  = client.db('chinesepod');
+      _db158BF  = client.db('bigfoot');
       return callback( err );
     } );
   },
 
   getDb158: function() {
     return _db158;
+  },
+
+  getDb158BF: function() {
+    return _db158BF;
   },
 
   connectToServerAWS: function( callback ) {
