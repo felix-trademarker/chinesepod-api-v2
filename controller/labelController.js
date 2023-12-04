@@ -152,6 +152,27 @@ exports.giftPackages = async function(req, res, next) {
       ship_from = `Lapu-Lapu City Post Office Box 16  |  6015 Lapu-Lapu City  |  Philippines`
     }
 
+    // add new ship from address from selected country
+    switch (address.country.toUpperCase()) {
+      case 'BE': 
+        ship_from = `ChinesePod Limited  |  Leeuwenstraat 4  |  2000 Antwerpen  | Belgium`; break;
+      case 'DE': 
+        ship_from = `ChinesePod Limited  |  Königsallee 27  |  40212 Dusseldorf  |  Germany`; break;
+
+      case 'HK': 
+        ship_from = `ChinesePod Limited  |  General Post Office Box 7347  |  Hong Kong S.A.R`; break;
+
+      case 'NL': 
+        ship_from = `ChinesePod Limited  |  Markt 19  |  6071 JD Swalmen  |  The Netherlands`; break;
+
+      case 'TW': 
+        ship_from = `ChinesePod Limited  |  2F No. 219, No. 1 Section 5 | Zhongxiao East Road | Xinyi District | Taipei City 11071 | Taiwan (R.O.C.)`; break;
+
+      case 'US': 
+        ship_from = `ChinesePod Limited  |  4 Taylor Street  |  Millburn NY 07041`; break;
+
+    }
+
     address.ship_from = ship_from
     address.ship_to = `${
       address.address1.length > 0 ? address.address1 + '\n' : ''
