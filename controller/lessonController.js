@@ -930,7 +930,7 @@ exports.getLessonURLNew = async function(req, res, next) {
   } else {
 
     let newHls = (await LessonNewSources.findQuery({v3_id:req.params.v3Id }))[0]
-    await redisClientExpansion.set(req.params.v3Id, JSON.stringify(returnData))
+    await redisClientExpansion.set(req.params.v3Id, JSON.stringify(newHls))
   
     res.json(newHls)
   }
