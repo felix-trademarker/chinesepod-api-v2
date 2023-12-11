@@ -44,7 +44,7 @@ exports.giftPackages = async function(req, res, next) {
   //   }
   // )
 
-  let sentFromWebApp = (await users.findQuery({ giftLabels: {$exists: true} })).map(
+  let sentFromWebApp = (await users.findQuery({ giftLabel: {$exists: true} })).map(
     (user) => {
       return user.id
     }
