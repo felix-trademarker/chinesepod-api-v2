@@ -19,7 +19,7 @@ exports.giftPackages = async function(req, res, next) {
   //     return item.id
   //   }
   // )
-
+// console.log(1);
   let sqlQuery = "SELECT user_id as id FROM gift_tracking";
   let sentPackages = (await giftPackages.getMysqlProduction(sqlQuery)).map(
     (item) => {
@@ -27,7 +27,7 @@ exports.giftPackages = async function(req, res, next) {
     }
   )
   
-
+// console.log(2);
   // fetch from mongo 
   
   // console.log(sentPackages.concat(oldTransactions));
@@ -36,7 +36,7 @@ exports.giftPackages = async function(req, res, next) {
   // return {}
 
   let oldTransactions = require('../lib/oldTransactions.json')
-
+    // console.log(3);
   // FETCH MONGO RECORDS 
   // let sentFromWebApp = (await giftPackages.get()).map(
   //   (item) => {
@@ -44,17 +44,18 @@ exports.giftPackages = async function(req, res, next) {
   //   }
   // )
 
-  let sentFromWebApp = (await users.findQuery({ giftLabel: {$exists: true} })).map(
-    (user) => {
-      return user.id
-    }
-  )
+  let sentFromWebApp = (await users.findQuery({ "giftlabel": { $exists: true } })).map(
+      (user) => {
+        return user.id
+      }
+    )
 
-  sentPackages = sentPackages.concat(sentFromWebApp)
+    console.log("from web app",sentFromWebApp.length);
+  // sentPackages = sentPackages.concat(sentFromWebApp)
 
     // console.log('then',sentPackages.length);
   // console.log(sentPackages.concat(oldTransactions));
-  sqlQuery = "SELECT * FROM transactions WHERE pay_status=2 AND is_recurring_payment=0 AND date_created >= '"+startDate+"' AND user_id NOT IN ("+sentPackages.concat(oldTransactions).join(",")+")";
+  sqlQuery = "SELECT * FROM transactions WHERE pay_status=2 AND is_recurring_payment=0 AND date_created >= '"+startDate+"' AND user_id NOT IN ("+sentPackages.concat(oldTransactions).concat(sentFromWebApp).join(",")+")";
   let relevantTransactions = await giftPackages.getMysqlProduction(sqlQuery)
   // let relevantTransactions = await Transactions.find({
   //   where: {
