@@ -46,7 +46,7 @@ exports.giftPackages = async function(req, res, next) {
   // console.log('this',sentPackages.length);
   // sentPackages = sentPackages.concat(sentFromWebApp)
 
-    console.log('then',sentPackages.length);
+    // console.log('then',sentPackages.length);
   // console.log(sentPackages.concat(oldTransactions));
   sqlQuery = "SELECT * FROM transactions WHERE pay_status=2 AND is_recurring_payment=0 AND date_created >= '"+startDate+"' AND user_id NOT IN ("+sentPackages.concat(oldTransactions).join(",")+")";
   let relevantTransactions = await giftPackages.getMysqlProduction(sqlQuery)
@@ -63,7 +63,7 @@ exports.giftPackages = async function(req, res, next) {
   //   },
   // })
 
-  console.log('plain',relevantTransactions.length);
+  // console.log('plain',relevantTransactions.length);
 
   // res.json(relevantTransactions)
 
@@ -77,12 +77,12 @@ exports.giftPackages = async function(req, res, next) {
     self.findIndex(v => v.user_id === value.user_id) === index
   );
 
-  console.log('uniq',relevantTransactions.length);
+  // console.log('uniq',relevantTransactions.length);
 
   relevantTransactions = relevantTransactions.map((transaction) => {
     return transaction.id
   })
-  console.log('map',relevantTransactions.length);
+  // console.log('map',relevantTransactions.length);
 
 
   
@@ -112,10 +112,12 @@ exports.giftPackages = async function(req, res, next) {
   //   sort: 'updatedAt DESC',
   // })
 
-  sqlQuery = "SELECT id,transaction_id, country, state, city, zip_code, full_name, address1, address2 "+
-              "FROM transaction_addresses "+
-              "WHERE country='"+inputs.country+"' AND last_update >= '"+startDate+"' AND transaction_id IN ("+relevantTransactions.join(",")+") AND id NOT IN ("+sentFromWebApp.join(",")+")" +
-              "ORDER BY last_update DESC"
+  sqlQuery = "SELECT ta.id,ta.transaction_id, ta.country, ta.state, ta.city, ta.zip_code, ta.full_name, ta.address1, ta.address2, t.user_id "+
+              " FROM transaction_addresses ta"+
+              " LEFT JOIN transactions t"+
+              " ON t.id=ta.transaction_id" +
+              " WHERE ta.country='"+inputs.country+"' AND ta.last_update >= '"+startDate+"' AND ta.transaction_id IN ("+relevantTransactions.join(",")+") AND ta.id NOT IN ("+sentFromWebApp.join(",")+")" +
+              " ORDER BY ta.last_update DESC"
   let addresses = await giftPackages.getMysqlProduction(sqlQuery)
   // res.json(addresses);
   console.log("addresses", addresses.length);
