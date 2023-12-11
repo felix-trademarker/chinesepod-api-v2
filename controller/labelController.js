@@ -1,4 +1,5 @@
 let giftPackages = require('../repositories/giftPackages')
+let users = require('../repositories/users')
 
 let _ = require('lodash')
 const sanitizeHtml = require('sanitize-html')
@@ -37,14 +38,19 @@ exports.giftPackages = async function(req, res, next) {
   let oldTransactions = require('../lib/oldTransactions.json')
 
   // FETCH MONGO RECORDS 
-  let sentFromWebApp = (await giftPackages.get()).map(
-    (item) => {
-      return item.id
+  // let sentFromWebApp = (await giftPackages.get()).map(
+  //   (item) => {
+  //     return item.id
+  //   }
+  // )
+
+  let sentFromWebApp = (await users.findQuery({ giftLabels: {$exists: true} })).map(
+    (user) => {
+      return user.id
     }
   )
-  // console.log(sentFromWebApp);
-  // console.log('this',sentPackages.length);
-  // sentPackages = sentPackages.concat(sentFromWebApp)
+
+  sentPackages = sentPackages.concat(sentFromWebApp)
 
     // console.log('then',sentPackages.length);
   // console.log(sentPackages.concat(oldTransactions));
@@ -116,11 +122,11 @@ exports.giftPackages = async function(req, res, next) {
               " FROM transaction_addresses ta"+
               " LEFT JOIN transactions t"+
               " ON t.id=ta.transaction_id" +
-              " WHERE ta.country='"+inputs.country+"' AND ta.last_update >= '"+startDate+"' AND ta.transaction_id IN ("+relevantTransactions.join(",")+") AND ta.id NOT IN ("+sentFromWebApp.join(",")+")" +
+              " WHERE ta.country='"+inputs.country+"' AND ta.last_update >= '"+startDate+"' AND ta.transaction_id IN ("+relevantTransactions.join(",")+")" +
               " ORDER BY ta.last_update DESC"
   let addresses = await giftPackages.getMysqlProduction(sqlQuery)
   // res.json(addresses);
-  console.log("addresses", addresses.length);
+  // console.log("addresses", addresses.length);
   // return;
 
   // sails.log.info(addresses)
