@@ -178,7 +178,7 @@ exports.giftPackages = async function(req, res, next) {
         ship_from = `ChinesePod LLC  |  2F No. 219, No. 1 Section 5 | Zhongxiao East Road | Xinyi District | Taipei City 11071 | Taiwan (R.O.C.)`; break;
 
       case 'US': 
-        ship_from = `ChinesePod LLC  |  4 Taylor Street  |  Millburn NY 07041`; break;
+        ship_from = `ChinesePod LLC  |  246 West Broadway  |  New York NY 10013`; break;
 
     }
 
