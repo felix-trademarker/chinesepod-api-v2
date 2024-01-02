@@ -445,6 +445,9 @@ exports.getSubscriptions = async function(req, res, next) {
       userSubs.push(subscription)
     }
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ subscriptions: userSubs });
     
     res.json(userSubs);
@@ -513,6 +516,9 @@ exports.courseLessons = async function(req, res, next) {
         res.json(returnData)
       } else {
 
+        let user = await userService.getUser(userId)
+
+        if (user && user.email)
         Users.upsert({id:userId},{ courseLessons: returnData });
 
         res.json(returnData
@@ -566,6 +572,9 @@ exports.userCourses = async function(req, res, next) {
       returnedData.push(courseData)
     }
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ userCourses: returnedData });
 
     res.json(returnedData);
@@ -606,6 +615,9 @@ exports.history = async function(req, res, next) {
       retArr.push(lesson)
     }
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ history: retArr });
 
     res.json(retArr)
@@ -745,6 +757,9 @@ exports.bookmarks = async function(req, res, next) {
       Lessons.upsert({id:lesson.id},lesson)
     }
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ bookmarks: retArr });
 
     res.json(retArr)
@@ -805,6 +820,9 @@ exports.moreCourses = async function(req, res, next) {
       })
     })
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ moreCourses: leveledCourses });
 
     res.json(leveledCourses)
@@ -923,6 +941,9 @@ exports.getBookMarkedLessons = async function(req, res, next) {
       retArr.push(lesson)
     }
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ bookmarkedLessons: retArr });
 
     res.json({count: count.count, lessons: retArr})
@@ -980,6 +1001,9 @@ exports.getStudiedLessons = async function(req, res, next) {
       retArr.push(lesson)
     }
 
+    let user = await userService.getUser(userId)
+
+    if (user && user.email)
     Users.upsert({id:userId},{ studiedLessons: retArr });
 
     res.json({count: count.count, lessons: retArr})
