@@ -400,6 +400,7 @@ exports.getUserStats = async function(userId) {
   // Users.upsert({id:userData.id},userData);
   console.log("Store user ", retData.id);
 
+  if (retData && retData.email)
   Users.upsert({id:retData.id}, retData)
   // res.json(retData);
 }
