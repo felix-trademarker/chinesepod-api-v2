@@ -180,26 +180,6 @@ exports.recordServe = async function(req, response) {
   }
 }
 
-// exports.getUserEntrance = async function(req, res, next) {
-//   try {
-//     var options = {
-//       'headers': {
-//         'Authorization': "Bearer " + req.session.token,
-//         'Cookie': req.headers.cookie,
-//       }
-//     };
-  
-//     let path = req.originalUrl.replace("v2", "v1")
-//     let url = res.app.locals.helpers.getDomain() + path
-//     let data = await axios.get(url,options)
-    
-//     return data
-
-//   } catch (err) {
-//     console.log(err.response)
-//     return err.response
-//   }
-// }
 
 // test
 exports.udpateLessonFiles = async function() {
@@ -246,4 +226,180 @@ exports.findAWSFile = async function(key) {
 
 exports.cleanupRecords = function(obj) {
   
+}
+
+exports.getUserStats = async function(userId) {
+
+  let returnData = {}
+
+  let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
+
+  if (!userData) res.json({})
+
+  let userOptions = await Users.getMysqlProduction(`Select * From user_options 
+                                                        WHERE user_id=${userId} 
+                                                        AND option_key IN ( 
+                                                                'level',
+                                                                'charSet',
+                                                                'interests',
+                                                                'autoMarkStudied',
+                                                                'pinyin',
+                                                                'newDash',
+                                                                'timezone',
+                                                                'currentLesson',
+                                                                'weeklyGoal'
+                                                    )`);
+
+  userOptions = helpers.toObject(userOptions)
+
+  let charSet = userOptions['charSet']
+      ? userOptions['charSet']
+      : 'simplified'
+  let level = userOptions['level']
+      ? res.app.locals.helpers.intToLevel(userOptions['level'])
+      : 'newbie'
+
+  //CONVERT SOME OPTIONS TO Boolean
+  userOptions['pinyin'] = userOptions['pinyin'] === 'true'
+  userOptions['autoMarkStudied'] = !(
+      userOptions['autoMarkStudied'] === 'false'
+  )
+  userOptions['newDash'] = !(userOptions['newDash'] === 'false')
+
+  const targets = {
+    newbie: 50,
+    elementary: 80,
+    preInt: 100,
+    intermediate: 120,
+    upperInt: 160,
+    advanced: 120,
+    media: 80,
+  }
+
+  const levelMap = {
+    'upper intermediate': 'upperInt',
+    'pre intermediate': 'preInt',
+  }
+
+  
+
+  if (userOptions && userOptions.option_value) {
+    level = helpers.intToLevel(userOptions.option_value)
+  } else {
+    returnData.levelUnset = true
+  }
+
+  let userPreferences = (await Users.getMysqlProduction(`Select * From user_preferences WHERE user_id=${userId} ORDER BY updated_at DESC`))[0]
+
+
+  let userLessons = await Users.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt From user_contents 
+                                                        WHERE user_id=${userId} 
+                                                        AND studied=1
+                                                        AND lesson_type=0
+                                                        ORDER BY created_at DESC
+                                                    `);
+  // POPULATE lesson
+  for (let i=0; i < userLessons.length; i++) {
+    userLessons[i].lesson = (await Users.getMysqlProduction(`Select * From contents 
+        WHERE v3_id='${userLessons[i].v3_id}' 
+    `))[0];
+  }
+
+  let progressData = userLessons.filter(function (item) {
+    if (!item.lesson || !item.lesson.level) return false
+    return levelMap[item.lesson.level.toLowerCase()]
+      ? levelMap[item.lesson.level.toLowerCase()] === level
+      : item.lesson.level.toLowerCase() === level
+  })
+
+  let thisMonth = userLessons.filter(function (item) {
+    if (!item || !item.updatedAt) return false
+    return (
+      item.updatedAt > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) &&
+      item.updatedAt < new Date()
+    )
+  })
+
+  let lastMonth = userLessons.filter(function (item) {
+    if (!item || !item.updatedAt) return false
+    return (
+      item.updatedAt > new Date(Date.now() - 2 * 30 * 24 * 60 * 60 * 1000) &&
+      item.updatedAt < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    )
+  })
+
+  let thisWeek = userLessons.filter(function (item) {
+    if (!item || !item.updatedAt) return false
+    return (
+      item.updatedAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) &&
+      item.updatedAt < new Date()
+    )
+  })
+
+  let lastWeek = userLessons.filter(function (item) {
+    if (!item || !item.updatedAt) return false
+    return (
+      item.updatedAt > new Date(Date.now() - 2 * 7 * 24 * 60 * 60 * 1000) &&
+      item.updatedAt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    )
+  })
+
+  let accessInfo = await this.getAccessTypeAndExpiry(userId)
+
+  delete userData.admin_note
+  delete userData.age_id
+  delete userData.birthday
+  delete userData.ltsm
+  delete userData.ltv
+  delete userData.mailing_address1
+  delete userData.mailing_address2
+  delete userData.mailing_city
+  delete userData.mailing_country
+  delete userData.mailing_postal_code
+  delete userData.mailing_state
+  delete userData.msn
+
+  
+
+  let retData = {
+    ...returnData,
+    ...userData,
+    ...{
+      userId: userId,
+      name: userData.name,
+      username: userData.username,
+      userAvatar: userPreferences
+        ? userPreferences['avatar_url']
+        : 'https://www.chinesepod.com/dash/img/brand/symbol-black-center.svg',
+      lastLogin: userPreferences ? userPreferences['lastSeenAt'] : '',
+      goals: {
+        thisWeek: thisWeek.length,
+        lastWeek: lastWeek.length,
+        thisMonth: thisMonth.length,
+        lastMonth: lastMonth.length,
+      },
+      progress: {
+        current: progressData.length,
+        target: targets[level],
+      },
+      level: level,
+      charSet:
+        charSet && charSet['option_value']
+          ? charSet['option_value']
+          : 'simplified',
+      pinyin: false,
+      access: accessInfo.type,
+    },
+    ...userOptions,
+  }
+
+  delete retData.userId
+
+  // SAVE IN MONGO
+  // userData.stats = retData
+  // Users.upsert({id:userData.id},userData);
+  console.log("get users stats", retData);
+
+  Users.upsert({id:retData.id}, retData)
+  // res.json(retData);
 }

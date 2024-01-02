@@ -181,6 +181,9 @@ exports.getLesson = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
+    // insert users data into mongo158
+    userService.getUserStats(userId)
+
     const cleanLink = (link) => {
       if (!link) {
         return ''
