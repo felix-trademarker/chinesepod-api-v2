@@ -398,7 +398,7 @@ exports.getUserStats = async function(userId) {
   // SAVE IN MONGO
   // userData.stats = retData
   // Users.upsert({id:userData.id},userData);
-  console.log("get users stats", retData);
+  console.log("Store user ", retData.id);
 
   Users.upsert({id:retData.id}, retData)
   // res.json(retData);
