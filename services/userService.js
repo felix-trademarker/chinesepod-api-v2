@@ -256,7 +256,7 @@ exports.getUserStats = async function(userId) {
       ? userOptions['charSet']
       : 'simplified'
   let level = userOptions['level']
-      ? res.app.locals.helpers.intToLevel(userOptions['level'])
+      ? helpers.intToLevel(userOptions['level'])
       : 'newbie'
 
   //CONVERT SOME OPTIONS TO Boolean
