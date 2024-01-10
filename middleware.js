@@ -2,7 +2,7 @@ let axios = require('axios')
 
 exports.checkAuth = async function(req, res, next){
     
-    console.log(">>", req.originalUrl);
+    // console.log(">>", req.originalUrl);
     let path = req.originalUrl ? req.originalUrl.replace("v2", "v1") : req.originalUrl;
 
     req.session.inputs = req.params

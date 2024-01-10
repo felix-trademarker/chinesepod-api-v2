@@ -228,7 +228,7 @@ exports.getInfo = async function(req, res, next) {
 
 
 
-      Users.upsert({id:userData.id},userData);
+      // Users.upsert({id:userData.id},userData);
       console.log("API USER GET INFO");
 
 
@@ -519,7 +519,7 @@ exports.courseLessons = async function(req, res, next) {
         let user = await userService.getUser(userId)
 
         if (user && user.email)
-        Users.upsert({id:userId},{ courseLessons: returnData });
+        Users.upsert({id:userId},{ courses: returnData });
 
         res.json(returnData
           .filter((lesson) => {

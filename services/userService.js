@@ -393,12 +393,28 @@ exports.getUserStats = async function(userId) {
     ...userOptions,
   }
 
-  delete retData.userId
+  retData.avatar = retData.userAvatar
 
+  delete retData.userId
+  delete retData.ip_address
+  delete retData.avatar_url
+  delete retData.interests
+  delete retData.http_referer
+  delete retData.source_type
+  delete retData.skyper
+  delete retData.created_by
+  delete retData.updated_by
+  delete retData.ip_country
+  delete retData.ip_region
+  delete retData.ip_city
+  delete retData.signin_source
+  delete retData.member_id
+  delete retData.userAvatar
+  
   // SAVE IN MONGO
   // userData.stats = retData
   // Users.upsert({id:userData.id},userData);
-  console.log("Store user ", retData.id);
+  console.log("Store user ", retData);
 
   if (retData && retData.email)
   Users.upsert({id:retData.id}, retData)
