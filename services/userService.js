@@ -7,6 +7,7 @@ let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
 let UserPhpSession = require('../repositories/users.phpsession')
 let helpers = require('../helpers')
 let axios = require('axios');
+let LessonProgress = require('../repositories/lessonProgressAWS')
 
 exports.getAccessTypeAndExpiry = async function(userId) {
     
@@ -411,11 +412,20 @@ exports.getUserStats = async function(userId) {
   delete retData.member_id
   delete retData.userAvatar
   
+
+  // Fetch lesson progress
+  let subscriptions = await Users.getUserSubscriptions(retData.id)
+  let emailLogs = await Users.getUserEmailLogs(retData.id)
+
+  console.log(emailLogs);
+  if (emailLogs && emailLogs.length > 0) retData.emailLogs = emailLogs
+  if (subscriptions && subscriptions.length > 0) retData.subscriptions = subscriptions
+
   // SAVE IN MONGO
   // userData.stats = retData
   // Users.upsert({id:userData.id},userData);
-  console.log("Store user ", retData);
-
+  // console.log("Store user ", retData);
+  // Users.removeFields()
   if (retData && retData.email)
   Users.upsert({id:retData.id}, retData)
   // res.json(retData);
