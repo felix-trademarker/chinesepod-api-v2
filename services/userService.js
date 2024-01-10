@@ -417,7 +417,7 @@ exports.getUserStats = async function(userId) {
   let subscriptions = await Users.getUserSubscriptions(retData.id)
   let emailLogs = await Users.getUserEmailLogs(retData.id)
 
-  console.log(emailLogs);
+  // console.log(emailLogs);
   if (emailLogs && emailLogs.length > 0) retData.emailLogs = emailLogs
   if (subscriptions && subscriptions.length > 0) retData.subscriptions = subscriptions
 
