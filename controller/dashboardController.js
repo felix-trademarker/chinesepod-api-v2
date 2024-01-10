@@ -56,6 +56,9 @@ exports.getInfo = async function(req, res, next) {
   if(userId) {
     let returnData = {}
 
+    // save userData in mongo158
+    userService.getUserStats(userId)
+
     let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
 
     try {
