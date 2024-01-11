@@ -582,7 +582,7 @@ exports.userCourses = async function(req, res, next) {
     let user = await userService.getUser(userId)
 
     if (user && user.email)
-    Users.upsert({id:userId},{ userCourses: returnedData });
+    Users.upsert({id:userId},{ courses: returnedData });
 
     res.json(returnedData);
   }
@@ -951,7 +951,7 @@ exports.getBookMarkedLessons = async function(req, res, next) {
     let user = await userService.getUser(userId)
 
     if (user && user.email)
-    Users.upsert({id:userId},{ bookmarkedLessons: retArr });
+    Users.upsert({id:userId},{ bookmarks: retArr });
 
     res.json({count: count.count, lessons: retArr})
   }
@@ -1011,7 +1011,7 @@ exports.getStudiedLessons = async function(req, res, next) {
     let user = await userService.getUser(userId)
 
     if (user && user.email)
-    Users.upsert({id:userId},{ studiedLessons: retArr });
+    Users.upsert({id:userId},{ history: retArr });
 
     res.json({count: count.count, lessons: retArr})
   }

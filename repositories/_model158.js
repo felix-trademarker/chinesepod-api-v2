@@ -170,23 +170,15 @@ class Model{
 
     }
 
-    removeFields() {
+    removeFields(id, query) {
 
         var this_ = this
 
 		return new Promise(function(resolve, reject) { 
 
-            let query = { };
+         
 
-            this_.db.getDb158().collection(this_.table).updateMany(query,{$unset: { 
-                mailingAddress1: '',
-                mailingAddress2: '',
-                mailingCity: '',
-                mailingPostalCode: '',
-                mailingCountry: '',
-                mailingState: '',
-                mailingState: ''
-            } }, 
+            this_.db.getDb158().collection(this_.table).updateMany({id:id},{$unset: query}, 
                 function(err, result) {
                 
                 if (err) reject(err);

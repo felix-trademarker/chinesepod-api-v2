@@ -35,8 +35,8 @@ module.exports = {
 	remove : async function(id) {
         return await defaultModel.remove(id)
     },
-    removeFields : async function() {
-        return await defaultModel.removeFields()
+    removeFields : async function(id,query) {
+        return await defaultModel.removeFields(id,query)
     },
 
     // CUSTOM MYSQL QUERY BELOW ========================
@@ -160,28 +160,15 @@ module.exports = {
         // return new Promise(function(resolve, reject) {
             var sql = `SELECT
                         c.course_id as courseId, 
-                        c.ams_course_id as amsCourseId, 
-                        c.course_title as courseTitle, 
+                        c.course_title as title, 
                         c.channel_id as channelId, 
                         c.type as type, 
-                        c.course_introduction as courseIntroduction, 
-                        c.course_hightlight as courseHightlight, 
-                        c.publish_time as publishTime, 
-                        c.course_image as courseImage, 
+                        c.course_introduction as introduction, 
+                        c.course_hightlight as hightlight, 
+                        c.course_image as image, 
                         c.level_id as levelId, 
-                        c.create_time as createTime, 
-                        c.update_time as updateTime, 
-                        c.created_by as createdBy, 
-                        c.updated_by as updatedBy, 
-                        c.is_private as isPrivate, 
-                        c.pubstatus as pubstatus, 
-                        c.course_type as courseType, 
-                        c.hash_code as code, 
-                        c.org_id as orgId, 
-                        c.closed as closed, 
-                        c.order_id as orderId, 
-                        c.publish_from as publishFrom, 
-                        c.publish_to as publishTo
+                        c.course_type as type, 
+                        c.hash_code as code
                         FROM course_detail AS c
                         LEFT JOIN user_courses AS uc
                         ON uc.course_id = c.course_id

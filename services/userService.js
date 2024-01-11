@@ -369,7 +369,7 @@ exports.getUserStats = async function(userId) {
       userId: userId,
       name: userData.name,
       username: userData.username,
-      userAvatar: userPreferences
+      avatar: userPreferences
         ? userPreferences['avatar_url']
         : 'https://www.chinesepod.com/dash/img/brand/symbol-black-center.svg',
       lastLogin: userPreferences ? userPreferences['lastSeenAt'] : '',
@@ -394,7 +394,15 @@ exports.getUserStats = async function(userId) {
     ...userOptions,
   }
 
-  retData.avatar = retData.userAvatar
+  // retData.avatar = retData.userAvatar
+  retData.mobilePhone = retData.mobile_phone
+  retData.creditAmount = retData.credit_amount
+  retData.confirmStatus = retData.confirm_status
+  retData.purchaseStatus = retData.purchase_status
+  retData.roleId = retData.role_id
+  retData.schoolId = retData.school_id
+  retData.createdAt = retData.created_at
+  retData.updatedAt = retData.updated_at
 
   delete retData.userId
   delete retData.ip_address
@@ -411,22 +419,78 @@ exports.getUserStats = async function(userId) {
   delete retData.signin_source
   delete retData.member_id
   delete retData.userAvatar
+  delete retData.mobile_phone
+  delete retData.credit_amount
+  delete retData.confirm_status
+  delete retData.purchase_status
+  delete retData.role_id
+  delete retData.school_id
+  delete retData.created_at
+  delete retData.updated_at
+  delete retData.come
   
+
+  
+
 
   // Fetch lesson progress
   let subscriptions = await Users.getUserSubscriptions(retData.id)
   let emailLogs = await Users.getUserEmailLogs(retData.id)
+  // let courses = await Users.getUserCourse(retData.id)
 
   // console.log(emailLogs);
   if (emailLogs && emailLogs.length > 0) retData.emailLogs = emailLogs
   if (subscriptions && subscriptions.length > 0) retData.subscriptions = subscriptions
+  // if (courses && courses.length > 0) retData.courses = courses
 
+  // console.log(courses);
   // SAVE IN MONGO
   // userData.stats = retData
   // Users.upsert({id:userData.id},userData);
   // console.log("Store user ", retData);
-  // Users.removeFields()
+  let removeFields = {
+    mailingAddress1: '',
+    mailingAddress2: '',
+    mailingCity: '',
+    mailingPostalCode: '',
+    mailingCountry: '',
+    mailingState: '',
+    mailingState: '',
+    studiedLessons: '',
+    mail: '',
+    ltsm: '',
+    ltv: '',
+    avatar_url: '',
+    http_referer: '',
+    ip_address: '',
+    ip_city: '',
+    ip_country: '',
+    ip_region: '',
+    mobile_phone: '',
+    credit_amount: '',
+    confirm_status: '',
+    purchase_status: '',
+    role_id: '',
+    school_id: '',
+    signin_source: '',
+    source_type: '',
+    created_at: '',
+    updated_at: '',
+    come: '',
+    createdBy: '',
+    updatedBy: '',
+    avatarUrl: '',
+    member_id: '',
+    updated_by: '',
+    created_by: '',
+    userAvatar: '',
+  }
+
+  // console.log(retData);
+
+  Users.removeFields(retData.id,removeFields)
   if (retData && retData.email)
   Users.upsert({id:retData.id}, retData)
+
   // res.json(retData);
 }
