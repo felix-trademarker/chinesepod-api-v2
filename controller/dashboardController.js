@@ -49,9 +49,9 @@ exports.getInfo = async function(req, res, next) {
 
   if (req.params.userId) userId = req.params.userId 
 
-  if (!userId) {
-    throw 'invalid'
-  }
+  // if (!userId) {
+  //   throw 'invalid'
+  // }
   // userId= "1210621"
   if(userId) {
     let returnData = {}
@@ -60,6 +60,8 @@ exports.getInfo = async function(req, res, next) {
     userService.getUserStats(userId)
 
     let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
+
+    if (!userData) res.json({})
 
     try {
 
