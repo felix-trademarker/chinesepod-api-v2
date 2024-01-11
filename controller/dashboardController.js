@@ -214,20 +214,20 @@ exports.getInfo = async function(req, res, next) {
       }
 
       // SAVE IN MONGO
-      userData.info = contents
-      // cleanup records
-      delete userData.admin_note
-      delete userData.age_id
-      delete userData.birthday
-      delete userData.ltsm
-      delete userData.ltv
-      delete userData.mailing_address1
-      delete userData.mailing_address2
-      delete userData.mailing_city
-      delete userData.mailing_country
-      delete userData.mailing_postal_code
-      delete userData.mailing_state
-      delete userData.msn
+      // userData.info = contents
+      // // cleanup records
+      // delete userData.admin_note
+      // delete userData.age_id
+      // delete userData.birthday
+      // delete userData.ltsm
+      // delete userData.ltv
+      // delete userData.mailing_address1
+      // delete userData.mailing_address2
+      // delete userData.mailing_city
+      // delete userData.mailing_country
+      // delete userData.mailing_postal_code
+      // delete userData.mailing_state
+      // delete userData.msn
 
 
 
@@ -259,6 +259,8 @@ exports.getStats = async function(req, res, next) {
   let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
 
   if (!userData) res.json({})
+
+  userService.getUserStats(userId)
 
   let userOptions = (await Users.getMysqlProduction(`Select * From user_options 
                                                         WHERE user_id=${userId} 
