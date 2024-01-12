@@ -159,7 +159,7 @@ exports.getInfo = async function(req, res, next) {
         returnData.upgrade = {
           needsUpgrade: false,
           canDismiss: false,
-          upgradePath: 1, // 3 , 2 , 1
+          upgradePath: 3, // 3 , 2 , 1
         }
         access = 'basic'
       }
