@@ -157,9 +157,16 @@ exports.getInfo = async function(req, res, next) {
 
       if (userId == 1197231) {
         returnData.upgrade = {
-          needsUpgrade: true,
+          needsUpgrade: false,
+          allowedCount: 10,
+          // lessonCount: lessonCount,
+          // lessonTimeline: lessonTimeline,
           canDismiss: true,
-          upgradePath: 3, // 3 , 2 , 1
+          upgradePath: 2, // 3 , 2 , 1,
+          prerollAdId: res.app.locals.variables.prerollAdId,
+          prerollAds: res.app.locals.variables.prerollAds,
+          upgradeLink:
+          res.app.locals.variables.upgradeLink + (trial ? '' : '?trial=yes'),
         }
         access = 'basic'
       }
