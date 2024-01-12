@@ -55,7 +55,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         } else {
           // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
           return {
-            type: 'basic',
+            type: 'free',
             expiry: userAccess.expiry,
           }
         }
