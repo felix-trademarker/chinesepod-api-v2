@@ -158,8 +158,8 @@ exports.getInfo = async function(req, res, next) {
       if (userId == 1197231) {
         returnData.upgrade = {
           needsUpgrade: false,
-          canDismiss: true,
-          upgradePath: 2, // 3 , 2 , 1
+          canDismiss: false,
+          upgradePath: 1, // 3 , 2 , 1
         }
         access = 'basic'
       }
