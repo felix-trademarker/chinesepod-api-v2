@@ -156,6 +156,7 @@ exports.getInfo = async function(req, res, next) {
       }
 
       if (userId == 1197231) {
+        trial = false
         returnData.upgrade = {
           needsUpgrade: false,
           allowedCount: 10,
