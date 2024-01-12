@@ -8,6 +8,7 @@ let UserPhpSession = require('../repositories/users.phpsession')
 let helpers = require('../helpers')
 let axios = require('axios');
 let LessonProgress = require('../repositories/lessonProgressAWS')
+let moment = require('moment')
 
 exports.getAccessTypeAndExpiry = async function(userId) {
     
@@ -42,10 +43,29 @@ exports.getAccessTypeAndExpiry = async function(userId) {
   
       let userAccess = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId}`))[0]
       if (userAccess && userAccess.usertype_id) {
-        return {
-          type: helpers.accessMap(userAccess.usertype_id),
-          expiry: userAccess.expiry,
+
+        // CHECK EXPIRY DATE AND CHECK MONGO 
+        // CHECKING OF MONGO STILL NEEDS CONFIRMATION
+
+        if (moment().diff(userAccess.expiry) > 0) {
+          return {
+            type: helpers.accessMap(userAccess.usertype_id),
+            expiry: userAccess.expiry,
+          }
+        } else {
+          // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
+          return {
+            type: 'basic',
+            expiry: userAccess.expiry,
+          }
         }
+
+
+
+        // return {
+        //   type: helpers.accessMap(userAccess.usertype_id),
+        //   expiry: userAccess.expiry,
+        // }
       } else {
         return { type: 'free', expiry: new Date() }
       }
