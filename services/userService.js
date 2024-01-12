@@ -47,26 +47,29 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         // CHECK EXPIRY DATE AND CHECK MONGO 
         // CHECKING OF MONGO STILL NEEDS CONFIRMATION
 
-        // if (moment().diff(userAccess.expiry) > 0) {
-        //   return {
-        //     type: helpers.accessMap(userAccess.usertype_id),
-        //     expiry: userAccess.expiry,
-        //   }
-        // } else {
-        //   // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
-        //   return {
-        //     type: 'free',
-        //     expiry: userAccess.expiry,
-        //   }
+        if (moment().diff(userAccess.expiry) > 0) {
+          // expired!
+
+          // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
+          return {
+            type: 'free',
+            expiry: userAccess.expiry,
+          }
+        } else {
+          console.log('f', userAccess.expiry)
+          return {
+            type: helpers.accessMap(userAccess.usertype_id),
+            expiry: userAccess.expiry,
+          }
           
-        // }
-
-
-
-        return {
-          type: helpers.accessMap(userAccess.usertype_id),
-          expiry: userAccess.expiry,
         }
+
+
+
+        // return {
+        //   type: helpers.accessMap(userAccess.usertype_id),
+        //   expiry: userAccess.expiry,
+        // }
       } else {
         return { type: 'free', expiry: new Date() }
       }
