@@ -104,7 +104,7 @@ exports.getInfo = async function(req, res, next) {
         let trial = userData.trial
 
         // console.log(access, res.app.locals)
-
+          console.log("generated access =========== >>>>>",accessInfo);
       if (!['premium', 'admin', 'basic'].includes(access)) { 
         const currentDate = new Date()
 
