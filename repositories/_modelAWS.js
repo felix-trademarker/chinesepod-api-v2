@@ -130,6 +130,23 @@ class Model{
         });
     }
 
+    upsert(query, data) {
+        var this_ = this
+
+        return new Promise(function(resolve, reject) { 
+
+            this_.db.getDbAWS().collection(this_.table).updateOne(query,{$set: data },{upsert:true}, 
+                function(err, result) {
+                
+                if (err) reject(err);
+					
+                resolve(result);
+                
+			});
+
+		});
+    }
+
     remove(id) {
 
         var this_ = this
@@ -148,6 +165,27 @@ class Model{
 					reject(err);
 				}
 			});
+		});
+
+    }
+
+    removeFields(id, query) {
+
+        var this_ = this
+
+		return new Promise(function(resolve, reject) { 
+
+         
+
+            this_.db.getDbAWS().collection(this_.table).updateMany({id:id},{$unset: query}, 
+                function(err, result) {
+                
+                if (err) reject(err);
+					
+                resolve(result);
+                
+			});
+
 		});
 
     }
