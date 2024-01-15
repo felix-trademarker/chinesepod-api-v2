@@ -54,7 +54,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         }
       }
 
-      console.log(">>>> CHECK USER EXPIRY ",userMongo.email, userAccess.expiry)
+      // console.log(">>>> CHECK USER EXPIRY ",userMongo.email, userAccess.expiry)
 
       if (userAccess && userAccess.usertype_id) {
 
