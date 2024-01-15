@@ -85,6 +85,21 @@ exports.accessMap = function(level) {
   }
 }
 
+exports.accessMapreverse = function(level) {
+  switch (level) {
+    case 'admin':
+      return 1
+    case 'premium':
+      return 5
+    case 'basic':
+      return 6
+    case 'free':
+      return 7
+    default:
+      return 7
+  }
+}
+
 exports.extractToken = function(req){
     
   let token = req.headers.authorization

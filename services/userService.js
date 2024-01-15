@@ -41,7 +41,19 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         }
       }
   
+      // fetch users in mongo
+      let userMongo = (await Users.findQuery({id:userId}))[0]
+
       let userAccess = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId}`))[0]
+      
+      // switch user access if mongo has latest expiry
+      if (userMongo && userMongo.accessType) {
+        if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
+          userAccess = userMongo.accessType
+          userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
+        }
+      }
+
       if (userAccess && userAccess.usertype_id) {
 
         // CHECK EXPIRY DATE AND CHECK MONGO 
@@ -49,8 +61,8 @@ exports.getAccessTypeAndExpiry = async function(userId) {
 
         if (moment().diff(userAccess.expiry) > 0) {
           // expired!
-
           // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
+          
           return {
             type: 'free',
             expiry: userAccess.expiry,
@@ -370,7 +382,7 @@ exports.getUserStats = async function(userId) {
   })
 
   let accessInfo = await this.getAccessTypeAndExpiry(userId)
-
+  console.log(accessInfo);
   delete userData.admin_note
   delete userData.age_id
   delete userData.birthday
@@ -510,11 +522,31 @@ exports.getUserStats = async function(userId) {
     userAvatar: '',
   }
 
+  // get users in mongo check user access object
+  // accessInfo
+  let userMongo = (await Users.findQuery({id: retData.id}))[0]
+
+  if (userMongo && userMongo.accessType){
+    if ( moment(accessInfo.expiry).diff(userMongo.accessType.expiry) > 0 ) {
+      retData.accessType = {
+        type: helpers.accessMap(accessInfo.usertype_id),
+        expiry: accessInfo.expiry
+      }
+    }
+  } else {
+    // add accesstype object in mongo records
+    retData.accessType = {
+      type: helpers.accessMap(accessInfo.usertype_id),
+      expiry: accessInfo.expiry
+    }
+  }
+
   // console.log(retData);
 
   Users.removeFields(retData.id,removeFields)
   if (retData && retData.email)
   Users.upsert({id:retData.id}, retData)
 
+  // console.log('saved',retData.accessType);
   // res.json(retData);
 }
