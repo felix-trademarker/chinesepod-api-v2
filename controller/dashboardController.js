@@ -775,8 +775,8 @@ exports.bookmarks = async function(req, res, next) {
         WHERE v3_id='${userLesson.v3_id}'
       `))[0];
 
-      lesson.saved = userLesson.saved
-      lesson.studied = userLesson.studied
+      // lesson.saved = userLesson.saved
+      // lesson.studied = userLesson.studied
       retArr.push(lesson)
       Lessons.upsert({id:lesson.id},lesson)
     }
