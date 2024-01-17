@@ -42,17 +42,17 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       }
   
       // fetch users in mongo
-      let userMongo = (await Users.findQuery({id:userId}))[0]
+      // let userMongo = (await Users.findQuery({id:userId}))[0]
 
       let userAccess = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId}`))[0]
       
       // switch user access if mongo has latest expiry
-      if (userMongo && userMongo.accessType) {
-        if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
-          userAccess = userMongo.accessType
-          userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
-        }
-      }
+      // if (userMongo && userMongo.accessType) {
+      //   if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
+      //     userAccess = userMongo.accessType
+      //     userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
+      //   }
+      // }
 
       // console.log(">>>> CHECK USER EXPIRY ",userMongo.email, userAccess.expiry)
 
@@ -61,7 +61,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         // CHECK EXPIRY DATE AND CHECK MONGO 
         // CHECKING OF MONGO STILL NEEDS CONFIRMATION
 
-        if (moment().diff(userAccess.expiry) > 0) {
+        if (false || moment().diff(userAccess.expiry) > 0) {
           // expired!
           // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
           
@@ -70,7 +70,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
             expiry: userAccess.expiry,
           }
         } else {
-          console.log('f', userAccess.expiry)
+          // console.log('f', userAccess.expiry)
           return {
             type: helpers.accessMap(userAccess.usertype_id),
             expiry: userAccess.expiry,
@@ -384,7 +384,7 @@ exports.getUserStats = async function(userId) {
   })
 
   let accessInfo = await this.getAccessTypeAndExpiry(userId)
-  console.log(accessInfo);
+  // console.log(accessInfo);
   delete userData.admin_note
   delete userData.age_id
   delete userData.birthday
@@ -474,11 +474,15 @@ exports.getUserStats = async function(userId) {
   // Fetch lesson progress
   let subscriptions = await Users.getUserSubscriptions(retData.id)
   let emailLogs = await Users.getUserEmailLogs(retData.id)
+  let dictionaries = await Users.getUsersDictionaries(retData.id)
+  let vocabularies = await Users.getUserVocabulary(retData.id)
   // let courses = await Users.getUserCourse(retData.id)
 
   // console.log(emailLogs);
   if (emailLogs && emailLogs.length > 0) retData.emailLogs = emailLogs
   if (subscriptions && subscriptions.length > 0) retData.subscriptions = subscriptions
+  if (dictionaries && dictionaries.length > 0) retData.dictionaries = dictionaries
+  if (vocabularies && vocabularies.length > 0) retData.vocabularies = vocabularies
   // if (courses && courses.length > 0) retData.courses = courses
 
   // console.log(courses);
@@ -549,6 +553,6 @@ exports.getUserStats = async function(userId) {
   if (retData && retData.email)
   Users.upsert({id:retData.id}, retData)
 
-  // console.log('saved',retData.accessType);
+  console.log('saved',retData.id);
   // res.json(retData);
 }
