@@ -12,7 +12,7 @@ let moment = require('moment')
 
 exports.getAccessTypeAndExpiry = async function(userId) {
     
-    
+    // console.log("fetching user access type");
       let szTeacherLinks = (await Users.getMysqlProduction(`Select * From sz_org_staff WHERE user_id=${userId} AND confirmed=1`))[0]
 
       if (szTeacherLinks && szTeacherLinks.length) {
@@ -27,7 +27,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         }
 
       }
-
+      // console.log(1)
       let szStudentLinks = (await Users.getMysqlProduction(`Select * From sz_students WHERE user_id=${userId} AND confirmed=1`))[0]
   
       if (szStudentLinks && szStudentLinks.length) {
@@ -40,19 +40,20 @@ exports.getAccessTypeAndExpiry = async function(userId) {
           return { type: 'premium', expiry: activeSchools[0].expiry }
         }
       }
-  
+      // console.log(2)
       // fetch users in mongo
-      // let userMongo = (await Users.findQuery({id:userId}))[0]
+      let userMongo = (await Users.findQuery({id:userId}))[0]
 
       let userAccess = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId}`))[0]
-      
+      // console.log(3)
       // switch user access if mongo has latest expiry
-      // if (userMongo && userMongo.accessType) {
-      //   if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
-      //     userAccess = userMongo.accessType
-      //     userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
-      //   }
-      // }
+      if (userMongo && userMongo.accessType) {
+        if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
+          console.log("used mongo records")
+          userAccess = userMongo.accessType
+          userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
+        }
+      }
 
       // console.log(">>>> CHECK USER EXPIRY ",userMongo.email, userAccess.expiry)
 
@@ -61,16 +62,16 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         // CHECK EXPIRY DATE AND CHECK MONGO 
         // CHECKING OF MONGO STILL NEEDS CONFIRMATION
 
-        if (false || moment().diff(userAccess.expiry) > 0) {
+        if (moment().diff(userAccess.expiry) > 0) {
           // expired!
           // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
-          
+          console.log("expired", userAccess.expiry);
           return {
             type: 'free',
             expiry: userAccess.expiry,
           }
         } else {
-          // console.log('f', userAccess.expiry)
+          console.log('f', userAccess.expiry, userAccess.usertype_id, helpers.accessMap(userAccess.usertype_id))
           return {
             type: helpers.accessMap(userAccess.usertype_id),
             expiry: userAccess.expiry,
@@ -87,6 +88,8 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       } else {
         return { type: 'free', expiry: new Date() }
       }
+
+      
 }
 
 exports.getUser = async function(userId) {
@@ -272,7 +275,7 @@ exports.getUserStats = async function(userId) {
   let returnData = {}
 
   let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
-
+// console.log(1)
   if (!userData) res.json({})
 
   let userOptions = await Users.getMysqlProduction(`Select * From user_options 
@@ -297,7 +300,7 @@ exports.getUserStats = async function(userId) {
   let level = userOptions['level']
       ? helpers.intToLevel(userOptions['level'])
       : 'newbie'
-
+      // console.log(2)
   //CONVERT SOME OPTIONS TO Boolean
   userOptions['pinyin'] = userOptions['pinyin'] === 'true'
   userOptions['autoMarkStudied'] = !(
@@ -320,31 +323,33 @@ exports.getUserStats = async function(userId) {
     'pre intermediate': 'preInt',
   }
 
-  
+  // console.log(3)
 
   if (userOptions && userOptions.option_value) {
     level = helpers.intToLevel(userOptions.option_value)
   } else {
     returnData.levelUnset = true
   }
-
+  // console.log(3.1)
   let userPreferences = (await Users.getMysqlProduction(`Select * From user_preferences WHERE user_id=${userId} ORDER BY updated_at DESC`))[0]
 
-
+  // console.log(3.2)
   let userLessons = await Users.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt From user_contents 
                                                         WHERE user_id=${userId} 
                                                         AND studied=1
                                                         AND lesson_type=0
                                                         ORDER BY created_at DESC
                                                     `);
+  // console.log(3.3, userLessons.length)
   // POPULATE lesson
   for (let i=0; i < userLessons.length; i++) {
-    userLessons[i].lesson = (await Users.getMysqlProduction(`Select * From contents 
+    userLessons[i].lesson = (await Users.getMysqlProduction(`Select updated_at as updatedAt, level From contents 
         WHERE v3_id='${userLessons[i].v3_id}' 
     `))[0];
   }
-
+  // console.log(4)
   let progressData = userLessons.filter(function (item) {
+    // console.log(item)
     if (!item.lesson || !item.lesson.level) return false
     return levelMap[item.lesson.level.toLowerCase()]
       ? levelMap[item.lesson.level.toLowerCase()] === level
@@ -382,7 +387,7 @@ exports.getUserStats = async function(userId) {
       item.updatedAt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     )
   })
-
+  // console.log(5)
   let accessInfo = await this.getAccessTypeAndExpiry(userId)
   // console.log(accessInfo);
   delete userData.admin_note
@@ -398,7 +403,7 @@ exports.getUserStats = async function(userId) {
   delete userData.mailing_state
   delete userData.msn
 
-  
+  // console.log(6)
 
   let retData = {
     ...returnData,
@@ -430,6 +435,7 @@ exports.getUserStats = async function(userId) {
       access: accessInfo.type,
     },
     ...userOptions,
+    accessType: accessInfo
   }
 
   // retData.avatar = retData.userAvatar
@@ -476,14 +482,14 @@ exports.getUserStats = async function(userId) {
   let emailLogs = await Users.getUserEmailLogs(retData.id)
   let dictionaries = await Users.getUsersDictionaries(retData.id)
   let vocabularies = await Users.getUserVocabulary(retData.id)
-  // let courses = await Users.getUserCourse(retData.id)
+  let courses = await Users.getUserCourse(retData.id)
 
   // console.log(emailLogs);
   if (emailLogs && emailLogs.length > 0) retData.emailLogs = emailLogs
   if (subscriptions && subscriptions.length > 0) retData.subscriptions = subscriptions
   if (dictionaries && dictionaries.length > 0) retData.dictionaries = dictionaries
   if (vocabularies && vocabularies.length > 0) retData.vocabularies = vocabularies
-  // if (courses && courses.length > 0) retData.courses = courses
+  if (courses && courses.length > 0) retData.courses = courses
 
   // console.log(courses);
   // SAVE IN MONGO
@@ -530,22 +536,22 @@ exports.getUserStats = async function(userId) {
 
   // get users in mongo check user access object
   // accessInfo
-  let userMongo = (await Users.findQuery({id: retData.id}))[0]
+  // let userMongo = (await Users.findQuery({id: retData.id}))[0]
 
-  if (userMongo && userMongo.accessType){
-    if ( moment(accessInfo.expiry).diff(userMongo.accessType.expiry) > 0 ) {
-      retData.accessType = {
-        type: helpers.accessMap(accessInfo.usertype_id),
-        expiry: accessInfo.expiry
-      }
-    }
-  } else {
-    // add accesstype object in mongo records
-    retData.accessType = {
-      type: helpers.accessMap(accessInfo.usertype_id),
-      expiry: accessInfo.expiry
-    }
-  }
+  // if (userMongo && userMongo.accessType){
+  //   if ( moment(accessInfo.expiry).diff(userMongo.accessType.expiry) > 0 ) {
+  //     retData.accessType = {
+  //       type: helpers.accessMap(accessInfo.usertype_id),
+  //       expiry: accessInfo.expiry
+  //     }
+  //   }
+  // } else {
+  //   // add accesstype object in mongo records
+  //   retData.accessType = {
+  //     type: helpers.accessMap(accessInfo.usertype_id),
+  //     expiry: accessInfo.expiry
+  //   }
+  // }
 
   // console.log(retData);
 
