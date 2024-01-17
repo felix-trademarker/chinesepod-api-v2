@@ -43,6 +43,8 @@ router.get('/account/subscription/subscriptions', dashboardController.getSubscri
 
 router.get('/labels/gift-packages', labelController.giftPackages);
 
+router.get('/user/confirm-email', dashboardController.setEmailConfirm);
+
 // BASED ON LIVE API
 // router.get('/recap/get-popular-recap-lessons', userController.popularRecapLessons);
 

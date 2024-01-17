@@ -60,7 +60,7 @@ module.exports = {
 
     getUserByEmailSQL : async function(email){
         // return new Promise(function(resolve, reject) {
-            var sql = "SELECT * FROM " + tableName
+            var sql = "SELECT * FROM " + _table
             sql += " WHERE email='" + email+"'"
             return await defaultModel.getMysql(conn.getDbMySqlProduction(),sql)
         // });
