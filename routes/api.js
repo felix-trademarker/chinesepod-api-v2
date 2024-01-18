@@ -2,6 +2,7 @@ var express = require('express');
 var dashboardController = require('../controller/dashboardController')
 var labelController = require('../controller/labelController')
 var lessonController = require('../controller/lessonController')
+var vocabularyController = require('../controller/vocabularyController')
 var middleware = require('../middleware')
 
 var router = express.Router();
@@ -38,12 +39,16 @@ router.get('/lessons/get-vocab', lessonController.getVocab);
 router.get('/lessons/get-downloads', lessonController.getDownloads);
 router.get('/lessons/get-expansion', lessonController.getExpansion);
 
+router.get('/vocabulary/decks', vocabularyController.getAllDecks);
+
 
 router.get('/account/subscription/subscriptions', dashboardController.getSubscriptions);
 
 router.get('/labels/gift-packages', labelController.giftPackages);
 
+// CUSTOM API
 router.get('/user/confirm-email', dashboardController.setEmailConfirm);
+router.get('/user/subscriptions', dashboardController.getUserSubscription);
 
 // BASED ON LIVE API
 // router.get('/recap/get-popular-recap-lessons', userController.popularRecapLessons);

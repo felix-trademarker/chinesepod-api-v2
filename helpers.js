@@ -69,6 +69,42 @@ exports.levelToChannelId = function(level) {
   }
 }
 
+exports.paymentMap = function(subscriptionFrom) {
+  switch (subscriptionFrom) {
+    case 1:
+      return 'Authorize'
+    case 2:
+      return 'Paypal'
+    case 3:
+    case 5:
+      return 'Apple Pay'
+    case 7:
+      return 'Stripe'
+  }
+}
+
+exports.subscriptionTypeMap = function(subscriptionType) {
+  switch (subscriptionType) {
+    case 1:
+      return 'basic'
+    case 2:
+      return 'premium'
+    case 5:
+      return 'classroom'
+  }
+}
+
+exports.subscriptionStatusMap = function(status) {
+  switch (status) {
+    case 1:
+      return 'active'
+    case 2:
+      return 'cancelled'
+    case 3:
+      return 'past due'
+  }
+}
+
 
 exports.accessMap = function(level) {
   switch (level) {
