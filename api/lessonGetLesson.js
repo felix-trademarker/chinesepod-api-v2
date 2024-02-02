@@ -52,6 +52,10 @@ exports.fn = async function(req, res, next) {
     
     // CHECK AND UPDATE LESSON DATA WITH USERS RECORDS ABOUT THE LESSON
     if (lesson && lesson.id != '123') {
+      
+      // UPDATE MONGO158 
+      Lessons.upsert({id:lesson.id}, lesson);
+
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
                                     WHERE user_id=${userId} 
