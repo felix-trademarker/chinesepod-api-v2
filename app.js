@@ -32,7 +32,7 @@ app.set('view engine', 'ejs');
 
 // APP  CONTAINER =========== >> 
 let conn = require('./config/DbConnect');
-conn.connectToServerAWS( function( err, client ) { // MAIN MONGO START
+conn.connectToServerAWS( function( err, client ) { // AWS MONGO START
 conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   await conn.prepareRedisConn();
@@ -67,9 +67,54 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.use('/api/v2/custom', apiRouter2);
   app.use('/api/v2/proxy', apiProxyRouter);
 
+  
+  // TEST TO CREATE 1 FILE FOR EACH API
+
+  // USER DASHBOARD API
+  app.get('/api/v2/dashboard/get-info',middleware.checkAuth, require('./api/getInfo').fn);
+  app.get('/api/v2/dashboard/get-stats',middleware.checkAuth, require('./api/getStats').fn);
+  app.get('/api/v2/dashboard/course-lessons',middleware.checkAuth, require('./api/courseLessons').fn);
+  app.get('/api/v2/dashboard/user-courses',middleware.checkAuth, require('./api/userCourses').fn);
+  app.get('/api/v2/dashboard/history',middleware.checkAuth, require('./api/history').fn);
+  app.get('/api/v2/dashboard/bookmarks',middleware.checkAuth, require('./api/bookmarks').fn);
+  app.get('/api/v2/dashboard/more-courses',middleware.checkAuth, require('./api/moreCourses').fn);
+  app.get('/api/v2/dashboard/all-lessons',middleware.checkAuth, require('./api/allLessons').fn);
+  app.get('/api/v2/dashboard/get-bookmarked-lessons',middleware.checkAuth, require('./api/getBookMarkedLessons').fn);
+  
+  app.get('/api/v2/dashboard/get-studied-lessons',middleware.checkAuth, require('./api/getStudiedLessons').fn);
+  app.get('/api/v2/dashboard/all-courses',middleware.checkAuth, require('./api/allCourses').fn);
+  app.get('/api/v2/dashboard/all-playlists',middleware.checkAuth, require('./api/allPlaylists').fn);
+  app.get('/api/v2/dashboard/onboarding/questions',middleware.checkAuth, require('./api/onboardingQuestions').fn);
+
+  app.get('/api/v2/dashboard/get-suggestions',middleware.checkAuth, require('./api/getSuggestions').fn);
+  app.get('/api/v2/dashboard/get-course',middleware.checkAuth, require('./api/getCourse').fn);
+  app.get('/api/v2/dashboard/get-all-lessons',middleware.checkAuth, require('./api/getAllLessons').fn);
+
+  // LESSON API
+  app.get('/api/v2/lessons/get-dialogue',middleware.checkAuth, require('./api/lessonGetDialogue').fn);
+  app.get('/api/v2/lessons/get-vocab',middleware.checkAuth, require('./api/lessonGetVocab').fn);
+  app.get('/api/v2/lessons/get-details/:id',middleware.checkAuth, require('./api/lessonGetDetailsId').fn);
+  app.get('/api/v2/lessons/get-expansion',middleware.checkAuth, require('./api/lessonGetExpansion').fn);
+  app.get('/api/v2/lessons/get-lesson',middleware.checkAuth, require('./api/lessonGetLesson').fn);
+  app.get('/api/v2/lessons/get-comments',middleware.checkAuth, require('./api/lessonGetComments').fn);
+  app.get('/api/v2/lessons/get-grammar',middleware.checkAuth, require('./api/lessonGetGrammar').fn);
+  // LESSON EXERCISES QUESTIONS
+  app.get('/api/v2/exercises/get-questions',middleware.checkAuth, require('./api/exercisesGetExercises').fn);
+  // VOCABULARY DECKS
+  app.get('/api/v2/vocabulary/decks',middleware.checkAuth, require('./api/vocabularyGetAllDecks').fn);
+
+  // ACCOUNT
+  app.get('/api/v2/account/subscription/subscriptions',middleware.checkAuth, require('./api/subscriptionGetSubscriptions').fn);
+
+  // USED IN PRINTER APP TO PRINT GIFT LABELS
+  app.get('/api/v2/labels/gift-packages',middleware.checkAuth, require('./api/labelgiftPackages').fn);
+
+  // CUSTOM API 
+  app.get('/api/v2/user/confirm-email',middleware.checkAuth, require('./api/setEmailConfirm').fn);
+  app.get('/api/v2/user/subscriptions',middleware.checkAuth, require('./api/getUserSubscription').fn);
+
+  
   app.use('/api/v2',middleware.checkAuth, apiRouter);
-
-
 
   // userService.udpateLessonFiles();
   // userService.findAWSFile('0bv22rnq8c.mp4')

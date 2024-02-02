@@ -27,6 +27,13 @@ var conCpod2015 = mysql.createConnection({
     database: "chinesepod2015",
 });
 
+var conCpodAssessment = mysql.createConnection({
+  host: process.env.DBHOST,
+  user: process.env.DBUSER,
+  password: process.env.DBPASS,
+  database: "assessment",
+});
+
 var redisClient = redis.createClient({
   host: process.env.REDISHOST,
   port: process.env.REDISPORT
@@ -74,6 +81,10 @@ module.exports = {
 
   getDbMySql2015: function() {
     return conCpod2015;
+  },
+
+  getDbMySqlAssessment: function() {
+    return conCpodAssessment;
   },
 
   getRedisConn: async function() {

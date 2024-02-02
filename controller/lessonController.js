@@ -18,7 +18,7 @@ let userService = require('../services/userService')
 let _ = require('lodash')
 const sanitizeHtml = require('sanitize-html')
 const geoip = require('geoip-country')
-
+let moment = require('moment')
 
 const { asyncForEach } = require('../frequent')
 
@@ -181,7 +181,7 @@ exports.getLesson = async function(req, res, next) {
     res.json({err:'Invalid'})
   } else {
 
-    // insert users data into mongo158
+    // UPDATE USERS IN MONGO158 
     userService.getUserStats(userId)
 
     const cleanLink = (link) => {
@@ -208,17 +208,18 @@ exports.getLesson = async function(req, res, next) {
       throw 'invalid'
     }
 
-    // fetch redis records here
     let lesson = {}
+
+    // GET REDIS LESSON DATA
     try{
       lesson = await redisClientLesson.get(inputs.slug)
     } catch(err) {
       console.log("==== Redis ERROR ====", err);
     }
-    // let lesson = {}
-    // if has saved data get user info and return
+    
+    
+    // CHECK AND UPDATE LESSON DATA WITH USERS RECORDS ABOUT THE LESSON
     if (lesson && lesson.id != '123') {
-      console.log(">>>>>>>>>>> Return lesson data from redis");
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
                                     WHERE user_id=${userId} 
@@ -235,9 +236,13 @@ exports.getLesson = async function(req, res, next) {
         lesson.saved = false
       }
 
+      console.log(">>>>>>>>>>> Return lesson data from redis");
+
+      // RETURN LESSON DATA FROM REDIS
       res.json(lesson)
 
     } else {
+      // GET LESSON DATA IN MYSQL, UPDATE MONGO158 AND REDIS RECORDS
       let lessonData = {}
       let columns = res.app.locals.helpers.getLessonColumns()
       columns[0] = "v3_id as id"
@@ -367,50 +372,7 @@ exports.getLesson = async function(req, res, next) {
         if (lesson.sources || lesson.video) {
           // const access = await sails.helpers.users.getAccessType(inputs.userId)
 
-          let accessInfo = await userService.getAccessTypeAndExpiry(userId)
-
-          let access = accessInfo.type
-
-          const geo = geoip.lookup(req.ip)
-
-          if (!lesson.sources) {
-            lesson.sources = { wistia: {} }
-          }
-
-          if (lesson.sources && lesson.sources.wistia && lesson.video) {
-            lesson.sources.wistia.simplified = lesson.video
-          }
-
-          try {
-            if (lesson.video && lesson.sources) {
-
-              // TODO: FIND RECORDS IN DYNAMODB
-              // CREATE REPOSITORIES LESSONFILES
-
-              // console.log("this", test);
-              const assets = (
-                await LessonFiles.findQuery({id:lesson.id})
-              )[0]
-                
-              // console.log(assets)
-              if (assets && assets.srcVideo) {
-                lesson.sources['hls'] = { simplified: assets.srcVideo }
-                // lesson.sources['mp4'] = { simplified: assets.mp4Urls }
-              }
-            }
-          } catch (e) {
-            console.log(e)
-            // sails.hooks.bugsnag.notify(e)
-            // sails.log.error(e)
-          }
-
-          // check if no HLS / get new hls links
-          let newHls = (await LessonNewSources.findQuery({v3_id:lesson.id }))[0]
-
-          if (newHls) {
-            // set hls link to the new URL
-            lesson.sources['hls'] = { simplified: newHls.src }
-          }
+          
 
           if (
             (!geo || geo.country !== 'CN') &&
@@ -423,7 +385,9 @@ exports.getLesson = async function(req, res, next) {
           }
         }
 
+        // UPDATE MONGO158 
         Lessons.upsert({id:lesson.id}, lesson);
+        // UPDATE REDIS RECORDS
         await redisClientLesson.set(inputs.slug, JSON.stringify(lesson))
 
         res.json(lesson)
@@ -657,130 +621,172 @@ exports.getVocab = async function(req, res, next) {
 
 exports.getDownloads = async function(req, res, next) {
 console.log('dl');
-  let response = await userService.getRequestAPI(req, res, next)
+
+// THIS IS A TEST TO GET ALL PREMIUM USERS FOR SITE STATS
+// ================ TEST START =================
+
+// let users = await Lessons.getMysqlProduction(`
+//   SELECT a.user_id, b.option_value as newDashboard, c.last_login
+//   FROM user_site_links a
+//   LEFT JOIN user_options b
+//   ON a.user_id=b.user_id
+//   LEFT JOIN user_preferences c
+//   ON a.user_id=c.user_id
+//    WHERE a.usertype_id <> 7 AND a.expiry > '${moment().format()}'
+//    AND b.option_key = 'newDashboard'
+// `)
+
+// let countLastLogin=0
+// await asyncForEach(users, async (user) => {
+
+//   if (moment(user.newDashboard).diff(user.last_login) > 0) {
+//     user.last_login = user.newDashboard
+//   }
+
+//   if ( moment().subtract(3, 'months').diff(user.last_login) < 0 ) {
+//     // user.last3Months = true; 
+//     countLastLogin++;
+//   }
+
+// })
+// ================== END TEST ==================
+
+
+
+// res.json({
+//   total : users.length,
+//   lastSeen3Months: countLastLogin,
+//   users: users
+// })
+
+
+  // let response = await userService.getRequestAPI(req, res, next)
   let userId = req.session.userId
   let inputs = req.session.inputs
 
-  // let queryAddOn = []
+  let queryAddOn = []
   
-  // if (inputs && inputs.limit) {
-  //   queryAddOn.push("LIMIT " + inputs.limit)
-  // }
-  // if (inputs && inputs.skip) {
-  //   queryAddOn.push("OFFSET " + inputs.skip)
-  // }
+  if (inputs && inputs.limit) {
+    queryAddOn.push("LIMIT " + inputs.limit)
+  }
+  if (inputs && inputs.skip) {
+    queryAddOn.push("OFFSET " + inputs.skip)
+  }
+  userId='925842'
+  if (!userId) {
+    res.json({err:'Invalid'})
+  } else {
 
-  // if (!userId) {
-  //   res.json({err:'Invalid'})
-  // } else {
+    const cleanLink = (link) => {
+      if (!link) {
+        return ''
+      }
+      link = link.replace('http:', 'https:')
+      return link
+    }
 
-  //   const cleanLink = (link) => {
-  //     if (!link) {
-  //       return ''
-  //     }
-  //     link = link.replace('http:', 'https:')
-  //     return link
-  //   }
+    let accessInfo = await userService.getAccessTypeAndExpiry(userId)
+    let access = accessInfo.type
+    
+    let user = await userService.getUser(userId)
+    
+    if (
+      user &&
+      user.email &&
+      user.email.split('@')[1] === 'chinesepod.com'
+    ) {
+      access = 'premium'
+    }
+    console.log(inputs.lessonId);
+    let lessonData = await Lessons.getMysqlProduction(`SELECT * FROM contents WHERE v3_id='${encodeURI(inputs.lessonId)}'`)
+    lessonData = lessonData[0]
+    // console.log(lessonData[0])
+    // let lessonData;
+    // _.each(lessonDataArr, function (lesson) {
+    //   console.log(lesson)
+    // })
+    let returnData = {
+      type: access,
+      downloads: {},
+    }
+    
+    let lessonRoot = `https://s3.amazonaws.com/chinesepod.com/${
+      lessonData.type === 'extra' ? 'extra/' : ''
+    }${lessonData.v3_id}/${lessonData.hash_code}/`
 
-  //   // let access = await sails.helpers.users.getAccessType(inputs.userId)
+    console.log(1);
+    if (access === 'premium' || access === 'admin') {
+      console.log(2);
+      if (lessonData.video) {
+        console.log(3);
+        const awsSources = (
+          await LessonFiles.findQuery({id:lessonData.v3_id}))[0]
+          console.log(4);
+        if (awsSources && awsSources['mp4Urls']) {
+          returnData.downloads.video = awsSources['mp4Urls'][0]
+        }
+      }
+      console.log(20);
+      if (lessonData.mp3_private) {
+        returnData.downloads.lesson = cleanLink(
+          lessonData.mp3_private && lessonData.mp3_private.startsWith('http')
+            ? lessonData.mp3_private
+            : lessonRoot + lessonData.mp3_private
+        )
+      }
+      if (lessonData.mp3_dialogue) {
+        returnData.downloads.dialogue = cleanLink(
+          lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
+            ? lessonData.mp3_dialogue
+            : lessonRoot + lessonData.mp3_dialogue
+        )
+      }
+      console.log("=============== here >>");
+      if (lessonData.mp3_thefix) {
+        returnData.downloads.review = cleanLink(
+          lessonData.mp3_thefix && lessonData.mp3_thefix.startsWith('http')
+            ? lessonData.mp3_thefix
+            : lessonRoot + lessonData.mp3_thefix
+        )
+      }
+      if (lessonData.pdf1) {
+        returnData.downloads.pdf1 = cleanLink(
+          lessonData.pdf1 && lessonData.pdf1.startsWith('http')
+            ? lessonData.pdf1
+            : lessonRoot + lessonData.pdf1
+        )
+      }
+      if (lessonData.pdf2) {
+        returnData.downloads.pdf2 = cleanLink(
+          lessonData.pdf2 && lessonData.pdf2.startsWith('http')
+            ? lessonData.pdf2
+            : lessonRoot + lessonData.pdf2
+        )
+      }
+    } else if (access === 'basic') {
+      if (lessonData.pdf1) {
+        returnData.downloads.pdf1 = cleanLink(
+          lessonData.pdf1 && lessonData.pdf1.startsWith('http')
+            ? lessonData.pdf1
+            : lessonRoot + lessonData.pdf1
+        )
+      }
+      if (lessonData.pdf2) {
+        returnData.downloads.pdf2 = cleanLink(
+          lessonData.pdf2 && lessonData.pdf2.startsWith('http')
+            ? lessonData.pdf2
+            : lessonRoot + lessonData.pdf2
+        )
+      }
+    }
+    console.log("=============== end here >>");
+    // let saveData = response
+    // saveData.lessonId = inputs.lessonId
+    // console.log(saveData);
+    // LessonDownloads.upsert({lessonId:inputs.lessonId}, saveData);
 
-  //   let accessInfo = await userService.getAccessTypeAndExpiry(userId)
-  //   let access = accessInfo.type
-
-  //   let user = await userService.getUser(userId)
-
-  //   if (
-  //     user &&
-  //     user.email &&
-  //     user.email.split('@')[1] === 'chinesepod.com'
-  //   ) {
-  //     access = 'premium'
-  //   }
-
-  //   let lessonData = (await Lessons.getMysqlProduction(`
-  //                       SELECT *
-  //                       FROM contents 
-  //                       WHERE v3_id='${inputs.lessonId}'
-  //                     `))[0]
-
-  //   let returnData = {
-  //     type: access,
-  //     downloads: {},
-  //   }
-
-  //   let lessonRoot = `https://s3.amazonaws.com/chinesepod.com/${
-  //     lessonData.type === 'extra' ? 'extra/' : ''
-  //   }${lessonData.id}/${lessonData.hash_code}/`
-
-  //   if (access === 'premium' || access === 'admin') {
-  //     if (lessonData.video) {
-  //       const awsSources = (
-  //         await LessonFiles.find('srcVideo', lessonData.video + '.mp4'))[0]
-        
-  //       if (awsSources && awsSources['mp4Urls']) {
-  //         returnData.downloads.video = awsSources['mp4Urls'][0]
-  //       }
-  //     }
-  //     if (lessonData.mp3_private) {
-  //       returnData.downloads.lesson = cleanLink(
-  //         lessonData.mp3_private && lessonData.mp3_private.startsWith('http')
-  //           ? lessonData.mp3_private
-  //           : lessonRoot + lessonData.mp3_private
-  //       )
-  //     }
-  //     if (lessonData.mp3_dialogue) {
-  //       returnData.downloads.dialogue = cleanLink(
-  //         lessonData.mp3_dialogue && lessonData.mp3_dialogue.startsWith('http')
-  //           ? lessonData.mp3_dialogue
-  //           : lessonRoot + lessonData.mp3_dialogue
-  //       )
-  //     }
-  //     console.log("=============== here >>");
-  //     if (lessonData.mp3_thefix) {
-  //       returnData.downloads.review = cleanLink(
-  //         lessonData.mp3_thefix && lessonData.mp3_thefix.startsWith('http')
-  //           ? lessonData.mp3_thefix
-  //           : lessonRoot + lessonData.mp3_thefix
-  //       )
-  //     }
-  //     if (lessonData.pdf1) {
-  //       returnData.downloads.pdf1 = cleanLink(
-  //         lessonData.pdf1 && lessonData.pdf1.startsWith('http')
-  //           ? lessonData.pdf1
-  //           : lessonRoot + lessonData.pdf1
-  //       )
-  //     }
-  //     if (lessonData.pdf2) {
-  //       returnData.downloads.pdf2 = cleanLink(
-  //         lessonData.pdf2 && lessonData.pdf2.startsWith('http')
-  //           ? lessonData.pdf2
-  //           : lessonRoot + lessonData.pdf2
-  //       )
-  //     }
-  //   } else if (access === 'basic') {
-  //     if (lessonData.pdf1) {
-  //       returnData.downloads.pdf1 = cleanLink(
-  //         lessonData.pdf1 && lessonData.pdf1.startsWith('http')
-  //           ? lessonData.pdf1
-  //           : lessonRoot + lessonData.pdf1
-  //       )
-  //     }
-  //     if (lessonData.pdf2) {
-  //       returnData.downloads.pdf2 = cleanLink(
-  //         lessonData.pdf2 && lessonData.pdf2.startsWith('http')
-  //           ? lessonData.pdf2
-  //           : lessonRoot + lessonData.pdf2
-  //       )
-  //     }
-  //   }
-  //   console.log("=============== end here >>");
-    let saveData = response
-    saveData.lessonId = inputs.lessonId
-    console.log(saveData);
-    LessonDownloads.upsert({lessonId:inputs.lessonId}, saveData);
-
-    res.json(response);
-  // }
+    res.json(returnData);
+  }
 }
 
 exports.getExpansion = async function(req, res, next) {
@@ -943,6 +949,321 @@ exports.getLessonURLNew = async function(req, res, next) {
   
 }
 
+exports.getComments = async function (req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  let lessonComments = await Lessons.getMysqlProduction(`select c.id, c.content, c.reply_to_id, c.reply_to_id_2, c.reply_to_user_id, c.comment_from, c.created_at,
+  c.user_id, u.username, p.avatar_url
+  from comments c
+  left join users u on c.user_id=u.id
+  left join user_preferences p on p.user_id=c.user_id
+  where c.parent_id = '${inputs.lessonId}' and c.type = 'lesson'`)
+
+  _.each(lessonComments, function (comment) {
+    if (comment.reply_to_id && comment.reply_to_id > 0) {
+      let parent = lessonComments.find((x) => x.id === comment.reply_to_id)
+      if (parent) {
+        if (!parent.nestedComments) {
+          parent.nestedComments = []
+        }
+        parent.nestedComments.push(comment)
+      }
+    }
+  })
+
+  res.json( {
+    count: lessonComments.length,
+    comments: lessonComments
+      .filter((comment) => comment.reply_to_user_id === 0)
+      .sort((a, b) => b.created_at - a.created_at),
+  })
+}
+
+exports.getGrammar = async function (req, res, next) {
+
+  let userId = req.session.userId
+  let inputs = req.session.inputs
+
+  // const grammarIds = await ContentGrammarTag.find({ v3_id: inputs.lessonId })
+  const grammarIds = await Lessons.getMysqlProduction(`
+    SELECT * 
+    FROM content_grammar_tag
+    WHERE v3_id = '${inputs.lessonId}'
+  `)
+  console.log(grammarIds);
+  let returnData = []
+
+  await asyncForEach(grammarIds, async (item) => {
+
+    let grammarBlocks = await Lessons.getMysqlProduction(`
+      SELECT *
+      FROM grammar_block
+      WHERE grammar_id = ${item.grammar_id}
+    `)
+
+    await asyncForEach(grammarBlocks, async (block) => {
+      // GET EXAMPLES AND GRAMMAR
+      block['examples'] = await Lessons.getMysqlProduction(`
+        select *
+        from grammar_sentence 
+        where grammar_block_id = ${block.grammar_block_id}
+      `)
+
+      block['grammar'] = await Lessons.getMysqlProduction(`
+        select *
+        from grammar_detail 
+        where grammar_id = '${item.grammar_id}'
+      `)
+
+      let exampledata=[]
+      // console.log(block['examples'])
+      block['examples'].forEach((example) => {
+        example.sentence = []
+
+        example['en'] = example['target']
+
+        example.p = ''
+        example.s = ''
+        example.t = ''
+
+        example['source_annotate'].replace(
+          /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
+          function (A, B, C, D, E, F, G, H) {
+            let d = ''
+            let e = ''
+            let c = ''
+            let b = ''
+            let g = ''
+
+            try {
+              d = decodeURI(D)
+            } catch (err) {
+              d = D
+            }
+            try {
+              e = decodeURI(E)
+            } catch (err) {
+              e = E
+            }
+            try {
+              c = decodeURI(C)
+            } catch (err) {
+              c = C
+            }
+            try {
+              b = decodeURI(B)
+            } catch (err) {
+              b = B
+            }
+
+            example.sentence.push({
+              s: d,
+              t: e,
+              p: c,
+              en: b,
+            })
+
+            example.p += c + ' '
+            example.s += d
+            example.t += e
+
+            if (G) {
+              try {
+                g = decodeURI(G)
+              } catch (err) {
+                g = G
+              }
+              example.sentence.push(g)
+              example.p += g
+              example.s += g
+              example.t += g
+            }
+          }
+        )
+        exampledata.push({
+          audio: example.source_audio,
+          en: example.en,
+          p: example.p,
+          s: example.s,
+          t: example.t,
+          target: example.target,
+          sentence: example.sentence
+        })
+      })
+      // FORMAT DATA TO SYNC WITH OLD API
+      let dataObj = {
+        examples: exampledata,
+        grammar: {
+          id: block.grammar[0].grammar_id,
+          introduction: block.grammar[0].introduction,
+          name: block.grammar[0].name,
+          tree: block.grammar[0].tree,
+          createdAt: block.grammar[0].update_time,
+        },
+        updatedAt: block.grammar[0].update_time
+      }
+      returnData.push(dataObj)
+    })
+  })
+
+  res.json(returnData) 
+}
+
+exports.getExercises = async function (req, res, next) {
+
+  const convert = require('xml-js')
+
+  let inputs = req.session.inputs
+
+  // let lessonQuestions = await Questions.find({
+  //   scope: inputs.lessonId,
+  //   product_id: 1,
+  //   status: 1,
+  // })
+
+  let lessonQuestions = await Lessons.getMysqlAssessment(`
+    Select * 
+      From questions 
+      WHERE scope = '${inputs.lessonId}' AND product_id=1 AND status=1`)
+
+  // await asyncForEach(lessonQuestions, async (question) => {
+  //   await QuestionsMongo.updateOrCreate({ id: question.id }, { ...question })
+  // })
+
+  lessonQuestions.forEach((question) => {
+    try {
+      question.options = convert.xml2js(question.options, {
+        compact: true,
+        ignoreAttributes: true,
+      })
+      question.options_2 = convert.xml2js(question.options_2, {
+        compact: true,
+        ignoreAttributes: true,
+      })
+      question.options_3 = convert.xml2js(question.options_3, {
+        compact: true,
+        ignoreAttributes: true,
+      })
+
+      // sails.log.info(question)
+
+      switch (question.type_id) {
+        case 4:
+          question.question = {
+            audio: question.options.type_d.data.prototype_mp3_url['_text'],
+          }
+          question.answer = {
+            s: question.options.type_d.data.prototype['_text'],
+            t: question.options_2.type_d.data.prototype['_text'],
+            p: question.options_3.type_d.data.prototype['_text'],
+            e: question.options.type_d.data.english['_text'],
+          }
+          break
+        case 2:
+          question.question = { segments: [] }
+          question.options.type_b.data.section.forEach((segment, index) => {
+            question.question.segments.push({
+              s: segment.prototype['_text'],
+              t:
+                question.options_2.type_b.data.section[index].prototype[
+                  '_text'
+                ],
+              p:
+                question.options_3.type_b.data.section[index].prototype[
+                  '_text'
+                ],
+              e: segment.english['_text'],
+              id: parseInt(segment.tag['_text']),
+            })
+          })
+          break
+        case 1:
+          question.question = { segments: [] }
+          question.options.type_a_options.data.section.forEach(
+            (phrase, index) => {
+              question.question.segments.push({
+                id: parseInt(phrase.tag['_text']),
+                s: phrase.prototype['_text'],
+                t:
+                  question.options_2.type_a_options.data.section[index]
+                    .prototype['_text'],
+                p:
+                  question.options_3.type_a_options.data.section[index]
+                    .prototype['_text'],
+                e: phrase.english['_text'],
+              })
+            }
+          )
+          break
+        case 5:
+          question.question = {
+            s: question.title,
+            t: question.title_2,
+            p: question.title_3,
+            choices: [],
+          }
+          question.answer = {
+            id: parseInt(question.options.type_e.data.answer['_text']),
+            s: question.options.type_e.data.sentence_translation['_text'],
+            t: question.options_2.type_e.data.sentence_translation['_text'],
+            p: question.options_3.type_e.data.sentence_translation['_text'],
+            e: question.options.type_e.data.sentence_english['_text'],
+          }
+
+          // sails.log.info(question.options.type_e.data)
+
+          question.options.type_e.data.options.forEach((choice, index) => {
+            question.question.choices.push({
+              id: parseInt(choice.tag['_text']),
+              s: choice.prototype['_text'],
+              t:
+                question.options_2.type_e.data.options[index].prototype[
+                  '_text'
+                ],
+              p:
+                question.options_3.type_e.data.options[index].prototype[
+                  '_text'
+                ],
+              e: choice.english['_text'],
+            })
+          })
+          break
+      }
+    } catch (e) {
+      // sails.log.error(e)
+      // sails.hooks.bugsnag.notify(e)
+    }
+  })
+  lessonQuestions = lessonQuestions.map((question) => {
+    return _.pick(question, [
+      'id',
+      'scope',
+      'score',
+      'type_id',
+      'status',
+      'question',
+      'answer',
+      'createdAt',
+    ])
+  })
+
+  res.json({
+    matching: lessonQuestions.filter((question) => {
+      return question.type_id === 1
+    }),
+    audio: lessonQuestions.filter((question) => {
+      return question.type_id === 4
+    }),
+    choice: lessonQuestions.filter((question) => {
+      return question.type_id === 5
+    }),
+    rearrange: lessonQuestions.filter((question) => {
+      return question.type_id === 2
+    }),
+  })
+}
 
 
 

@@ -170,3 +170,44 @@ exports.getLessonColumns = function(){
 
 }
 
+// exports.getLessonSources = async function (req,userId, lesson) { 
+
+//   let accessInfo = await userService.getAccessTypeAndExpiry(userId)
+
+//   let access = accessInfo.type
+
+//   const geo = geoip.lookup(req.ip)
+
+//   if (!lesson.sources) {
+//     lesson.sources = { wistia: {} }
+//   }
+
+//   if (lesson.sources && lesson.sources.wistia && lesson.video) {
+//     lesson.sources.wistia.simplified = lesson.video
+//   }
+
+//   try {
+//     if (lesson.video && lesson.sources) {
+//       const assets = (
+//         await LessonFiles.findQuery({id:lesson.id})
+//       )[0]
+        
+//       if (assets && assets.srcVideo) {
+//         lesson.sources['hls'] = { simplified: assets.srcVideo }
+//       }
+//     }
+//   } catch (e) {
+//     console.log(e)
+//   }
+
+//   // check if no HLS / get new hls links
+//   let newHls = (await LessonNewSources.findQuery({v3_id:lesson.id }))[0]
+
+//   if (newHls) {
+//     // set hls link to the new URL
+//     lesson.sources['hls'] = { simplified: newHls.src }
+//   }
+
+//   return lesson;
+// }
+

@@ -1192,7 +1192,8 @@ exports.onboardingQuestions = async function(req, res, next) {
       WHERE user_id=${userId}
     `)
     let userOptionsArr = {}
-    for (let i=0; i < userOptions.length; i++) { let entry = userOptions[i]
+    for (let i=0; i < userOptions.length; i++) { 
+      let entry = userOptions[i]
       userOptionsArr[entry.option_key] = entry.option_value
     }
 

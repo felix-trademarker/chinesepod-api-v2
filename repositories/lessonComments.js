@@ -50,10 +50,6 @@ module.exports = {
     getMysql2015 : async function(query){
         return await defaultModel.getMysql(conn.getDbMySql2015(),query)
     },
-
-    getMysqlAssessment : async function(query){
-        return await defaultModel.getMysql(conn.getDbMySqlAssessment(),query)
-    },
     
     // ADD CUSTOM FUNCTION BELOW ========================
     // ==================================================
