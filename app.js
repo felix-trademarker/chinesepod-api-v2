@@ -98,6 +98,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/lessons/get-lesson',middleware.checkAuth, require('./api/lessonGetLesson').fn);
   app.get('/api/v2/lessons/get-comments',middleware.checkAuth, require('./api/lessonGetComments').fn);
   app.get('/api/v2/lessons/get-grammar',middleware.checkAuth, require('./api/lessonGetGrammar').fn);
+  app.get('/api/v2/lessons/get-downloads',middleware.checkAuth, require('./api/lessonGetDownloads').fn);
   // LESSON EXERCISES QUESTIONS
   app.get('/api/v2/exercises/get-questions',middleware.checkAuth, require('./api/exercisesGetExercises').fn);
   // VOCABULARY DECKS

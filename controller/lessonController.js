@@ -673,6 +673,7 @@ console.log('dl');
     queryAddOn.push("OFFSET " + inputs.skip)
   }
   userId='925842'
+  // console
   if (!userId) {
     res.json({err:'Invalid'})
   } else {

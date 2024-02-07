@@ -33,7 +33,7 @@ var router = express.Router();
 // router.get('/lessons/get-vocab', lessonController.getVocab);
 // router.get('/lessons/get-details/:id', lessonController.getDetails);
 // router.get('/lessons/get-lesson/', lessonController.getLesson);
-router.get('/lessons/get-downloads', lessonController.getDownloads);
+// router.get('/lessons/get-downloads', lessonController.getDownloads);
 // router.get('/lessons/get-comments', lessonController.getComments);
 // router.get('/lessons/get-grammar', lessonController.getGrammar);
 
