@@ -16,7 +16,7 @@ exports.fn = async function(req, res, next) {
   if (inputs && inputs.skip) {
     queryAddOn.push("OFFSET " + inputs.skip)
   }
-  userId='925842'
+  // userId='925842'
   // console
   if (!userId) {
     res.json({err:'Invalid'})
