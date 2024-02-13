@@ -106,6 +106,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   // ACCOUNT
   app.get('/api/v2/account/subscription/subscriptions',middleware.checkAuth, require('./api/subscriptionGetSubscriptions').fn);
+  app.get('/api/v2/account/update/subscriptions', require('./api/userUpdateSubscription').fn);
 
   // USED IN PRINTER APP TO PRINT GIFT LABELS
   app.get('/api/v2/labels/gift-packages',middleware.checkAuth, require('./api/labelgiftPackages').fn);
@@ -115,7 +116,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/user/subscriptions',middleware.checkAuth, require('./api/getUserSubscription').fn);
 
   
-  app.use('/api/v2',middleware.checkAuth, apiRouter);
+  // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
   // userService.udpateLessonFiles();
   // userService.findAWSFile('0bv22rnq8c.mp4')

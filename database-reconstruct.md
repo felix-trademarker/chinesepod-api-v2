@@ -141,3 +141,33 @@ Merge users vocabulary, grammar ,decks, history, and bookmarked to users collect
 | courses | array of objects | user list of courses taken. Tables are join to fetch users courses | chinesepod_production | users, course_detail, user_courses |
 | history | array of objects | user list of lessons taken | chinesepod_production | user_contents |
 | bookmarks | array of objects | user list of bookmarked lessons | chinesepod_production | user_contents |
+
+## ChinesePod Orders Collection
+Reconstruct orders data from mysql to mongo database
+
+### MYSQL USERS TABLES ###
+**orders**: This table contains list of order data from customers, table is under chinesepod_production database and this is table reference to other mysql tables such as transactions, users, products and products from old database "chinesepod_2015".
+
+**transactions**: This table contains list of customers transaction and links to customers subscription record
+
+**transaction_logs**: This table contains list of transaction logs, records transactions status either success, denied or any error while making the transaction.
+
+**subscriptions**: This table contains list of users subscriptions, this also records the next billing and product info
+
+**products**: This table contains list of products offered in the site and also contains the length of each subscriptions.
+
+**Below table is the proposed collection in mongo**
+> Stop for now, can't locate how orders table are used in the sailsJS App
+
+| Field | Type | Description | DATABASE | TABLE |
+|---|---|---|---|---|
+| id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| transaction_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| serial_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| serial_total | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| recurring | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| product_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| product2015_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| product_type | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| user_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| promo_code | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
