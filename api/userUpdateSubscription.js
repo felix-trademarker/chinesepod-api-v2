@@ -7,7 +7,7 @@ exports.fn = async function(req, res, next) {
   // console.log(inputs);
 
 
-  if(inputs.userId && inputs.secret == "mikerocks123") {
+  if(inputs.userId && inputs.secret == "mikerocks123" && inputs.status == 'paid') {
     let userData;
     if ( ! isNaN(inputs.userId)) {
       userData = (await Users.findQuery({id:Number(inputs.userId)}))[0] 
