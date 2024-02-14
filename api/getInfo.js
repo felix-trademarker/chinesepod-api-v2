@@ -1,6 +1,7 @@
 let userService = require('../services/userService')
 let Users = require('../repositories/users')
 let crmUsersMongoAws = require('../repositories/crmUsersMongoAWS')
+let _ = require('lodash')
 
 exports.fn = async function(req, res, next) {
     console.log('called new function')
@@ -11,7 +12,7 @@ exports.fn = async function(req, res, next) {
   // if (!userId) {
   //   throw 'invalid'
   // }
-  // userId= "1197231"
+  // userId= "1297653"
   if(userId) {
     let returnData = {}
 
@@ -119,7 +120,9 @@ exports.fn = async function(req, res, next) {
 
       if (userData.admin_note && Number.isInteger(userData.admin_note)) {
         newLastLogin = new Date(userData.admin_note)
+        // newLastLogin = res.app.locals.moment(userData.admin_note).format("L")
       }
+      // console.log(userData.admin_note, res.app.locals.moment.unix('1707881416').format());
 
       if (userPreferences && userPreferences['last_login_ip']) {
         oldLastLogin = new Date(userPreferences['last_login_ip'])

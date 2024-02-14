@@ -39,13 +39,6 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   
   if (err) console.log(err);
   // start the rest of your app here
-  
-  // test block start
-  // var ModelRedis = require('./repositories/_modelRedis')
-  // let redisClient = new ModelRedis('lessons')
-  // console.log(await redisClient.get('mykey'))
-
-  // test block end
 
   // Create our number formatter.
   var formatter = new Intl.NumberFormat('en-US', {
