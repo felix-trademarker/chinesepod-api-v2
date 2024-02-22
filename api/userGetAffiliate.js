@@ -1,43 +1,41 @@
 let Users = require('../repositories/users')
-let _ = require('lodash')
 let userService = require('../services/userService')
 
 exports.fn = async function(req, res, next) {
   
-  if (!this.req.session) {
-    throw 'invalid'
-  }
+  let userId = req.session.userId
 
-  const { userId } = this.req.session
-
+  // userId= "1275816"
   if (!userId) {
-    return this.res.status(401).send('Not Authorized')
-  }
+    res.status(401).send('Not Authorized')
+  } else {
 
-  let affiliate = {}
-  affiliate = await AffiliateDetails.findOne({
-    user_id: userId,
-    status: 1,
-  })
+    let affiliate = {}
 
-  const userData = await User.findOne(userId).select('email')
+    affiliate = (await Users.getMysqlProduction(`SELECT * 
+                                              FROM affiliate_details
+                                              WHERE user_id=${userId} AND status=1`))[0]
 
-  if (
-    userData &&
-    userData.email &&
-    userData.email.endsWith('chinesepod.com')
-  ) {
-    if (affiliate) {
-      affiliate.isTeam = true
-    } else {
-      affiliate = { isTeam: true }
+    const userData = await userService.getUser(userId)
+
+    if (
+      userData &&
+      userData.email &&
+      userData.email.endsWith('chinesepod.com')
+    ) {
+      if (affiliate) {
+        affiliate.isTeam = true
+      } else {
+        affiliate = { isTeam: true }
+      }
     }
-  }
 
-  if (!affiliate) {
-    return this.res.status(404).send('Not Found')
-  }
+    if (!affiliate) {
+      res.status(401).send('Not Authorized')
+    }
 
-  return affiliate
+    res.json(affiliate)
+
+  }
     
 }

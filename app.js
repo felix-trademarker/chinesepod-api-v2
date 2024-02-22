@@ -101,6 +101,11 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/account/subscription/subscriptions',middleware.checkAuth, require('./api/subscriptionGetSubscriptions').fn);
   app.get('/api/v2/account/subscription/transactions', require('./api/getUserTransactions').fn);
 
+  // AFFILIATES API
+  app.get('/api/v2/affiliates/affiliate',middleware.checkAuth, require('./api/userGetAffiliate').fn);
+  app.get('/api/v2/affiliates/users',middleware.checkAuth, require('./api/userGetAffiliateList').fn);
+
+
   // custom account api
   app.get('/api/v2/account/update/subscriptions', require('./api/userUpdateSubscription').fn);
 
