@@ -45,6 +45,17 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       let userMongo = (await Users.findQuery({id:userId}))[0]
 
       let userAccess = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId}`))[0]
+
+      // check user site links if site id != 2
+      if (userAccess.site_id != 2) {
+        let userAccessSite2 = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId} AND site_id=2`))[0]
+
+        // force to use site id 2
+        if (userAccessSite2) {
+          userAccess = userAccessSite2
+        }
+      }
+
       // console.log(3)
       // switch user access if mongo has latest expiry
       if (userMongo && userMongo.accessType) {

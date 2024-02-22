@@ -152,22 +152,40 @@ Reconstruct orders data from mysql to mongo database
 
 **transaction_logs**: This table contains list of transaction logs, records transactions status either success, denied or any error while making the transaction.
 
-**subscriptions**: This table contains list of users subscriptions, this also records the next billing and product info
+**subscriptions**: This table contains list of users subscriptions, this also records the next billing and product info. subscriptions are created after a transaction is completed and sets the expiry date according to the purchased plan.
 
 **products**: This table contains list of products offered in the site and also contains the length of each subscriptions.
 
 **Below table is the proposed collection in mongo**
-> Stop for now, can't locate how orders table are used in the sailsJS App
 
 | Field | Type | Description | DATABASE | TABLE |
 |---|---|---|---|---|
 | id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
 | transaction_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| serial_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| serial_total | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| recurring | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| product_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| product2015_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| product_type | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| subscription_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
 | user_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
-| promo_code | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| product_id | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| product_length | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| is_old | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| product_price | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| currency | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| is_recurring_payment | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| is_recurring_product | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| discount | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| balance_before | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| balance_after | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| billed_amount | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| promotion_code | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| voucher_code | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| pay_status | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| pay_method | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| notes | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| country | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| region | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| city | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| ip_address | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| date_created | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| created_by | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| modified_by | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| last_modified | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+| email | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
