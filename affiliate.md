@@ -23,9 +23,24 @@
 
 <hr>
 
+## ChinesePod Affiliate Payment Process
+- Chinesepod admin will generate invoice document and send payment to customer. update system records according to paid invoice.
+
+### Step 1: 
+- From affiliates list, click on which affiliates to generate invoice. After selecting an affiliate it should show the affiliates details and in the date range select date from and to. Tick checkbox which outstanding referrals to generate invoice.
+- After selecting outstanding referrals at the upper right from the table a button to generate invoice should show and after clicking that button, this will geenrate invoice document and download directly to your computer.
+
+### Step 2: 
+- From affiliates admin dashboard, at the right side bar, click on credit notes.
+- After clicking on credit notes, the new generated invoice should show in the list of invoice with status "outstanding"
+- When payment is made, admin can update the invoice as paid. button is at the last column of each row.
+
 ## Mysql Database
 **Database:** chinesepod_production
 
 **Tables:** 
 - affiliate_details, This stores all affiliated users
 - affiliate_events, This records all users events and links to users and affiliated users
+
+**Source Code**
+- github CPOD-Affiliates
