@@ -10,7 +10,7 @@ exports.fn = async function(req, res, next) {
   
   let userId = req.session.userId
 
-  userId= "1275816"
+  // userId= "1275816"
   if (!userId) {
     res.status(401).send('Not Authorized')
   } else {
