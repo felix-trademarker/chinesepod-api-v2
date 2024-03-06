@@ -58,6 +58,9 @@ exports.fn = async function(req, res, next) {
         // .populate('user_id')
         // .populate('invoice')
       // console.log(affiliate.options)
+      for (let i=0; i < events.length; i++) {
+        events[i].invoice = await Users.getMysqlProduction(`SELECT * FROM affiliate_invoices WHERE id='${events[i].invoice}'`)
+      }
       res.json({
         ...JSON.parse(affiliate.options),
         // ..._.pick(affiliate.user_id, ['name', 'email', 'id']),
@@ -67,6 +70,7 @@ exports.fn = async function(req, res, next) {
         tag: affiliate.tag,
         events: events.map((event) => {
           event.event_details = JSON.parse(event.event_details)
+          // event.invoice = await Users.getMysqlProduction(`SELECT * FROM affiliate_invoices WHERE id='${event.invoice}'`)
           return {
             email: event.email,
             id: event.user_id,
