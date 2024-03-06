@@ -105,6 +105,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/affiliates/affiliate',middleware.checkAuth, require('./api/userGetAffiliate').fn);
   app.get('/api/v2/affiliates/users',middleware.checkAuth, require('./api/userGetAffiliateList').fn);
   app.post('/api/v2/affiliates/users/:id',middleware.checkAuth, require('./api/getAffiliateAdmin').fn);
+  app.put('/api/v2/affiliates/users/:id',middleware.checkAuth, require('./api/updateAffiliateAdmin').fn);
 
 
   // custom account api
