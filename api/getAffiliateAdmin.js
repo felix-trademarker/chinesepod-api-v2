@@ -11,7 +11,7 @@ exports.fn = async function(req, res, next) {
   // console.log(userId)
   // console.log(req.params)
 
-  // userId= "1275816"
+  userId= "1275816"
   if (!userId) {
     res.status(401).send('Not Authorized')
   } else {
@@ -37,8 +37,6 @@ exports.fn = async function(req, res, next) {
                                               FROM affiliate_events ae
                                               LEFT JOIN users u
                                               ON u.id=ae.user_id
-                                              LEFT JOIN affiliate_invoices ai
-                                              ON ai.id=ae.invoice
                                               WHERE ae.affiliate_id='${inputs.id}'
                                               AND ae.createdAt >= '${res.app.locals.moment(inputs.fromDate).format()}'
                                               AND ae.createdAt <= '${res.app.locals.moment(inputs.toDate).format()}'`)
@@ -59,7 +57,7 @@ exports.fn = async function(req, res, next) {
         // .populate('invoice')
       // console.log(affiliate.options)
       for (let i=0; i < events.length; i++) {
-        events[i].invoice = await Users.getMysqlProduction(`SELECT * FROM affiliate_invoices WHERE id='${events[i].invoice}'`)
+        events[i].invoice = (await Users.getMysqlProduction(`SELECT * FROM affiliate_invoices WHERE id='${events[i].invoice}'`))[0]
       }
       res.json({
         ...JSON.parse(affiliate.options),
