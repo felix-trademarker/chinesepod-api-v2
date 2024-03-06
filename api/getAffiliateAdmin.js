@@ -66,6 +66,7 @@ exports.fn = async function(req, res, next) {
         id: affiliate.user_id,
         tag: affiliate.tag,
         events: events.map((event) => {
+          event.event_details = JSON.parse(event.event_details)
           return {
             email: event.email,
             id: event.user_id,
