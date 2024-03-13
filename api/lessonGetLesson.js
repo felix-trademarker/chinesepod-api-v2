@@ -208,13 +208,12 @@ exports.fn = async function(req, res, next) {
         if (lesson.sources || lesson.video) {
 
           if (
-            (!geo || geo.country !== 'CN') &&
             access === 'free' &&
             (lesson.sources.youtube || lesson.sources.vimeo)
           ) {
             delete lesson.sources.wistia
             delete lesson.sources.hls
-            // delete lesson.sources.mp4
+
           }
         }
 
