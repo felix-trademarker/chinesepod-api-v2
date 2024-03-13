@@ -205,17 +205,17 @@ exports.fn = async function(req, res, next) {
 
         lesson.sources = (await LessonSources.findQuery({v3_id: lesson.id}))[0]
 
-        if (lesson.sources || lesson.video) {
+        // if (lesson.sources || lesson.video) {
 
-          if (
-            access === 'free' &&
-            (lesson.sources.youtube || lesson.sources.vimeo)
-          ) {
-            delete lesson.sources.wistia
-            delete lesson.sources.hls
+        //   if (
+        //     access === 'free' &&
+        //     (lesson.sources.youtube || lesson.sources.vimeo)
+        //   ) {
+        //     delete lesson.sources.wistia
+        //     delete lesson.sources.hls
 
-          }
-        }
+        //   }
+        // }
 
         // UPDATE MONGO158 
         Lessons.upsert({id:lesson.id}, lesson);
