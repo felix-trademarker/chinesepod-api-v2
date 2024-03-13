@@ -2,6 +2,7 @@ let Users = require('../repositories/users')
 let UsersApi = require('../repositories/users.api')
 let LessonFile = require('../repositories/lessonFiles')
 let Lesson = require('../repositories/lessons')
+let NewV3Id = require('../repositories/newV3Id')
 
 let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
 let UserPhpSession = require('../repositories/users.phpsession')
@@ -572,4 +573,175 @@ exports.getUserStats = async function(userId) {
 
   console.log('saved',retData.id);
   // res.json(retData);
+}
+
+// Update lesson v3_id to numeric
+exports.updateLessonV3Id = async function(v3_id) {
+    
+    
+  // chinesepod_production TABLES
+  // contents
+  // content_rates
+  // comments => parent_id
+  // content_dialogues
+  // content_expansions
+  // content_grammar_tag
+  // contents_free
+  // contents_to_content_tags
+  // course_contents
+  // group_contents
+  // hsk_level_vocabulary_mapping
+  // report_records => mark_id
+  // reports
+  // user_contents
+  // user_contents_assign
+  // user_contents_category
+  // vocabulary
+  // vocabulary_for_search
+
+  // chinesepod_logging TABLES
+  // lesson_logs
+  // lesson_tracks
+
+  // assessment TABLES
+  // assessments
+  // course_require => v3_id as string comma separated
+  // 
+
+  // v3_id = 'AI000'
+  // // get new assigned ID
+  // let v3_id_new = '6000'
+
+  // fetch old and new ID
+  let newID = (await NewV3Id.findQuery({v3_id:v3_id, status: "FALSE"}))[0] 
+
+  if (!newID) {
+    return 'end';
+  }
+  let v3_id_new = newID.v3_id_new
+
+  // duplicate old contents lesson and modify slug to retain permalink, SEO
+  let lesson = (await Lesson.getMysqlProduction(`SELECT * FROM contents WHERE v3_id='${v3_id}'`))[0]
+
+  if (newID && !newID.added) {
+
+    // modify old slug add '-v1' at the end of string
+    await Lesson.getMysqlProduction(`UPDATE contents
+                                        SET slug='${lesson.slug}-v1'
+                                        WHERE v3_id='${v3_id}'`)
+
+    // set duplicate lesson 
+    delete lesson.content_id
+    lesson.v3_id = v3_id_new
+
+    // duplicate contents
+    let query = (`INSERT INTO contents SET ?`)
+    let insertResponse = await Lesson.getMysqlProduction( query, lesson )
+
+    await NewV3Id.upsert({v3_id:v3_id}, {added: true})
+  }
+
+  await Lesson.getMysqlProduction(`UPDATE content_rates
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update content_rates')
+
+  await Lesson.getMysqlProduction(`UPDATE comments
+                                      SET parent_id='${v3_id_new}'
+                                      WHERE parent_id='${v3_id}'`)
+  console.log('update comments')
+
+  await Lesson.getMysqlProduction(`UPDATE content_dialogues
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update content_dialogues')
+
+  await Lesson.getMysqlProduction(`UPDATE content_expansions
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update content_expansions')
+
+  await Lesson.getMysqlProduction(`UPDATE content_grammar_tag
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update content_grammar_tag')
+
+  await Lesson.getMysqlProduction(`UPDATE contents_free
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update contents_free')
+
+  await Lesson.getMysqlProduction(`UPDATE group_contents
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update group_contents')
+
+  await Lesson.getMysqlProduction(`UPDATE course_contents
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update course_contents')
+
+  await Lesson.getMysqlProduction(`UPDATE hsk_level_vocabulary_mapping
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update hsk_level_vocabulary_mapping')
+
+  await Lesson.getMysqlProduction(`UPDATE contents_to_content_tags
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update contents_to_content_tags')
+
+  await Lesson.getMysqlProduction(`UPDATE report_records
+                                      SET mark_id='${v3_id_new}'
+                                      WHERE mark_id='${v3_id}'`)
+  console.log('update report_records')
+  // THIS GENERATES ERRPR DUPLICATE UNIQ KEYS
+  // REMOVE PERIOD CONSTRAINTS AND ADD NEW WITH NUM COL.
+
+  await Lesson.getMysqlProduction(`UPDATE reports
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update reports')
+
+  await Lesson.getMysqlProduction(`UPDATE user_contents
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update user_contents')
+
+  await Lesson.getMysqlProduction(`UPDATE user_contents_assign
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update user_contents_assign')
+
+
+  await Lesson.getMysqlProduction(`UPDATE vocabulary
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update vocabulary')
+
+  await Lesson.getMysqlProduction(`UPDATE vocabulary_for_search
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update vocabulary_for_search')
+
+  await Lesson.getMysqlLogging(`UPDATE lesson_logs
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update lesson_logs')
+
+  await Lesson.getMysqlLogging(`UPDATE lesson_tracks
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update lesson_tracks')
+
+  await Lesson.getMysqlAssessment(`UPDATE assessments
+                                      SET v3_id='${v3_id_new}'
+                                      WHERE v3_id='${v3_id}'`)
+  console.log('update assessments')
+  
+  await NewV3Id.upsert({v3_id:v3_id}, {status: 'TRUE'})
+  return '-END-'
+
+
+
 }

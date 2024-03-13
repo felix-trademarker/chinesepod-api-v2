@@ -203,6 +203,18 @@ class Model{
 		});
 
     }
+
+    insertMysql(con,query, data) {
+
+		return new Promise(function(resolve, reject) {
+            con.query(query, data, function (err, result) {
+                if (err) reject(err);
+
+                resolve(result)
+            });
+		});
+
+    }
 }
 
 module.exports = Model;

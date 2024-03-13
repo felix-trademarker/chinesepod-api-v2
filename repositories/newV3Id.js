@@ -1,4 +1,4 @@
-let _table = "lessons";
+let _table = "new.v3id";
 var Model = require('./_model158')
 var defaultModel = new Model(_table)
 

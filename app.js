@@ -123,7 +123,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   // userService.udpateLessonFiles();
   // userService.findAWSFile('0bv22rnq8c.mp4')
-  // userService.getUserStats(1168343)
+  // userService.updateLessonV3Id('AI001')
   // userService.getAccessTypeAndExpiry('1168343')
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
