@@ -39,7 +39,7 @@ module.exports = {
     // CUSTOM MYSQL QUERY BELOW ========================
     // ==================================================
 
-	getMysqlProduction : async function(query, data){
+	getMysqlProduction : async function(query, data=null){
 
         if (data) {
             return await defaultModel.insertMysql(conn.getDbMySqlProduction(),query, data)
