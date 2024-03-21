@@ -3,6 +3,7 @@ let LessonSources = require('../repositories/lessonSources')
 var ModelRedis = require('../repositories/_modelRedis')
 let redisClientLesson = new ModelRedis('lessons')
 const sanitizeHtml = require('sanitize-html')
+let NewV3Id = require('../repositories/newV3Id')
 
 exports.fn = async function(req, res, next) {
   let userId = req.session.userId
@@ -51,7 +52,7 @@ exports.fn = async function(req, res, next) {
     
     
     // CHECK AND UPDATE LESSON DATA WITH USERS RECORDS ABOUT THE LESSON
-    if (lesson && lesson.id != '123') {
+    if (false && lesson && lesson.id != '123') {
       
       // UPDATE MONGO158 
       Lessons.upsert({id:lesson.id}, lesson);
@@ -120,6 +121,12 @@ exports.fn = async function(req, res, next) {
           lesson.studied = false
           lesson.saved = false
         }
+
+        // get lesson data old v3_id
+        let newV3ID = (await NewV3Id.findQuery({v3_id_new:lesson.id}))[0]
+
+        if (newV3ID)
+        lessonData.id = newV3ID.v3_id
 
         let lessonRoot = `https://s3contents.chinesepod.com/${
           lessonData.type === 'extra' ? 'extra/' : ''
@@ -204,6 +211,10 @@ exports.fn = async function(req, res, next) {
         lesson.extra = lesson.type === 'extra'
 
         lesson.sources = (await LessonSources.findQuery({v3_id: lesson.id}))[0]
+
+        // revert to assigned v3 id
+        if (newV3ID)
+        lessonData.id = newV3ID.v3_id_new
 
         // if (lesson.sources || lesson.video) {
 
