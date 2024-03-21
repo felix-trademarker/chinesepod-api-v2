@@ -222,7 +222,14 @@ exports.fn = async function(req, res, next) {
               simplified : newSrc.src
             }
           }
-          // delete lesson.sources.wistia
+          
+        } else if (lesson.sources && lesson.sources.hls) {
+          // if source and has hls value
+          lesson.sources = {
+            hls: {
+              simplified : lesson.sources.hls
+            }
+          }
         }
 
         
