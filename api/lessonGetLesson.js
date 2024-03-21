@@ -1,5 +1,6 @@
 let Lessons = require('../repositories/lessons')
 let LessonSources = require('../repositories/lessonSources')
+let LessonNewSources = require('../repositories/lessonNewSources')
 var ModelRedis = require('../repositories/_modelRedis')
 let redisClientLesson = new ModelRedis('lessons')
 const sanitizeHtml = require('sanitize-html')
@@ -210,7 +211,17 @@ exports.fn = async function(req, res, next) {
 
         lesson.extra = lesson.type === 'extra'
 
+
         lesson.sources = (await LessonSources.findQuery({v3_id: lesson.id}))[0]
+
+        // fetch lesson new video source
+        let newSrc = (await LessonNewSources.findQuery({v3_id: lesson.id}))[0]
+        if (newSrc) {
+          lesson.sources.hls = newSrc.src
+          delete lesson.sources.wistia
+        }
+
+        
 
         // revert to assigned v3 id
         if (newV3ID)
