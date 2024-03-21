@@ -217,8 +217,12 @@ exports.fn = async function(req, res, next) {
         // fetch lesson new video source
         let newSrc = (await LessonNewSources.findQuery({v3_id: lesson.id}))[0]
         if (newSrc) {
-          lesson.sources.hls = newSrc.src
-          delete lesson.sources.wistia
+          lesson.sources = {
+            hls: {
+              simplified : newSrc.src
+            }
+          }
+          // delete lesson.sources.wistia
         }
 
         
