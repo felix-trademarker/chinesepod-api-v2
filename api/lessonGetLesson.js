@@ -52,7 +52,7 @@ exports.fn = async function(req, res, next) {
     
     
     // CHECK AND UPDATE LESSON DATA WITH USERS RECORDS ABOUT THE LESSON
-    if (false && lesson && lesson.id != '123') {
+    if (lesson && lesson.id != '123') {
       
       // UPDATE MONGO158 
       Lessons.upsert({id:lesson.id}, lesson);
