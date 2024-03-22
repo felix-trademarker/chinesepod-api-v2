@@ -3,7 +3,7 @@ var ModelRedis = require('../repositories/_modelRedis')
 let redisClientDialogue = new ModelRedis('dialogue')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
-
+let NewV3Id = require('../repositories/newV3Id')
 
 exports.fn = async function(req, res, next) {
   let userId = req.session.userId
