@@ -130,17 +130,17 @@ exports.fn = async function(req, res, next) {
   console.log("addresses", addresses.length);
   // return;
 
-  // if (addresses.length < 1) {
-  //   sqlQuery = "SELECT ta.id,ta.transaction_id, ta.country, ta.state, ta.city, ta.zip_code, ta.full_name, ta.address1, ta.address2, t.user_id "+
-  //             " FROM user_shipping_info ta"+
-  //             " LEFT JOIN transactions t"+
-  //             " ON t.id=ta.transaction_id" +
-  //             " WHERE ta.country='"+inputs.country+"' AND ta.last_update >= '"+startDate+"' AND ta.transaction_id IN ("+relevantTransactions.join(",")+")" +
-  //             " ORDER BY ta.last_update DESC";
+  if (addresses.length < 1) {
+    sqlQuery = "SELECT t.id,t.transaction_id, ta.country, ta.state, ta.city, ta.zip_code, ta.full_name, ta.address1, ta.address2, t.user_id "+
+              " FROM user_shipping_info ta"+
+              " LEFT JOIN transactions t"+
+              " ON t.user_id=ta.user_id" +
+              " WHERE ta.country='"+inputs.country+"' AND t.date_created >= '"+startDate+"' AND t.id IN ("+relevantTransactions.join(",")+")" +
+              " ORDER BY t.date_created DESC";
 
-  //   addresses = await giftPackages.getMysqlProduction(sqlQuery)
-  // }
-
+    addresses = await giftPackages.getMysqlProduction(sqlQuery)
+  }
+  console.log("addresses 2nd", addresses.length);
   // sails.log.info(addresses)
 
   const europeanAddresses = [

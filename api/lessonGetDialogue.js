@@ -30,7 +30,7 @@ exports.fn = async function(req, res, next) {
       console.log("==== Redis ERROR Dialogue ====", err);
     }
 
-    if (dialogueRedisData) {
+    if (false && dialogueRedisData) {
       console.log(">>>>>>>>>>> Return dialogue data from redis");
       res.json( dialogueRedisData )
 
@@ -43,6 +43,25 @@ exports.fn = async function(req, res, next) {
             ORDER BY display_order ASC
           `)
 
+      // get lesson data old v3_id
+      let newV3ID = (await NewV3Id.findQuery({v3_id_new:inputs.lessonId}))[0]
+      let audioRoot = ""
+
+      if (newV3ID) {
+        // get lesson and set audio
+        lessonData = (await Lessons.getMysqlProduction(`
+          SELECT hash_code, type
+          FROM contents 
+          WHERE v3_id='${inputs.lessonId}'
+        `))[0]
+
+        // build audio link
+        audioRoot = `https://s3contents.chinesepod.com/${
+          lessonData.type === 'extra' ? 'extra/' : ''
+        }${newV3ID.v3_id}/${lessonData.hash_code}/`
+
+      }
+
       let dialogueData = []
       let speakers = []
       //
@@ -51,8 +70,13 @@ exports.fn = async function(req, res, next) {
       await asyncForEach(rawDialogues, async (dialogue) => {
 
         if (dialogue.speaker) {
-        speakers.push(dialogue.speaker)
+          speakers.push(dialogue.speaker)
         }
+        // check if audio link not starting with http
+        if (!dialogue.audio.startsWith('http')){
+          dialogue.audio = audioRoot + dialogue.audio
+        }
+
         dialogue.vocabulary = []
         dialogue.sentence = []
         dialogue.en = dialogue.row_2
@@ -60,65 +84,65 @@ exports.fn = async function(req, res, next) {
         dialogue.s = ''
         dialogue.t = ''
         dialogue['row_1'].replace(
-        /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
-        function (A, B, C, D, E, F, G, H) {
-        let d = ''
-        let e = ''
-        let c = ''
-        let b = ''
-        let g = ''
+          /\(event,\'(.*?)\',\'(.*?)\',\'(.*?)\',\'(.*?)\'.*?\>(.*?)\<\/span\>([^\<]+)?/g,
+          function (A, B, C, D, E, F, G, H) {
+            let d = ''
+            let e = ''
+            let c = ''
+            let b = ''
+            let g = ''
 
-        try {
-        d = decodeURI(D)
-        } catch (err) {
-        d = D
-        }
-        try {
-        e = decodeURI(E)
-        } catch (err) {
-        e = E
-        }
-        try {
-        c = decodeURI(C)
-        } catch (err) {
-        c = C
-        }
-        try {
-        b = decodeURI(B)
-        } catch (err) {
-        b = B
-        }
+            try {
+            d = decodeURI(D)
+            } catch (err) {
+            d = D
+            }
+            try {
+            e = decodeURI(E)
+            } catch (err) {
+            e = E
+            }
+            try {
+            c = decodeURI(C)
+            } catch (err) {
+            c = C
+            }
+            try {
+            b = decodeURI(B)
+            } catch (err) {
+            b = B
+            }
 
-        dialogue.sentence.push({
-        s: d,
-        t: e,
-        p: c,
-        en: b,
-        })
+            dialogue.sentence.push({
+            s: d,
+            t: e,
+            p: c,
+            en: b,
+            })
 
-        dialogue.p += c + ' '
-        dialogue.s += d
-        dialogue.t += e
+            dialogue.p += c + ' '
+            dialogue.s += d
+            dialogue.t += e
 
-        if (G) {
-        try {
-        g = decodeURI(G)
-        } catch (err) {
-        g = G
-        }
-        dialogue.sentence.push(g)
-        dialogue.p += g
-        dialogue.s += g
-        dialogue.t += g
-        }
+            if (G) {
+            try {
+            g = decodeURI(G)
+            } catch (err) {
+            g = G
+            }
+            dialogue.sentence.push(g)
+            dialogue.p += g
+            dialogue.s += g
+            dialogue.t += g
+            }
 
-        dialogue.vocabulary.push({
-        s: d ? d : '',
-        t: e ? e : '',
-        p: c ? c : '',
-        en: b ? b : '',
-        })
-        }
+            dialogue.vocabulary.push({
+            s: d ? d : '',
+            t: e ? e : '',
+            p: c ? c : '',
+            en: b ? b : '',
+            })
+          }
         )
         dialogueData.push(
         _.pick(dialogue, [
