@@ -2,7 +2,7 @@ let Lessons = require('../repositories/lessons')
 var ModelRedis = require('../repositories/_modelRedis')
 let userService = require('../services/userService')
 let LessonFiles = require('../repositories/lessonFiles')
-
+let NewV3Id = require('../repositories/newV3Id')
 
 exports.fn = async function(req, res, next) {
   let userId = req.session.userId
@@ -61,6 +61,14 @@ exports.fn = async function(req, res, next) {
     let returnData = {
       type: access,
       downloads: {},
+    }
+
+    // get lesson data old v3_id
+    let newV3ID = (await NewV3Id.findQuery({v3_id_new:inputs.lessonId}))[0]
+
+    if (newV3ID) {
+      // build audio link
+      lessonData.v3_id = newV3ID.v3_id
     }
     
     let lessonRoot = `https://s3.amazonaws.com/chinesepod.com/${
