@@ -3,7 +3,7 @@ var ModelRedis = require('../repositories/_modelRedis')
 let redisClientGrammar = new ModelRedis('grammar')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
-
+let NewV3Id = require('../repositories/newV3Id')
 
 exports.fn = async function(req, res, next) {
   let userId = req.session.userId
@@ -16,7 +16,7 @@ exports.fn = async function(req, res, next) {
     console.log("==== Redis ERROR Vocab ====", err);
   }
 
-  if (lessonGrammar) {
+  if (false && lessonGrammar) {
 
     console.log(">>>>>>>>>>> Return Grammar data from redis");
     res.json(lessonGrammar);
@@ -30,6 +30,25 @@ exports.fn = async function(req, res, next) {
     `)
     // console.log(grammarIds);
     let returnData = []
+
+    let newV3ID = (await NewV3Id.findQuery({v3_id_new:inputs.lessonId}))[0]
+    let audioRoot = ""
+
+    let lessonData = {}
+    if (newV3ID) {
+      // get lesson and set audio
+      lessonData = (await Lessons.getMysqlProduction(`
+        SELECT hash_code, type
+        FROM contents 
+        WHERE v3_id='${inputs.lessonId}'
+      `))[0]
+
+      // build audio link
+      audioRoot = `https://s3contents.chinesepod.com/${
+        lessonData.type === 'extra' ? 'extra/' : ''
+      }${newV3ID.v3_id}/${lessonData.hash_code}/`
+
+    }
 
     await asyncForEach(grammarIds, async (item) => {
 
@@ -118,6 +137,11 @@ exports.fn = async function(req, res, next) {
               }
             }
           )
+
+          if (newV3ID) {
+            example.source_audio = audioRoot + example.source_audio
+          }
+
           exampledata.push({
             audio: example.source_audio,
             en: example.en,
