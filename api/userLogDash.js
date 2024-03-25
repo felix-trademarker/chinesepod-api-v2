@@ -6,13 +6,15 @@ exports.fn = async function(req, res, next) {
 
   let inputs = {
     userId: req.params.id,
-    dash: req.query.dash
+    dash: req.query.dash,
+    v3Id: req.query.v3id
   }
 
   let user = await userService.logUserDash(inputs)
 
   let userMongo = (await Users.findQuery({id:user.id}))[0]
 
+  console.log("==================== added user log site visited " + userMongo.id + " ========================");
   res.json(userMongo)
   
 }
