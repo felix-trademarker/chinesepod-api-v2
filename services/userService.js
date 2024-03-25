@@ -797,7 +797,8 @@ exports.logUserDash = async function(input) {
 
     data.newSiteUsedLogs = [{
       siteVisited: input.dash,
-      dateVisited: moment().format()
+      dateVisited: moment().format(),
+      lesson: input.v3id
     }].concat(data.newSiteUsedLogs)
 
     //LIMIT TO 20 ENTRIES ONLY 

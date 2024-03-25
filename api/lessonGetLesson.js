@@ -5,6 +5,7 @@ var ModelRedis = require('../repositories/_modelRedis')
 let redisClientLesson = new ModelRedis('lessons')
 const sanitizeHtml = require('sanitize-html')
 let NewV3Id = require('../repositories/newV3Id')
+let userService = require('../services/userService')
 
 exports.fn = async function(req, res, next) {
   let userId = req.session.userId
@@ -103,6 +104,15 @@ exports.fn = async function(req, res, next) {
       }
 
       if (lessonData && lessonData.slug) {
+
+        // keep track on users site used
+        // IE. PHP OR SAILSJS
+        let logData = {
+          userId: userId,
+          dash: 'new',
+          v3Id: lessonData.id
+        }
+        userService.logUserDash(logData)
 
         lesson = lessonData
         lesson.introduction = sanitizeHtml(lesson.introduction, sanitizeOptions)
