@@ -783,8 +783,12 @@ exports.updateLessonV3Id = async function() {
 
 exports.logUserDash = async function(input) {
 
-  let user = (await Users.getMysqlProduction(`Select * From users WHERE id=${input.userId}`))[0]
+  // let user = (await Users.getMysqlProduction(`Select * From users WHERE id=${input.userId}`))[0]
+  let user = (await Users.findQuery({id:input.userId}))[0]
 
+  console.log(user)
+
+  if (user) 
   await Users.upsert({id:user.id},{newSiteUsed:(input.dash == "new" ? true : false)})
 
   return user;
