@@ -61,7 +61,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       // switch user access if mongo has latest expiry
       if (userMongo && userMongo.accessType) {
         if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
-          console.log("used mongo records")
+          // console.log("used mongo records")
           userAccess = userMongo.accessType
           userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
         }
@@ -77,13 +77,13 @@ exports.getAccessTypeAndExpiry = async function(userId) {
         if (moment().diff(userAccess.expiry) > 0) {
           // expired!
           // CHECK MONGO RECORDS HERE FOR ADDITIONAL CHECKING
-          console.log("expired", userAccess.expiry);
+          // console.log("expired", userAccess.expiry);
           return {
             type: 'free',
             expiry: userAccess.expiry,
           }
         } else {
-          console.log('f', userAccess.expiry, userAccess.usertype_id, helpers.accessMap(userAccess.usertype_id))
+          // console.log('f', userAccess.expiry, userAccess.usertype_id, helpers.accessMap(userAccess.usertype_id))
           return {
             type: helpers.accessMap(userAccess.usertype_id),
             expiry: userAccess.expiry,
@@ -798,7 +798,7 @@ exports.logUserDash = async function(input) {
     data.newSiteUsedLogs = [{
       siteVisited: input.dash,
       dateVisited: moment().format(),
-      lesson: input.v3id
+      lesson: input.v3Id
     }].concat(data.newSiteUsedLogs)
 
     //LIMIT TO 20 ENTRIES ONLY 
