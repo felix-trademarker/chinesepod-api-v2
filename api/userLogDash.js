@@ -12,9 +12,15 @@ exports.fn = async function(req, res, next) {
 
   let user = await userService.logUserDash(inputs)
 
-  let userMongo = (await Users.findQuery({id:user.id}))[0]
+  if (user){
+    let userMongo = (await Users.findQuery({id:user.id}))[0]
 
-  console.log("==================== added user log site visited " + userMongo.id + " ========================");
-  res.json(userMongo)
+    console.log("==================== added user log site visited " + userMongo.id + " ========================");
+    res.json(userMongo)
+  } else {
+    res.json({})
+  }
+
+  
   
 }
