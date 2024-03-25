@@ -117,6 +117,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   // CUSTOM API 
   app.get('/api/v2/user/confirm-email',middleware.checkAuth, require('./api/setEmailConfirm').fn);
   app.get('/api/v2/user/subscriptions',middleware.checkAuth, require('./api/getUserSubscription').fn);
+  app.get('/api/v2/user/log-dash/:id/', require('./api/userLogDash').fn);
 
   
   // app.use('/api/v2',middleware.checkAuth, apiRouter);

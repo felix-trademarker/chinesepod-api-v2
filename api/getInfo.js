@@ -16,6 +16,14 @@ exports.fn = async function(req, res, next) {
   if(userId) {
     let returnData = {}
 
+    // keep track on users site used
+    // IE. PHP OR SAILSJS
+    let logData = {
+      userId: userId,
+      dash: 'new'
+    }
+    userService.logUserDash(logData)
+
     // save userData in mongo158
     userService.getUserStats(userId)
 
