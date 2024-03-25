@@ -783,10 +783,11 @@ exports.updateLessonV3Id = async function() {
 
 exports.logUserDash = async function(input) {
 
-  // let user = (await Users.getMysqlProduction(`Select * From users WHERE id=${input.userId}`))[0]
-  let user = (await Users.findQuery({id:input.userId}))[0]
+  // let userMysql = (await Users.getMysqlProduction(`Select * From users WHERE id=${input.userId}`))[0]
+  // console.log(input);
+  let user = (await Users.findQuery({id:parseInt(input.userId)}))[0]
 
-  console.log(user)
+  // console.log(user)
 
   if (user) {
     

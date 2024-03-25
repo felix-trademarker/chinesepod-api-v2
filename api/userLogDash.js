@@ -9,7 +9,7 @@ exports.fn = async function(req, res, next) {
     dash: req.query.dash,
     v3Id: req.query.v3id
   }
-
+  console.log(inputs);
   let user = await userService.logUserDash(inputs)
 
   if (user){
