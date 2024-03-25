@@ -788,8 +788,25 @@ exports.logUserDash = async function(input) {
 
   console.log(user)
 
-  if (user) 
-  await Users.upsert({id:user.id},{newSiteUsed:(input.dash == "new" ? true : false)})
+  if (user) {
+    
+    let data = {
+      newSiteUsed: (input.dash == "new" ? true : false),
+      newSiteUsedLogs: user.newSiteUsedLogs ? user.newSiteUsedLogs : []
+    }
+
+    data.newSiteUsedLogs = [{
+      siteVisited: input.dash,
+      dateVisited: moment().format()
+    }].concat(data.newSiteUsedLogs)
+
+    //LIMIT TO 20 ENTRIES ONLY 
+    data.newSiteUsedLogs.slice(0,19)
+
+    await Users.upsert({id:user.id},data)
+
+
+  }
 
   return user;
 }
