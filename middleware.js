@@ -26,7 +26,7 @@ exports.checkAuth = async function(req, res, next){
         
 
         if (token && token.length > 0) {
-            console.log(token);
+            // console.log(token);
             var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
 
             req.session.token = token
