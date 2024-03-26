@@ -11,7 +11,6 @@ exports.fn = async function(req, res, next) {
   // console.log(userId)
   // console.log(req.params)
 
-  userId= "1275816"
   if (!userId) {
     res.status(401).send('Not Authorized')
   } else {
