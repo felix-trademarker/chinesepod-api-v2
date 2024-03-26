@@ -261,11 +261,14 @@ exports.fn = async function(req, res, next) {
         // }
 
         // UPDATE MONGO158 
+        let returnedData = lesson 
+        delete lesson.studied
+        delete lesson.saved
         Lessons.upsert({id:lesson.id}, lesson);
         // UPDATE REDIS RECORDS
-        await redisClientLesson.set(inputs.slug, JSON.stringify(lesson))
+        await redisClientLesson.set(inputs.slug, JSON.stringify(returnedData))
 
-        res.json(lesson)
+        res.json(returnedData)
       } else {
         throw 'invalid'
       }

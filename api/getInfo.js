@@ -4,7 +4,7 @@ let crmUsersMongoAws = require('../repositories/crmUsersMongoAWS')
 let _ = require('lodash')
 
 exports.fn = async function(req, res, next) {
-    console.log('called new function')
+
   let userId = req.session.userId
 
   if (req.params.userId) userId = req.params.userId 
