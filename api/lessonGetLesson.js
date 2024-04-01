@@ -46,11 +46,11 @@ exports.fn = async function(req, res, next) {
     let lesson = {}
 
     // GET REDIS LESSON DATA
-    try{
-      lesson = await redisClientLesson.get(inputs.slug)
-    } catch(err) {
-      console.log("==== Redis ERROR ====", err);
-    }
+    // try{
+    //   lesson = await redisClientLesson.get(inputs.slug)
+    // } catch(err) {
+    //   console.log("==== Redis ERROR ====", err);
+    // }
     
     
     // CHECK AND UPDATE LESSON DATA WITH USERS RECORDS ABOUT THE LESSON
@@ -142,6 +142,7 @@ exports.fn = async function(req, res, next) {
         let lessonRoot = `https://s3contents.chinesepod.com/${
           lessonData.type === 'extra' ? 'extra/' : ''
         }${lessonData.id}/${lessonData.hash_code}/`
+
         if (lesson.image) {
           lesson.image = cleanLink(
             lessonData.image && lessonData.image.startsWith('http')
@@ -149,7 +150,7 @@ exports.fn = async function(req, res, next) {
               : lessonRoot + lessonData.image
           )
         }
-        // console.log("dialogue data", lessonData.mp3_dialogue);
+  
         if (lessonData.mp3_dialogue) {
           if (lessonData.mp3_dialogue.endsWith('.mp3')) {
             lesson.mp3_dialogue = cleanLink(

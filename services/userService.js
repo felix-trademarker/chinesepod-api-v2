@@ -3,6 +3,8 @@ let UsersApi = require('../repositories/users.api')
 let LessonFile = require('../repositories/lessonFiles')
 let Lesson = require('../repositories/lessons')
 let NewV3Id = require('../repositories/newV3Id')
+let LessonSources = require('../repositories/lessonSources')
+let LessonNewSources = require('../repositories/lessonNewSources')
 
 let UserPhpSessionAWS = require('../repositories/users.phpsessionAWS')
 let UserPhpSession = require('../repositories/users.phpsession')
@@ -811,4 +813,195 @@ exports.logUserDash = async function(input) {
   }
 
   return user;
+}
+
+// TO BE CONTINUE
+exports.updateLessonURL = async function() {
+
+  const cleanLink = (link) => {
+    if (!link) {
+      return ''
+    }
+    link = link.replace('http:', 'https:')
+    link = link.replace(
+      'https://s3.amazonaws.com/chinesepod.com/',
+      'https://s3contents.chinesepod.com/'
+    )
+    return link
+  }
+
+  // let newIDs = await NewV3Id.get();
+  let newIDs = await NewV3Id.findQuery({v3_id_new:'7458'});
+
+
+
+  for (let i=0; i < newIDs.length; i++) {
+
+    let newID = newIDs[i];
+
+    // get video URL
+    let lesson = (await Lesson.findQuery({id:newID.v3_id_new}))[0]
+
+    if (!lesson) {
+      lesson = (await Lesson.findQuery({id:newID.v3_id}))[0]
+    }
+
+
+    if (lesson) {
+
+      let lessonRoot = `https://s3contents.chinesepod.com/${
+        lesson.type === 'extra' ? 'extra/' : ''
+        }${newID.v3_id}/${lesson.hash_code}/`
+    
+
+      if (lesson.image) {
+        lesson.image = cleanLink(
+          lesson.image && lesson.image.startsWith('http')
+            ? lesson.image
+            : lessonRoot + lesson.image
+        )
+
+        await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET image='${lesson.image}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+      }
+
+      if (lesson.mp3_dialogue) {
+        if (lesson.mp3_dialogue.endsWith('.mp3')) {
+          lesson.mp3_dialogue = cleanLink(
+            lesson.mp3_dialogue && lesson.mp3_dialogue.startsWith('http')
+              ? lesson.mp3_dialogue
+              : lessonRoot + lesson.mp3_dialogue
+          )
+        } else {
+          lesson.mp3_dialogue = '';
+        }
+        await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET mp3_dialogue='${lesson.mp3_dialogue}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+      }
+      if (lesson.mp3_public) {
+        console.log(lesson.mp3_public);
+        if (lesson.mp3_public.endsWith('.mp3')) {
+          lesson.mp3_public = cleanLink(
+            lesson.mp3_public && lesson.mp3_public.startsWith('http')
+              ? lesson.mp3_public
+              : lessonRoot + lesson.mp3_public
+          )
+        } else {
+          lesson.mp3_public = '';
+        }
+        let res = await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET mp3_public='${lesson.mp3_public}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+                                      // console.log(lesson.id)
+      }
+      if (lesson.mp3_private) {
+        if (lesson.mp3_private.endsWith('.mp3')) {
+          lesson.mp3_private = cleanLink(
+            lesson.mp3_private && lesson.mp3_private.startsWith('http')
+              ? lesson.mp3_private
+              : lessonRoot + lesson.mp3_private
+          )
+        } else {
+          lesson.mp3_private = '';
+        }
+
+        await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET mp3_private='${lesson.mp3_private}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+      }
+      if (lesson.mp3_thefix) {
+        if (lesson.mp3_thefix.endsWith('.mp3')) {
+          lesson.mp3_thefix = cleanLink(
+            lesson.mp3_thefix && lesson.mp3_thefix.startsWith('http')
+              ? lesson.mp3_thefix
+              : lessonRoot + lesson.mp3_thefix
+          )
+        } else {
+          lesson.mp3_thefix = '';
+        }
+
+        await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET mp3_thefix='${lesson.mp3_thefix}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+      }
+      if (lesson.pdf1) {
+        if (lesson.pdf1.endsWith('.pdf')) {
+          lesson.pdf1 = cleanLink(
+            lesson.pdf1 && lesson.pdf1.startsWith('http')
+              ? lesson.pdf1
+              : lessonRoot + lesson.pdf1
+          )
+        } else {
+          lesson.pdf1 = '';
+        }
+
+        await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET pdf1='${lesson.pdf1}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+      }
+      if (lesson.pdf2) {
+        if (lesson.pdf2.endsWith('.pdf')) {
+          lesson.pdf2 = cleanLink(
+            lesson.pdf2 && lesson.pdf2.startsWith('http')
+              ? lesson.pdf2
+              : lessonRoot + lesson.pdf2
+          )
+        } else {
+          lesson.pdf2 = '';
+        }
+
+        await Lesson.getMysqlProduction(`UPDATE contents
+                                      SET pdf2='${lesson.pdf2}'
+                                      WHERE v3_id='${newID.v3_id_new}'`)
+      }
+
+      // let lessonSources = (await LessonSources.findQuery({v3_id: lesson.id}))[0]
+
+      // if (!lessonSources) {
+      // // fetch lesson new video source
+      //   let newSrc = (await LessonNewSources.findQuery({v3_id: lesson.id}))[0]
+      //   if (newSrc) {
+      //     lesson.sources = {
+      //       hls: {
+      //         simplified : newSrc.src
+      //       }
+      //     }
+          
+      //   } else if (lesson.sources && lesson.sources.hls) {
+      //     // if source and has hls value
+      //     lesson.sources = {
+      //       hls: {
+      //         simplified : lesson.sources.hls
+      //       }
+      //     }
+      //   }
+      // }
+
+      // delete lesson._id
+      // console.log(lesson)
+      
+
+      // return;
+      // await Lesson.upsert({id:lesson.id}, lesson)
+      console.log(">>>>>> UPDATED : ", lesson.id);
+    } // if lesson
+    else {
+      console.log(">>>>>> NOT FOUND : ", newID.v3_id);
+    }
+    // update mysql video path
+
+    
+
+  }
+
+  console.log(">>>>> END <<<<<");
+
+// >>>>>> NOT FOUND :  AI031
+// >>>>>> NOT FOUND :  AI032
+// >>>>>> NOT FOUND :  AI033
+// >>>>>> NOT FOUND :  AI034
+// >>>>>> NOT FOUND :  QW0458
+
 }
