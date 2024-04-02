@@ -1,6 +1,6 @@
 let Lessons = require('../repositories/lessons')
-var ModelRedis = require('../repositories/_modelRedis')
-let redisClient = new ModelRedis('exercises')
+// var ModelRedis = require('../repositories/_modelRedis')
+// let redisClient = new ModelRedis('exercises')
 let _ = require('lodash')
 
 
@@ -160,7 +160,7 @@ exports.fn = async function(req, res, next) {
     }
 
     Lessons.upsert({id:inputs.lessonId}, {exercises: returnedData});
-    await redisClient.set(inputs.lessonId, JSON.stringify(returnedData))
+    // await redisClient.set(inputs.lessonId, JSON.stringify(returnedData))
 
     res.json(returnedData)
   }

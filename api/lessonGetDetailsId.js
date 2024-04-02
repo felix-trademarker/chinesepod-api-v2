@@ -1,7 +1,7 @@
 let Lessons = require('../repositories/lessons')
 let LessonsVocabulary = require('../repositories/lessonVocabulary')
-var ModelRedis = require('../repositories/_modelRedis')
-let redisClientVocab = new ModelRedis('vocab')
+// var ModelRedis = require('../repositories/_modelRedis')
+// let redisClientVocab = new ModelRedis('vocab')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
 

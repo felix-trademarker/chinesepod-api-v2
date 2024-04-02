@@ -1,6 +1,6 @@
 let Lessons = require('../repositories/lessons')
-var ModelRedis = require('../repositories/_modelRedis')
-let redisClientDialogue = new ModelRedis('dialogue')
+// var ModelRedis = require('../repositories/_modelRedis')
+// let redisClientDialogue = new ModelRedis('dialogue')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
 let NewV3Id = require('../repositories/newV3Id')

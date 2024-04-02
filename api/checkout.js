@@ -1,5 +1,5 @@
 let Lessons = require('../repositories/lessons')
-var ModelRedis = require('../repositories/_modelRedis')
+// var ModelRedis = require('../repositories/_modelRedis')
 let userService = require('../services/userService')
 let LessonFiles = require('../repositories/lessonFiles')
 
