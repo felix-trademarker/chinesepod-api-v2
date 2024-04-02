@@ -10,13 +10,13 @@ exports.fn = async function(req, res, next) {
   let inputs = req.session.inputs
 
   let redisData = {}
-  try{
-    redisData = await redisClient.get(inputs.lessonId)
-  } catch(err) {
-    console.log("==== Redis ERROR exercices ====", err);
-  }
+  // try{
+  //   redisData = await redisClient.get(inputs.lessonId)
+  // } catch(err) {
+  //   console.log("==== Redis ERROR exercices ====", err);
+  // }
 
-  if (redisData) {
+  if (false && redisData) {
     console.log(">>>>>>>>>>> Return questions data from redis");
     res.json( redisData )
 
