@@ -10,11 +10,11 @@ exports.fn = async function(req, res, next) {
   let inputs = req.session.inputs
 
   let lessonGrammar = {}
-  try{
-    lessonGrammar = await redisClientGrammar.get(inputs.lessonId)
-  } catch(err) {
-    console.log("==== Redis ERROR Vocab ====", err);
-  }
+  // try{
+  //   lessonGrammar = await redisClientGrammar.get(inputs.lessonId)
+  // } catch(err) {
+  //   console.log("==== Redis ERROR Vocab ====", err);
+  // }
 
   if (false && lessonGrammar) {
 
@@ -169,7 +169,7 @@ exports.fn = async function(req, res, next) {
     })
 
     Lessons.upsert({id:inputs.lessonId}, {grammar: returnData});
-    await redisClientGrammar.set(inputs.lessonId, JSON.stringify(returnData))
+    // await redisClientGrammar.set(inputs.lessonId, JSON.stringify(returnData))
 
     res.json(returnData) 
   }

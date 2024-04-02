@@ -23,13 +23,13 @@ exports.fn = async function(req, res, next) {
   } else {
 
     let lessonExpansion = {}
-    try{
-      lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
-    } catch(err) {
-      console.log("==== Redis ERROR Vocab ====", err);
-    }
+    // try{
+    //   lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
+    // } catch(err) {
+    //   console.log("==== Redis ERROR Vocab ====", err);
+    // }
 
-    if (lessonExpansion) {
+    if (false && lessonExpansion) {
 
       console.log(">>>>>>>>>>> Return Expansion data from redis");
       res.json(lessonExpansion);
@@ -151,7 +151,7 @@ exports.fn = async function(req, res, next) {
       })
 
       Lessons.upsert({id:inputs.lessonId}, {expansion: returnData});
-      await redisClientExpansion.set(inputs.lessonId, JSON.stringify(returnData))
+      // await redisClientExpansion.set(inputs.lessonId, JSON.stringify(returnData))
 
       res.json(returnData);
     }

@@ -23,12 +23,12 @@ exports.fn = async function(req, res, next) {
   } else {
 
     // let dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
-    let dialogueRedisData = {}
-    try{
-      dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
-    } catch(err) {
-      console.log("==== Redis ERROR Dialogue ====", err);
-    }
+    // let dialogueRedisData = {}
+    // try{
+    //   dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
+    // } catch(err) {
+    //   console.log("==== Redis ERROR Dialogue ====", err);
+    // }
 
     if (false && dialogueRedisData) {
       console.log(">>>>>>>>>>> Return dialogue data from redis");
@@ -169,7 +169,7 @@ exports.fn = async function(req, res, next) {
       }
 
       Lessons.upsert({id:inputs.lessonId}, {dialogue: returnedData});
-      await redisClientDialogue.set(inputs.lessonId, JSON.stringify(returnedData))
+      // await redisClientDialogue.set(inputs.lessonId, JSON.stringify(returnedData))
 
       res.json( returnedData )
     }

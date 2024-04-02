@@ -26,11 +26,11 @@ exports.fn = async function(req, res, next) {
 
     // let lessonVocab = await redisClientVocab.get(inputs.lessonId)
     let lessonVocab = {}
-    try{
-      lessonVocab = await redisClientVocab.get(inputs.lessonId)
-    } catch(err) {
-      console.log("==== Redis ERROR Vocab ====", err);
-    }
+    // try{
+    //   lessonVocab = await redisClientVocab.get(inputs.lessonId)
+    // } catch(err) {
+    //   console.log("==== Redis ERROR Vocab ====", err);
+    // }
     if (false && lessonVocab){
 
       console.log(">>>>>>>>>>> Return Vocab data from redis");
@@ -89,7 +89,7 @@ exports.fn = async function(req, res, next) {
             );
 
       Lessons.upsert({id:inputs.lessonId}, {vocabulary: returnedData});
-      await redisClientVocab.set(inputs.lessonId, JSON.stringify(returnedData))
+      // await redisClientVocab.set(inputs.lessonId, JSON.stringify(returnedData))
 
       res.json(returnedData)
     }
