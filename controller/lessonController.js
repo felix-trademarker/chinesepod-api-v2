@@ -1,4 +1,5 @@
 let LessonNewSources = require('../repositories/lessonNewSources')
+let Users = require('../repositories/users')
 
 exports.getLessonURLNew = async function(req, res, next) {
 
@@ -10,5 +11,21 @@ exports.getLessonURLNew = async function(req, res, next) {
 }
 
 
+exports.getUsersSiteUsageStat = async function(req, res, next) {
 
+  let oldSite = await Users.findQuerySelected({newSiteUsed:false}, {id: 1, access: 1});
+  let newSite = await Users.findQuerySelected({newSiteUsed:true}, {id: 1, access: 1});
+
+  let oldPremium = oldSite.filter((element) => element.access == 'premium');
+  let newPremium = newSite.filter((element) => element.access == 'premium');
+
+  let returnedData = {
+    oldSiteUsers: oldSite.length,
+    oldSitePremiumUsers: oldPremium.length, 
+    newSiteUsers: newSite.length,
+    newSitePremiumUsers: newPremium.length, 
+  }
+  res.json(returnedData);
+  
+}
 

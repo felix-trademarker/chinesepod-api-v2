@@ -805,7 +805,7 @@ exports.logUserDash = async function(input) {
     }].concat(data.newSiteUsedLogs)
 
     //LIMIT TO 20 ENTRIES ONLY 
-    data.newSiteUsedLogs.slice(0,19)
+    data.newSiteUsedLogs = data.newSiteUsedLogs.slice(0,19)
 
     await Users.upsert({id:user.id},data)
 

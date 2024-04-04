@@ -77,6 +77,37 @@ class Model{
         });
     }
 
+    findQuerySelected(query, selectedFields = null ) {
+        var this_ = this
+        let ObjectID = require('mongodb').ObjectID;
+        return new Promise(function(resolve, reject) {
+            
+			if (selectedFields) {
+                this_.db.getDb158().collection(this_.table).find(query).project(selectedFields).toArray(function(err, result) {
+					
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+    
+                });
+            } else {
+                this_.db.getDb158().collection(this_.table).find(query).toArray(function(err, result) {
+					
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+    
+                });
+            }
+			
+
+        });
+    }
+
     paginate(skip,limit) {
         var this_ = this
         let ObjectID = require('mongodb').ObjectID;

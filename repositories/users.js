@@ -20,6 +20,9 @@ module.exports = {
 	findQuery : async function(query) {
         return await defaultModel.findQuery(query)
     },
+    findQuerySelected : async function(query, selected=null) {
+        return await defaultModel.findQuerySelected(query, selected)
+    },
     paginate : async function(skip,limit) {
         return await defaultModel.paginate(skip,limit)
 	},

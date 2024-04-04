@@ -108,6 +108,9 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.put('/api/v2/affiliates/users/:id',middleware.checkAuth, require('./api/updateAffiliateAdmin').fn);
 
 
+  app.get('/api/v2/tutorials/android-intro-video', require('./api/android-intro-tutorials').fn);
+
+
   // custom account api
   app.get('/api/v2/account/update/subscriptions', require('./api/userUpdateSubscription').fn);
 
