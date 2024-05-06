@@ -269,6 +269,9 @@ exports.fn = async function(req, res, next) {
         // UPDATE REDIS RECORDS
         // await redisClientLesson.set(inputs.slug, JSON.stringify(returnedData))
 
+        // test remove published date
+        delete returnedData.publication_timestamp
+
         res.json(returnedData)
       } else {
         throw 'invalid'
