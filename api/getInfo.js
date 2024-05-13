@@ -177,7 +177,12 @@ exports.fn = async function(req, res, next) {
       // res.setHeader("Pragma", "no-cache");
       // res.setHeader("Expires", 0);
 
-      res.json(contents);
+      if (access == 'deleted') {
+        res.json(null)
+      } else {
+        res.json(contents);
+      }
+
     } catch (e) {
       console.log(e);
     }

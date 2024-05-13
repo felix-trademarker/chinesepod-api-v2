@@ -143,11 +143,17 @@ exports.fn = async function(req, res, next) {
     },
   }
 
+  if (accessInfo.type == 'deleted') {
+    res.json(null)
+  } else {
+    res.json(retData);
+  }
+
   // res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   // res.setHeader("Pragma", "no-cache");
   // res.setHeader("Expires", 0);
 
-  res.json(retData);
+  // res.json(retData);
 
   
 } 
