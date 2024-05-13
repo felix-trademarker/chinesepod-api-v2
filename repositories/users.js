@@ -93,7 +93,7 @@ module.exports = {
                         mailing_postal_code as mailingPostalCode,
                         mobile_phone as mobileNumber,
                         credit_amount as creditAmount
-                    FROM ${tableName}
+                    FROM ${_table}
                     WHERE id=${id}`;
         return await defaultModel.getMysql(conn.getDbMySqlProduction(),sql)
         // });
@@ -129,7 +129,7 @@ module.exports = {
                             mailing_postal_code as mailingPostalCode,
                             mobile_phone as mobileNumber,
                             credit_amount as creditAmount
-                        FROM ${tableName}
+                        FROM ${_table}
                         WHERE ${cond}
                         LIMIT 1
                         `;

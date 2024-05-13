@@ -116,6 +116,8 @@ exports.accessMap = function(level) {
       return 'basic'
     case 7:
       return 'free'
+    case 20:
+      return 'deleted'
     default:
       return 'free'
   }
@@ -131,6 +133,8 @@ exports.accessMapreverse = function(level) {
       return 6
     case 'free':
       return 7
+    case 'deleted':
+      return 20
     default:
       return 7
   }
