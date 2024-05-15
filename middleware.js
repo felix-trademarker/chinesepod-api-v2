@@ -24,7 +24,6 @@ exports.checkAuth = async function(req, res, next){
 
         var token = req.headers.authorization ? req.headers.authorization.replace("Bearer ","") : []
         
-
         if (token && token.length > 0) {
             // console.log(token);
             var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
@@ -38,8 +37,6 @@ exports.checkAuth = async function(req, res, next){
     if (req.query) {
         req.session.inputs = req.query
     }
-
-
 
     next()
 }

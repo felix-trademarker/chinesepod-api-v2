@@ -113,7 +113,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   // custom account api
   app.get('/api/v2/account/update/subscriptions', require('./api/userUpdateSubscription').fn);
-  app.get('/api/v2/account/delete/:id',middleware.checkAuth, require('./api/setUserDeleted').fn);
+  app.get('/api/v2/account/delete/:id', require('./api/setUserDeleted').fn);
 
   // USED IN PRINTER APP TO PRINT GIFT LABELS
   app.get('/api/v2/labels/gift-packages',middleware.checkAuth, require('./api/labelgiftPackages').fn);

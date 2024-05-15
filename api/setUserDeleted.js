@@ -4,11 +4,26 @@ let Users = require('../repositories/users')
 
 exports.fn = async function(req, res, next) {
 
-  let userIdSession = req.session.userId
   // get user ID
-  let userId = req.params.id
+  let sessionId = req.params.id
 
-  if (!userIdSession || userId != userIdSession) {
+  // let authToken = req.headers.authorization
+
+  
+  let userSession = (await Users.getMysqlProduction("SELECT ns.session_user_id, u.id FROM ny_session ns LEFT JOIN users u ON u.email=ns.session_user_id WHERE ns.session_id='"+sessionId+"'"))[0]
+  console.log(userSession);
+
+  // return;
+  if (userSession) {
+    // check session ID
+    // let userSession = (await Users.getMysqlProduction("SELECT ns.session_user_id, u.id FROM ny_session ns LEFT JOIN users u ON u.email=ns.session_user_id WHERE ns.session_id='"+authToken+"'"))[0]
+    userIdSession =  userSession ? userSession.id : null;
+    console.log(userIdSession)
+  }
+
+  // return;
+
+  if (!userIdSession) {
     res.json({
       status: false,
       message: "Permission denied"
@@ -16,7 +31,7 @@ exports.fn = async function(req, res, next) {
     // console.log('asd');
 
   } else {
-    
+    let userId = userIdSession
     // udpate records
     if (userId) {
       let user = (await Users.getUserByIdSQL(userId))[0]
@@ -63,7 +78,7 @@ exports.fn = async function(req, res, next) {
     } else {
       res.json({
         status: false,
-        message: "Invalid user ID"
+        message: "Invalid ID"
       });
     }
   }
