@@ -48,7 +48,7 @@ exports.fn = async function(req, res, next) {
           // add record in users options 
           let getDeletedPreference = (await Users.getMysqlProduction("select * from user_options where user_id="+userId+" and option_key='deleted'"))[0]
 
-          console.log(getDeletedPreference);
+          // console.log(getDeletedPreference);
 
           if (!getDeletedPreference) {
             // add deleted record
