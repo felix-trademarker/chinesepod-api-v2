@@ -38,9 +38,11 @@ exports.fn = async function(req, res, next) {
       if (user) {
         let userSiteLinksQuery = "select id, user_id, usertype_id from user_site_links where user_id="+user.id+" and site_id=2"
         let updateQuery = "update user_site_links set usertype_id=20 where user_id="+user.id+" and site_id=2";
+        let updateUserQuery = "update users set email='"+user.email+"-deleted' where id="+user.id;
 
         let userSiteLinks = (await Users.getMysqlProduction(userSiteLinksQuery))[0]
         let response = await Users.getMysqlProduction(updateQuery)
+        let userRes = await Users.getMysqlProduction(updateUserQuery)
 
         // res.json(response);
         if (response) {
