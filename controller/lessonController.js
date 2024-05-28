@@ -7,12 +7,10 @@ exports.getLessonURLNew = async function(req, res, next) {
   let newHls = (await LessonNewSources.findQuery({v3_id:req.params.v3Id }))[0]
     // await redisClientLessonVideos.set(req.params.v3Id, JSON.stringify(newHls))
   // add dl file
-  const awsSources = (
-    await LessonFiles.findQuery({id:req.params.v3Id}))[0]
 
-  if (awsSources && awsSources['mp4Urls']) {
-    newHls.src_mp4 = awsSources['mp4Urls'][0]
-  }
+  let mp4Src = newHls.src.replace(/\/HLS\//g,"/MP4/").replace(/.m3u8/g,".mp4");
+  newHls.mp4 = mp4Src
+  
   res.json(newHls)
   
 }
