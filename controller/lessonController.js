@@ -1,6 +1,5 @@
 let LessonNewSources = require('../repositories/lessonNewSources')
 let Users = require('../repositories/users')
-let LessonFiles = require('../repositories/lessonFiles')
 
 exports.getLessonURLNew = async function(req, res, next) {
 
@@ -8,8 +7,12 @@ exports.getLessonURLNew = async function(req, res, next) {
     // await redisClientLessonVideos.set(req.params.v3Id, JSON.stringify(newHls))
   // add dl file
 
-  let mp4Src = newHls.src.replace(/\/HLS\//g,"/MP4/").replace(/.m3u8/g,".mp4");
-  newHls.mp4 = mp4Src
+  if (!newHls.mp4) {
+    let mp4Src = newHls.src.replace(/\/HLS\//g,"/MP4/").replace(/.m3u8/g,".mp4");
+    newHls.mp4 = mp4Src
+  
+    LessonNewSources.upsert({v3_id:newHls.v3_id},{mp4:mp4Src})
+  }
   
   res.json(newHls)
   
