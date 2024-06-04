@@ -21,8 +21,8 @@ exports.getLessonURLNew = async function(req, res, next) {
         type: 'simplified',
         mp4: '',
       }
+      LessonNewSources.upsert({v3_id:newHls.v3_id},newHls)
     }
-    LessonNewSources.upsert({v3_id:newHls.v3_id},newHls)
   }
 
   if (newHls && !newHls.mp4) {
