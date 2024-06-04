@@ -2,461 +2,735 @@
 ## chinesepod_production ##
 
 **USD_exchange_rates**: List of USD conversion rates, not sure if this is updated or used in the current system.
+
 **abtest_data**: test data for model views, not used in the current system.
+
 **abtest_orders**: list of order ID's, data last entry was last 2013.
+
 **abtest_plans**: list of user plans, last entry was last 2011, not used in the current system.
+
 **access_academic_codes**: list of access codes used for selected admin users
+
 **access_voucher_codes**: list of voucher codes with expiry status, last update 2020 by Ugis
+
 **ads**: list of image url used in ads
+
 **affiliate_details**: This stores all affiliated users.
+
 **affiliate_events**: This records all users events and links to users and affiliated users.
-**affiliate_invoices**: list of users generated invoices
-**affiliate_log**: Log affiliate invites and records the origin
-**ages**: age brackets 
-**api_clients**: list of client id and secret keys
-**api_custom**: list of set of query strings 
-**api_log**: 
-**api_tokens**
-**app_ads**
-**app_decks_categories**
-**app_decks_content**
-**app_decks_translations**
-**app_getmore**
-**applications**
-**blocks**
-**campaign_codes**
-**campaign_user**
-**campaigns**
-**cancellation_surveys**
-**cancellation_surveys_old**
-**channel_detail**
-**chatlog**
-**classes_addon_credits**
-**classes_addon_credits_backup**
-**classes_booking**
-**classes_booking_backup**
-**classes_booking_log**
-**classes_comments**
-**classes_credits**
-**classes_credits_actions**
-**classes_dayoff**
-**classes_emails**
-**classes_plan_credits**
-**classes_plan_credits_backup**
-**classes_teachers_availability**
-**classes_teachers_availability_exceptions**
-**classes_update**
-**classroom_email_templates**
-**classrooms**
+
+**affiliate_invoices**: list of users generated invoices.
+
+**affiliate_log**: Log affiliate invites and records the origin.
+
+**ages**: age brackets.
+
+**api_clients**: list of client id and secret keys.
+
+**api_custom**: list of set of query strings.
+
+**api_log**: PHP api logs, stores the access token used and which current user is logged in.
+
+**api_tokens**: list of access tokens used in IOS and andriod APP.
+
+**app_ads**: ??
+
+**app_decks_categories**: List of category names 
+
+**app_decks_content**: List of app content details linked with category ID and identified by type ID 
+
+**app_decks_translations**: ??
+
+**app_getmore**: empty table
+
+**applications**: List of Web Apps including chinesepod.com 
+
+**blocks**: ??
+
+**campaign_codes** List of generated codes, not sure how this is used in the system.
+
+**campaign_user**: List of users that uses "cid (campaign)" code when signup.
+
+**campaigns**: List of campaigns with code and notes.
+
+**cancellation_surveys**: list of product cancellation includes notes and reason.
+
+**channel_detail**: List of lesson channels and identified using product ID
+
+**chatlog**: List of chat logs from users, with logs starting in 2017 and ending in 2018. Not sure which app was used.
+
+**classes_addon_credits**: ??
+
+**classes_booking**: List of bookings from students to selected teachers
+
+**classes_booking_emaillog**: booking status linked with booking ID
+
+**classes_comments**: booking comments linked via booking ID and user ID
+
+**classes_credits**: Class information, stores time and expiration date and its status either free or paid
+
+**classes_credits_actions**: List of action descriptions
+
+**classes_dayoff**: List of teachers dayoff, recorded with unix timestamp
+
+**classes_emails**: List of recorded sent emails regarding the class
+
+**classes_plan_credits**: Class credits indicates the expiration dates and which teacher and student in each class
+
+**classes_teachers_availability**: List of teachers available day and time
+
+**classes_teachers_availability_exceptions**: ??
+
+**classes_update**: ??
+
+**classroom_email_templates**: email templates with subject and contents
+
+**classrooms**: List of assigned teacher and which course of lessons and which organization it belongs to.
+
 **comments**: This table contains all comments on each lesson. Data is linked using parent_id as the ve_id on contents fields and user_id in users table.
-**comments_subscriptions**
+
+**comments_subscriptions**: Identifies the users which topic it added comments and settings if user needs to be notified.
+
 **content_dialogues**: This table contains the list of dialogue for each lesson, data is linked using a foreign key v3_id. Data consist of traditional, simplified, english and pinyin sentences.
+
 **content_expansions**: This table contains the list of expansions for each lesson, data is linked using a foreign key v3_id. Data consist of traditional, simplified, english and pinyin sentences.
+
 **content_grammar_tag**: This table contains the list of grammar ID’s which is linked to contents using v3_id. grammar_id can be found in the grammar_details table.
+
 **content_rates**: This table contains the ratings on each lesson from users. Content_rates links data from contents and users by using a foreign key user_id and v3_id.
-**content_tags**
+
+**content_tags**: ??
+
 **Contents**: This table contains the main content of each lesson. This also holds the old wistia video ID’s which is already replaced by S3, and links on each video are in mongo158 on lessons.new.sources collection.
 
-**contents_free**
-**contents_notes**
-**contents_notes_files**
-**contents_recap_ready**
-**contents_series**
-**contents_to_content_tags**
-**continents**
-**countries**
-**country**
-**country_db**
-**course_contents**
-**course_details**
-**course_survey**
-**creditcard_details**
-**credits**
-**cron_email_queue**
-**currencyUSD**
-**dictionary**
-**dictionary_search**
-**download_content**
-**downloads_log**
-**dvd_posts**
-**email_notification_counts**
-**email_queue**
-**email_templates**
-**error_log**
-**evergage_tracking**
-**faq**
-**faq_categories**
-**feedback_forms**
-**gift_tracking**
-**gifts**
+**contents_free**: list of free lesson ID's, no longer updated.
+
+**contents_notes**: Lesson notes, no longer updated
+
+**contents_notes_files**: lesson notes attachments from old system.
+
+**contents_recap_ready**: ??
+
+**contents_series**: Lesson series with levels
+
+**contents_to_content_tags**: ??
+
+**continents**: List of continents for referrence
+
+**countries**: List of countries with ISO formats and country full names
+
+**country**: List of country code and name
+
+**country_db**: List of countries with ISO formats, country full names, and phone code
+
+**course_contents**: List of lessons with assigned course
+
+**course_details**: Course information list
+
+**course_survey**: contains only 10 records, possible only test table.
+
+**creditcard_details**: captured credit card records
+
+**credits**: Purchased credits from users, used in old system.
+
+**cron_email_queue**: empty table
+
+**currencyUSD**: Currency rates
+
+**dictionary**: List of dictionary words and times of checked
+
+**dictionary_search**: List of searched dictionary and determines which user searched which word
+
+**download_content**: empty table
+
+**downloads_log**: Log users downloaded file, used in old system, no data current updates.
+
+**dvd_posts**: list of users address and which product it purchased. used in old system. Data last update was last 2009.
+
+**email_notification_counts**: Record number of email confirmation sent to user, currently used in sailsJS
+
+**email_queue**: empty table
+
+**email_templates**: System email tamplates and formats
+
+**error_log**: empty table
+
+**evergage_tracking**: ??
+
+**faq**: FAQ contents, used in sailsJS
+
+**faq_categories**: Faq categories, not sure how data is currently used.
+
+**feedback_forms**: Hold the feedback experience from users, active table.
+
+**gift_tracking**: Records the gift labels printed and sent to users.
+
+**gifts**: contains only 1 record, not sure how the data is being used.
+
 **grammar_block**: This table contains the list of grammar ID’s to group each block of grammar contents. This table links to grammar_details using grammar_id.
+
 **grammar_details**: This table contains the main grammar data.
-**grammar_guide**
+
+**grammar_guide**: ??
+
 **grammar_sentence**: This table contains the grammar sentence usage. This table links to grammar_block using grammar_block_id.
-**group_categories**
-**group_contents**
-**group_records**
-**group_roles**
-**group_student_teacher**
-**group_tags**
-**groups**
-**groups_invite**
-**groups_to_group_tags**
-**grouptypes**
-**help**
-**help_category**
-**hr_surveys**
-**hsk_level_vocabulary_mapping**
-**hsk_levels**
-**http_referer_infos**
-**http_referer_rules**
-**institution_account_invoices**
-**institution_account_products**
-**institution_account_users**
-**institution_accounts**
-**institution_students**
-**institutions**
-**junkie_codes**
-**junkie_downloads**
-**junkie_products**
-**lesson_evaluation**
-**levels**
-**link_device**
-**livestream**
-**location**
-**log_redirect**
-**logged_exceptions**
-**mail_counters**
-**mail_queues**
-**mailing_donotcontact**
-**mailing_lists**
-**mailing_lists_users**
-**marketing_ships**
-**marketing_statements**
-**marketings**
-**messages**
-**messages_folders**
-**metatags**
-**miss_content**
-**motivations**
-**new_email_templates**
-**new_lesson_notification_users**
-**new_payments**
-**new_sessions**
-**news**
-**newsletter_send_email**
-**notification_levels**
-**ny_admin**
-**ny_block**
-**ny_file**
-**ny_language**
-**ny_nav_links**
-**ny_page**
-**ny_pagetype**
-**ny_row**
-**ny_session**
-**oauth_access_tokens**
-**oauth_authorization_codes**
-**oauth_clients**
-**oauth_jwt**
-**oauth_refresh_tokens**
-**oauth_scopes**
-**oauth_users**
-**offers**
-**openemm_tasks**
-**order_logs**
-**order_type**
-**orders**
-**orders_additions**
-**orders_to_promotions**
-**org_managers**
-**org_medias**
-**org_students**
-**org_teachers**
-**organization_groups**
-**organizations**
-**page_dynamics**
-**page_permissions**
-**password_reset_tokens**
-**playlist_lessons**
-**playlist_studied_lessons**
-**playlists**
+
+**group_categories**: Group categories details, not sure how it was used in the sailsJS
+
+**group_contents**: Set of lesson groups
+
+**group_records**: ??, this must be used in the old system.
+
+**group_roles**: user roles in a group.
+
+**group_student_teacher**: Identifies which student and teacher in each group
+
+**group_tags**: list of tags in each group
+
+**groups**: List of lesson groups and identify its level
+
+**groups_invite**: record of all group invites from each user
+
+**groups_to_group_tags**: Link group and group tags via ID's
+
+**grouptypes**: group types, channel, class, or community
+
+**help**: Contains questions and guide with possible encountered problems.
+
+**help_category**: Help categories.
+
+**hr_surveys**: users assisstment records.
+
+**hsk_level_vocabulary_mapping**: contains vocabulary and pinyin for each lesson
+
+**hsk_levels**: contains words and translations
+
+**http_referer_infos**: contains site referrers, last update was last 2013
+
+**http_referer_rules**: list of domains and names, not sure how it was used in the old system.
+
+**institution_account_invoices**: ??
+
+**institution_account_products**: ??, empty table
+
+**institution_account_users**: ??, empty table
+
+**institution_accounts**: ??
+
+**institution_students**: ??
+
+**institutions**: List of schools registered in the system
+
+**junkie_codes**: Not used in system.
+
+**junkie_downloads**: Not used in system.
+
+**junkie_products**: Not used in system.
+
+**lesson_evaluation**: Not used in system.
+
+**levels**: List of user levels
+
+**link_device**: list of code linked to users using andriod app. tables seems newly created, first data was added May 29, 2024.
+
+**livestream**: Not used in system.
+
+**location**: List of locations with latlang fields, not sure if this table is used in the new system.
+
+**log_redirect**: users logs when they are redirected
+
+**logged_exceptions**: Not used in system.
+
+**mail_counters**: Not used in system.
+
+**mail_queues**: Not used in system.
+
+**mailing_donotcontact**: Users who op-out or unsubscribe from mailing
+
+**mailing_lists**: List of type of mailing list
+
+**mailing_lists_users**: opt-in users from mailing
+
+**marketing_ships**: Not used in system.
+
+**marketing_statements**: Not used in system.
+
+**marketings**: Mailing templates for marketing 
+
+**messages**: Not sure if this is still used in system. last data update since 2015
+
+**messages_folders**: ??
+
+**metatags**: List of set metatags per page name
+
+**miss_content**: empty table.
+
+**motivations**: List of users possible interest or motivations
+
+**new_email_templates**: Mailing templates
+
+**new_lesson_notification_users**: empty table
+
+**new_payments**: ??
+
+**new_sessions**: ??
+
+**news**: not used in system.
+
+**newsletter_send_email**: empty table
+
+**notification_levels**: ??
+
+**ny_admin**: Dynamic admin variables, not sure but it seems PHP is using this values. 
+
+**ny_block**: ??
+
+**ny_file**: ??
+
+**ny_language**: ??
+
+**ny_nav_links**: ??
+
+**ny_page**: List of pages, not sure how it was used.
+
+**ny_pagetype**: Type of ny pages
+
+**ny_row**: ??
+
+**ny_session**: saved sessions used in Andriod and IOS APP
+
+**oauth_access_tokens**: list of generated tokens per user, not used in current system, last entry was last 2014.
+
+**oauth_authorization_codes**: empty table
+
+**oauth_clients**: only test accounts are saved
+
+**oauth_jwt**: empty table
+
+**oauth_refresh_tokens**: not used, only test data
+
+**oauth_scopes**: empty table
+
+**oauth_users**: ??
+
+**offers**: ??
+
+**openemm_tasks**: ??
+
+**order_logs**: Order logs, used in old system, last entry was last 2014
+
+**order_type**: Order types(New, Renewal) used in old system
+
+**orders**: List of users orders, From old system. used in old system
+
+**orders_additions**: used in old system
+
+**orders_to_promotions**: used in old system
+
+**org_managers**: not sure how and where it was used in the current and old system.
+
+**org_medias**: not sure how and where it was used in the current and old system.
+
+**org_students**: not sure how and where it was used in the current and old system.
+
+**org_teachers**: not sure how and where it was used in the current and old system.
+
+**organization_groups**: not sure how and where it was used in the current and old system.
+
+**organizations**: not sure how and where it was used in the current and old system.
+
+**page_dynamics**: not used, only test data
+
+**page_permissions**: not used, only test data
+
+**password_reset_tokens**: list of users tokens used to reset password.
+
+**playlist_lessons**: say it right lessons, but current system is using a json file with a list of say it right lessons. must be used in old system.
+
+**playlist_studied_lessons**: from old system, marked the playlist lesson as studied.
+
+**playlists**: not used, only test data
+
 **products**: This table contains list of products offered in the site and also contains the length of each subscriptions.
-**promo_addrs**
-**promo_templates**
-**promos**
-**promotions**
-**public_decks**
-**public_feed**
-**record_action**
-**referral_commision_plans**
-**refresh_tokens**
-**reg_student**
-**register_device**
-**report_records**
-**reports**
-**roles**
-**sales**
-**samplecourse_lessons**
-**samplecourses**
-**sc_medias**
-**sc_pages**
-**sc_sliders**
-**sc_sliders_front**
-**schema_migrations**
-**school**
-**school_assign**
-**school_branch**
-**school_custom_lesson**
-**school_lessons**
-**school_playlists**
-**school_score**
-**school_tchats**
-**school_timeline_comments**
-**school_timeline_likes**
-**school_timelines**
-**search_log**
-**segments**
-**sessions**
-**short_lessons**
-**sites**
-**source_lists**
-**sources**
-**spraddr**
-**states**
-**study_packages**
+
+**promo_addrs**: used in old system, last entry was last 2010
+
+**promo_templates**: email templates, used in old system or only test data.
+
+**promos**: promo codes, only test data or used in old system.
+
+**promotions**: List of promo codes with promo expiry dates, currently used in system
+
+**public_decks**: Not used. only test data
+
+**public_feed**: list of v3_id, not sure how it was used in the system.
+
+**record_action**: empty table
+
+**referral_commision_plans**: empty table
+
+**refresh_tokens**: users refresh tokens for login auth
+
+**reg_student**: List of students, not sure how this is used in the system
+
+**register_device**: empty table
+
+**report_records**: currently used in system, not sure how it was used
+
+**reports**: not used, last entry was last 2011
+
+**roles**: List of user roles
+
+**sales**: order records from users, currently not used in system, last recorded was last 2011
+
+**samplecourse_lessons**: test data
+
+**samplecourses**: test data
+
+**sc_medias**: list of image paths from users, only test data
+
+**sc_pages**: empty table
+
+**sc_sliders**: ??
+
+**sc_sliders_front**: ??
+
+**schema_migrations**: ??
+
+**school**: List of schools, this includes chinesepod
+
+**school_assign**: only test data, implementation might be not finished
+
+**school_branch**: only test data, implementation might be not finished
+
+**school_custom_lesson**: only test data, implementation might be not finished
+
+**school_lessons**: only test data, implementation might be not finished
+
+**school_playlists**: only test data, implementation might be not finished
+
+**school_score**: only test data, implementation might be not finished
+
+**school_tchats**: only test data, implementation might be not finished
+
+**school_timeline_comments**: only test data, implementation might be not finished
+
+**school_timeline_likes**: only test data, implementation might be not finished
+
+**school_timelines**: only test data, implementation might be not finished
+
+**search_log**: list of searches inside system
+
+**segments**: ??
+
+**sessions**: List of users sessions 
+
+**short_lessons**: Short lessons used in PHP site
+
+**sites**: List of sites, this includes the chinesepod.com, site ID is used to determine which account affiliated to which site.
+
+**source_lists**: List of app sources sites or app
+
+**sources**: list of social media sites
+
+**spraddr**: empty table
+
+**states**: List of US states, not sure how this data used in site
+
+**study_packages**: List of users current packages, last entry was last 2011.
+
 **subscriptions**: This table contains list of users subscriptions, this also records the next billing and product info. subscriptions are created after a transaction is completed and sets the expiry date according to the purchased plan.
-**suggestions**
+
+**suggestions**: users suggestions, last entry was last 2013
+
 **sz_org_staff**: This table contains list of teacher users, identified as a team in sailsJS system. linked to users table using user_id.
-**sz_organizations**
-**sz_student_daily_stats**
-**sz_student_stats**
-**sz_student_tags**
+
+**sz_organizations**: List of organizations, this includes chinesepod LLC
+
+**sz_student_daily_stats**: This records all users daily stats
+
+**sz_student_stats**: This records each users stats
+
+**sz_student_tags**: not used in system
+
 **sz_students**: This table contains list of student users, linked to users table using user_id.
-**sz_tags**
-**teacher_blogs**
-**teachers**
-**teachers_availability**
-**teaching_class_reviews**
-**teaching_classes**
-**team_directory**
-**temp**
-**temp_acceptance**
-**temp_active_since_jan_sunscriberss**
-**temp_affiliates**
-**temp_all_users_ca**
-**temp_all_users_us**
-**temp_all_users_us_one**
-**temp_final_jackusers**
-**temp_http_referrers**
-**temp_june_paid_referrers**
-**temp_jacksonville_subscribers**
-**temp_june_paid_referrers**
-**temp_june_paid_referrersp**
-**temp_june_paid_referrerst**
-**temp_june_referrers**
-**temp_london_users**
-**temp_london_users_one**
-**temp_mailchimp_subscribers**
-**temp_may_paid_referrers**
-**temp_may_referrers**
-**temp_new_jacksonville_subscribers**
-**temp_organizations**
-**temp_referrals**
-**temp_subscribers_us**
-**temp_tracking_login_ca**
-**temp_tracking_login_us**
-**temp_tracking_login_us_one**
-**temp_user_chars_mapping**
-**temp_useremail_ca**
-**temp_vouchers_export**
-**term_class**
-**terms**
-**terms_user_acceptance**
-**timezone**
-**token**
-**tracking_login**
+
+**sz_tags**: not used in system
+
+**teacher_blogs**: empty table
+
+**teachers**: empty table
+
+**teachers_availability**: empty table
+
+**teaching_class_reviews**: teachers reviews from students, used in old system
+
+**teaching_classes**: classes statuses and point which teacher and student using users table
+
+**team_directory**: Team directory, stored team information
+
+**temp**: test data, not used in site
+
+**temp_acceptance**: test data, not used in site
+
+**temp_active_since_jan_sunscriberss**: test data, not used in site
+
+**temp_affiliates**: test data, not used in site
+
+**temp_all_users_ca**: test data, not used in site
+
+**temp_all_users_us**: test data, not used in site
+
+**temp_all_users_us_one**: test data, not used in site
+
+**temp_final_jackusers**: test data, not used in site
+
+**temp_http_referrers**: test data, not used in site
+
+**temp_june_paid_referrers**: test data, not used in site
+
+**temp_jacksonville_subscribers**: test data, not used in site
+
+**temp_june_paid_referrers**: test data, not used in site
+
+**temp_june_paid_referrersp**: test data, not used in site
+
+**temp_june_paid_referrerst**: test data, not used in site
+
+**temp_june_referrers**: test data, not used in site
+
+**temp_london_users**: test data, not used in site
+
+**temp_london_users_one**: test data, not used in site
+
+**temp_mailchimp_subscribers**: test data, not used in site
+
+**temp_may_paid_referrers**: test data, not used in site
+
+**temp_may_referrers**: test data, not used in site
+
+**temp_new_jacksonville_subscribers**: test data, not used in site
+
+**temp_organizations**: test data, not used in site
+
+**temp_referrals**: test data, not used in site
+
+**temp_subscribers_us**: test data, not used in site
+
+**temp_tracking_login_ca**: test data, not used in site
+
+**temp_tracking_login_us**: test data, not used in site
+
+**temp_tracking_login_us_one**: test data, not used in site
+
+**temp_user_chars_mapping**: test data, not used in site
+
+**temp_useremail_ca**: test data, not used in site
+
+**temp_vouchers_export**: test data, not used in site
+
+**term_class**: term and condition type
+
+**terms**: terms contents depends on each term class
+
+**terms_user_acceptance**: terms acceptance records
+
+**timezone**: List of timezone with zone ID's
+
+**token**: List of user tokens and its validity
+
+**tracking_login**: users tracking login with user agents
+
 **transactions**: This table contains list of customers transaction and links to customers subscription record
+
 **transaction_address**: This table contains list of transaction addresses, address are fetch from checkout form
-**transaction_logs**: This table contains list of transaction logs, records transactions status either success, denied or any error while making the transaction.
-**transaction_gifts**
+
+**transaction_logs**: This table contains list of transaction logs, records transactions status either success, denied or any 
+error while making the transaction.
+
+**transaction_gifts**: record of gift sent to users
 
 **user_actions**: This table contains list of user actions from lesson page, this records the users action like adding vocabulary word
+
 **user_action_type**: This table contains list of action type, this linked to user_actions table using user_id as an identifier.
-**user_activities**
+
+**user_activities**: record users activities, used in old system
+
 **user_addresses**: This table contains user address.
-**user_apps**
-**user_bank_accounts**
-**user_bounced_emails**
-**user_campaigns**
+
+**user_apps**: record which app users used, last record was last 2011. 
+
+**user_bank_accounts**: not used, test data only
+
+**user_bounced_emails**: list of emails bounced
+
+**user_campaigns**: List of user campaigns
+
 **user_contents**: This table contains list of users studied and bookmarked lessons.
-**user_contents_assign**
-**user_contents_category**
+
+**user_contents_assign**: not used, last records was last 2010
+
+**user_contents_category**: not used, last records was last 2012
+
 **user_course_contents**: This table contains list of users lessons with course.
-**user_course_score**
+
+**user_course_score**: not used, last records was last 2011
+
 **user_courses**: This table contains list of users courses.
-**user_custom_assessments**
+
+**user_custom_assessments**: not used, last records was last 2011
+
 **user_daily_stats**: This table contains list of users progress on each lesson and records the average score from exercises.
-**user_evaluation**
-**user_feeds**
+
+**user_evaluation**: not used, last records was last 2011
+
+**user_feeds**: users feeds with serialized data
+
 **user_groups**: This table contains list of user group id and which user role.
-**user_http_referer**
-**user_lesson_assignments**
+
+**user_http_referer**: empty table
+
+**user_lesson_assignments**: user assigned to check each lesson, used in old system.
+
 **user_level_test**: This table contains users test levels
-**user_listening_tests**
+
+**user_listening_tests**: user listening test results, used in old system.
+
 **user_log**: This table contains users logs, this records which page users visited
-**user_notes**
-**user_notification_tokens**
-**user_notifications**
-**user_oauth_consumers**
-**user_oauth_tokens**
+
+**user_notes**: user notes from CS Agents
+
+**user_notification_tokens**: users notification per device tokens, not sure if used in app.
+
+**user_notifications**: notification messages for users, used in old system
+
+**user_oauth_consumers**: app keys and secret keys
+
+**user_oauth_tokens**: app consumer oauth key and secret keys
+
 **user_options**: This table contains user options like level, interests weekly goals, table links to users using user_id.
-**user_placements**
-**user_post_tags**
-**user_posts**
-**user_post_files**
-**user_posts_to_user_post_tags**
+
+**user_placements**: list of users taken lessons questions
+
+**user_post_tags**: list of common tags for forums or community page
+
+**user_posts**: user created post, not sure where content is used
+
+**user_post_files**: user post file attachments
+
+**user_posts_to_user_post_tags**: list of users post tags, content is linked via `user_post_tags` and `user_posts`
+
 **user_preferences**: This table contains list of users preferences, this records the users last login and login times. data is linked to users table using user_id.
-**user_prepares**
-**user_purchase_expires**
-**user_referral_commisions**
-**user_referrals**
-**user_refunds**
-**user_relationships**
+
+**user_prepares**: list of users info, not used in current site, last update was last 2013.
+
+**user_purchase_expires**: User settings to identify users access types and expiry of subscription, used in old system. last data recorded was last 2013.
+
+**user_referral_commisions**: list of user referrals linked with commision plan and users ID 
+
+**user_referrals**: Record of users referred to join chinesepod
+
+**user_refunds**: test data only
+
+**user_relationships**: user to user relations, determine to block user or not, used in old system, last record was last 2012.
+
 **user_settings**: This table contains users settings, saved data are unserialized
-**user_settings_token**
-**user_shipping_info**
+
+**user_settings_token**: from old system, last record was last 2010
+
+**user_shipping_info**: users shipping details
+
 **user_site_links**: This table contains user settings includes subscription expiry date.
-**user_studying_data**
-**user_subscribed**
-**user_trial_classes**
-**user_tweet_question_type**
-**user_tweets**
-**user_tweets_to_twitter_tweets**
-**user_twitter_settings**
-**user_vocabulary**
-**user_vocabulary_concentration**
-**user_vocabulary_to_vocabulary_tags**
-**users**: This table contains the main content of each user. This also holds the users last seen set in field admin_note which is unix value. 'ltv' and 'ltsm' fields are still under investigation on how this fields works.
-**usertypes**: This table contains user types like 'premium', this table is a reference table from users which is linked using foreign key in users table usertype_id.
+
+**user_studying_data**: contact details and schedule for lessons. Used in old system 
+
+**user_subscribed**: List of user who subscribe to a lessons
+
+**user_trial_classes**: Trail classes, only test data.
+
+**user_tweet_question_type**: List of common questions, no new data. not sure if this is used in site.
+
+**user_tweets**: user tweet contents, last record was last 2010.
+
+**user_tweets_to_twitter_tweets**: linked to twitter using twitter id and tweet id
+
+**user_twitter_settings**: List of users twitter accounts and settings
+
+**user_vocabulary**: Users visited vocabulary or studied
+
+**user_vocabulary_concentration**: empty table
+
+**user_vocabulary_to_vocabulary_tags**: Link users vocabulary to vocabulary tags using ID
+
+**users**: This table contains the main content of each user. This also holds the users last seen set in field admin_note which 
+is unix value. 'ltv' and 'ltsm' fields are still under investigation on how this fields works.
+
+**usertypes**: This table contains user types like 'premium', this table is a reference table from users which is linked using 
+foreign key in users table usertype_id.
+
 **vocabulary**: This table contains the list of vocabulary for each lesson, data is linked using a foreign key v3_id and data are separated from vocabulary_class ‘Key Vocabulary’ or ‘Supplementary’. Data consist of traditional, simplified, english and pinyin words.
-**vicabulary_for_search**
-**vocabulary_recordings**
-**vocabulary_tags**
-**voucher_tags**
-**voucher_amounts**
-**voucher_campaigns**
-**voucher_codes**
-**voucher_credits**
-**wechat_payments**
-**welcome_posts**
-**zone**
+
+**vicabulary_for_search**: set of vocabularies identified using vocabulary class
+
+**vocabulary_recordings**: vocabulary audio records this includes the audio links and descriptions
+
+**vocabulary_tags**: tags or key word for vocabulary from user
+
+**voucher_amounts**: list of users ID with amounts, no new data last records was last 2013
+
+**voucher_campaigns**: list of user campaign with voucher codes and expiry date, last update was last 2012
+
+**voucher_codes**: List of voucher codes last record was last 2012
+
+**voucher_credits**: List of claimed vouchers, last record was last 2013
+
+**wechat_payments**: record of wechat payments
+
+**welcome_posts**: welcome contents for each teachers
+
+**zone**: List of country zones
+
+## Below tables are used in wordpress/blog ##
 
 **wp_commentmeta**
+
 **wp_comments**
+
 **wp_links**
+
 **wp_options**
+
 **wp_popularpostsdata**
+
 **wp_popularpostssummary**
+
 **wp_postmeta**
+
 **wp_posts**
+
 **wp_term_relationships**
+
 **wp_term_taxonomy**
+
 **wp_termmeta**
+
 **wp_terms**
+
 **wp_usermeta**
+
 **wp_users**
+
 **wp_userstats_count**
+
 **wp_wpsd_trends**
 
+## assessment ##
+
+**
+
+## chinesepod_2015 ##
+## chinesepod_logging ##
+## chinesepod_customdict ##
 
 
 
-
-
-
-
-**Contents**: This table contains the main content of each lesson. This also holds the old wistia video ID’s which is already replaced by S3, and links on each video are in mongo158 on lessons.new.sources collection.
-
-**content_rates**: This table contains the ratings on each lesson from users. Content_rates links data from contents and users by using a foreign key user_id and v3_id.
-
-**content_dialogues**: This table contains the list of dialogue for each lesson, data is linked using a foreign key v3_id. Data consist of traditional, simplified, english and pinyin sentences.
-
-**content_expansions**: This table contains the list of expansions for each lesson, data is linked using a foreign key v3_id. Data consist of traditional, simplified, english and pinyin sentences.
-
-**content_grammar_tag**: This table contains the list of grammar ID’s which is linked to contents using v3_id. grammar_id can be found in the grammar_details table.
-
-**grammar_details**: This table contains the main grammar data.
-
-**grammar_block**: This table contains the list of grammar ID’s to group each block of grammar contents. This table links to grammar_details using grammar_id.
-
-**grammar_sentence**: This table contains the grammar sentence usage. This table links to grammar_block using grammar_block_id.
-
-**content_dialogues**: This table contains the list of dialogue for each lesson, data is linked using a foreign key v3_id. Data consist of traditional, simplified, english and pinyin sentences.
-
-**vocabulary**: This table contains the list of vocabulary for each lesson, data is linked using a foreign key v3_id and data are separated from vocabulary_class ‘Key Vocabulary’ or ‘Supplementary’. Data consist of traditional, simplified, english and pinyin words.
-
-**comments**: This table contains all comments on each lesson. Data is linked using parent_id as the ve_id on contents fields and user_id in users table.
-
-**questions**: This table contains all questions on each lesson. The table is in the Assessment database and on the questions table. The data set of questions are stored as xml data in the options field.
-
-## ChinesePod Users Collection
-Reconstruct users data from mysql to mongo database
-
-### MYSQL USERS TABLES ###
-
-**Users**: This table contains list of CRM users, table is under chinesepod2015 database.
-
-**users**: This table contains the main content of each user. This also holds the users last seen set in field admin_note which is unix value. 'ltv' and 'ltsm' fields are still under investigation on how this fields works.
-
-**usertypes**: This table contains user types like 'premium', this table is a reference table from users which is linked using foreign key in users table usertype_id.
-
-**user_site_links**: This table contains user settings includes subscription expiry date.
-
-**user_options**: This table contains user options like level, interests weekly goals, table links to users using user_id.
-
-**sz_students**: This table contains list of student users, linked to users table using user_id.
-
-**sz_org_staff**: This table contains list of teacher users, identified as a team in sailsJS system. linked to users table using user_id.
-
-**user_preferences**: This table contains list of users preferences, this records the users last login and login times. data is linked to users table using user_id.
-
-**user_contents**: This table contains list of users studied and bookmarked lessons.
-
-**user_courses**: This table contains list of user courses taken.
-
-**user_actions**: This table contains list of user actions from lesson page, this records the users action like adding vocabulary word
-
-**user_action_type**: This table contains list of action type, this linked to user_actions table using user_id as an identifier.
-
-**user_daily_stats**: This table contains list of users progress on each lesson and records the average score from exercises.
-
-**user_addresses**: This table contains user address.
-
-**user_course_contents**: This table contains list of users lessons with course.
-
-**user_courses**: This table contains list of users courses.
-
-**user_groups**: This table contains list of user group id and which user role.
-
-**user_level_test**: This table contains users test levels
-
-**user_log**: This table contains users logs, this records which page users visited
-
-**user_settings**: This table contains users settings, saved data are unserialized
-
-## ChinesePod Orders Collection
-Reconstruct orders data from mysql to mongo database
-
-### MYSQL USERS TABLES ###
-**orders**: This table contains list of order data from customers, table is under chinesepod_production database and this is table reference to other mysql tables such as transactions, users, products and products from old database "chinesepod_2015".
-
-**transactions**: This table contains list of customers transaction and links to customers subscription record
-
-**transaction_address**: This table contains list of transaction addresses, address are fetch from checkout form
-
-**transaction_logs**: This table contains list of transaction logs, records transactions status either success, denied or any error while making the transaction.
-
-**subscriptions**: This table contains list of users subscriptions, this also records the next billing and product info. subscriptions are created after a transaction is completed and sets the expiry date according to the purchased plan.
-
-**products**: This table contains list of products offered in the site and also contains the length of each subscriptions.

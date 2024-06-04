@@ -189,3 +189,8 @@ Reconstruct orders data from mysql to mongo database
 | modified_by | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
 | last_modified | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
 | email | varchar | mysql default ID(auto-increment) | chinesepod_production | orders |
+
+
+__Field Notes: *Leave field entirely if value is null or empty string__
+
+__Email Notes: *Leave field entirely if value is null or empty string__ 
