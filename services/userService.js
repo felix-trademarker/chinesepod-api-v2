@@ -1005,3 +1005,23 @@ exports.updateLessonURL = async function() {
 // >>>>>> NOT FOUND :  QW0458
 
 }
+
+exports.checknewpaidusers = async function() {
+
+  let users = await Users.getMysqlProduction(`Select id from users where created_at > '2024-06-13'`)
+
+  console.log(users.length)
+}
+
+// CHECK LESSON POPULARITY
+exports.getlessonstats = async function(req, res, next) {
+console.log(req.query)
+
+  let top = req.query && req.query.top ? 'limit '+req.query.top : ''
+
+  let lessons = await Users.getMysqlLogging(`Select DISTINCT(v3_id) as lesson_id, (select count(*) as count from lesson_logs where v3_id=lesson_id) as count from lesson_logs where created > '2024-01-01' order by count desc ${top}`)
+
+  // console.log(lessons)
+
+  res.json(lessons)
+}

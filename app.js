@@ -123,6 +123,8 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/user/subscriptions',middleware.checkAuth, require('./api/getUserSubscription').fn);
   app.get('/api/v2/user/log-dash/:id/', require('./api/userLogDash').fn);
 
+  app.get('/api/v2/lesson/popularity', userService.getlessonstats);
+
   
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
@@ -131,6 +133,8 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   // userService.updateLessonV3Id()
   // userService.getAccessTypeAndExpiry('1168343')
   // userService.updateLessonURL()
+  // userService.checknewpaidusers()
+  // userService.getlessonstats()
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     next(createError(404));
