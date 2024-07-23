@@ -45,7 +45,7 @@ exports.getAccessTypeAndExpiry = async function(userId) {
       }
       // console.log(2)
       // fetch users in mongo
-      let userMongo = (await Users.findQuery({id:userId}))[0]
+      // let userMongo = (await Users.findQuery({id:userId}))[0]
 
       let userAccess = (await Users.getMysqlProduction(`Select * From user_site_links WHERE user_id=${userId} ORDER BY expiry DESC LIMIT 1`))[0]
 
@@ -61,13 +61,13 @@ exports.getAccessTypeAndExpiry = async function(userId) {
 
       // console.log(3)
       // switch user access if mongo has latest expiry
-      if (userMongo && userMongo.accessType) {
-        if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
-          // console.log("used mongo records")
-          userAccess = userMongo.accessType
-          userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
-        }
-      }
+      // if (userMongo && userMongo.accessType) {
+      //   if ( moment(userMongo.accessType.expiry).diff(userAccess.expiry) > 0 ) {
+
+      //     userAccess = userMongo.accessType
+      //     userAccess.usertype_id = helpers.accessMapreverse(userAccess.type)
+      //   }
+      // }
 
       // console.log(">>>> CHECK USER EXPIRY ",userMongo.email, userAccess.expiry)
 
