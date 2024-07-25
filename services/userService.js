@@ -115,6 +115,15 @@ exports.getUser = async function(userId) {
 
 }
 
+exports.updateUserContents = async function(userId) {
+    
+    
+  let userContents = await Users.getMysqlProduction(`Select v3_id, status, saved, studied From user_contents WHERE user_id=${userId}`)
+
+  Users.upsert({id:userId},{userContents:userContents})
+
+}
+
 exports.migrateSession = async function() {
   console.log("migration called");
 

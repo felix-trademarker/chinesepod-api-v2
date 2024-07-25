@@ -149,6 +149,9 @@ exports.fn = async function(req, res, next) {
         await crmUsersMongoAws.upsert({ id: isTeam.id }, { ...isTeam })
       }
 
+      // add hook to update user collection with user_contents
+      userService.updateUserContents(userId)
+
       let contents = {
         ...returnData,
         ...userOptions,
