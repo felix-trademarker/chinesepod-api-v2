@@ -263,16 +263,16 @@ exports.fn = async function(req, res, next) {
 
         // UPDATE MONGO158 
         let returnedData = lesson 
-        delete lesson.studied
-        delete lesson.saved
-        Lessons.upsert({id:lesson.id}, lesson);
+        delete returnedData.studied
+        delete returnedData.saved
+        Lessons.upsert({id:lesson.id}, returnedData);
         // UPDATE REDIS RECORDS
         // await redisClientLesson.set(inputs.slug, JSON.stringify(returnedData))
 
         // test remove published date
         // delete returnedData.publication_timestamp
 
-        res.json(returnedData)
+        res.json(lesson)
       } else {
         throw 'invalid'
       }
