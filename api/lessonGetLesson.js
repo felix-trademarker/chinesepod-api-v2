@@ -125,14 +125,7 @@ exports.fn = async function(req, res, next) {
                                       LIMIT ${inputs.limit ? inputs.limit : 10}
                                   `); 
 
-        if (userLessons[0]) {
-          lesson.studied = userLessons[0].studied ? userLessons[0].studied : false
-          lesson.saved = userLessons[0].saved ? userLessons[0].saved : false
-        } else {
-          lesson.studied = false
-          lesson.saved = false
-        }
-
+        
         // get lesson data old v3_id
         let newV3ID = (await NewV3Id.findQuery({v3_id_new:lesson.id}))[0]
 
@@ -262,15 +255,23 @@ exports.fn = async function(req, res, next) {
         // }
 
         // UPDATE MONGO158 
-        let returnedData = lesson 
-        delete returnedData.studied
-        delete returnedData.saved
-        Lessons.upsert({id:lesson.id}, returnedData);
+        // let returnedData = lesson 
+        // delete returnedData.studied
+        // delete returnedData.saved
+        Lessons.upsert({id:lesson.id}, lesson);
         // UPDATE REDIS RECORDS
         // await redisClientLesson.set(inputs.slug, JSON.stringify(returnedData))
 
         // test remove published date
         // delete returnedData.publication_timestamp
+
+        if (userLessons[0]) {
+          lesson.studied = userLessons[0].studied ? userLessons[0].studied : false
+          lesson.saved = userLessons[0].saved ? userLessons[0].saved : false
+        } else {
+          lesson.studied = false
+          lesson.saved = false
+        }
 
         res.json(lesson)
       } else {
