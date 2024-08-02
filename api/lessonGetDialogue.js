@@ -1,6 +1,6 @@
 let Lessons = require('../repositories/lessons')
-// var ModelRedis = require('../repositories/_modelRedis')
-// let redisClientDialogue = new ModelRedis('dialogue')
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClientDialogue = new ModelRedis('dialogue')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
 let NewV3Id = require('../repositories/newV3Id')
@@ -23,15 +23,28 @@ exports.fn = async function(req, res, next) {
   } else {
 
     // let dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
-    // let dialogueRedisData = {}
-    // try{
-    //   dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
-    // } catch(err) {
-    //   console.log("==== Redis ERROR Dialogue ====", err);
-    // }
-
-    if (false && dialogueRedisData) {
+    let dialogueRedisData = {}
+    try{
+      dialogueRedisData = await redisClientDialogue.get(inputs.lessonId)
       console.log(">>>>>>>>>>> Return dialogue data from redis");
+    } catch(err) {
+      console.log("==== Redis ERROR Dialogue ====", err);
+    }
+
+    // GET MONGO158 LESSON DATA
+    if (!dialogueRedisData)
+    try{
+      let selectedFields = {
+        dialogue: 1
+      }
+      lesson = await Lessons.findQuerySelected({id:inputs.lessonId},selectedFields)
+      console.log(">>>>>>>>>>> Return lesson data from mongo158");
+    } catch(err) {
+      console.log("==== Mongo ERROR SKIPPED ====");
+    }
+
+    if (dialogueRedisData) {
+      
       res.json( dialogueRedisData )
 
     } else {
