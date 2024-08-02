@@ -14,7 +14,7 @@ var conCpodProduction = mysql.createConnection({
 });
 
 var conCpodLogging = mysql.createConnection({
-    host: process.env.DBHOST,
+    host: 'cpod-testdb-cluster.cluster-cx6o0r5nidjs.us-east-1.rds.amazonaws.com',
     user: process.env.DBUSER,
     password: process.env.DBPASS,
     database: "chinesepod_logging",
