@@ -46,18 +46,51 @@ exports.fn = async function(req, res, next) {
     let lesson = {}
 
     // GET REDIS LESSON DATA
-    // try{
-    //   lesson = await redisClientLesson.get(inputs.slug)
-    // } catch(err) {
-    //   console.log("==== Redis ERROR ====", err);
-    // }
+    try{
+      lesson = await redisClientLesson.get(inputs.slug)
+      console.log(">>>>>>>>>>> Return lesson data from redis");
+    } catch(err) {
+      console.log("==== Redis ERROR SKIPPED ====");
+    }
+
+    // GET MONGO158 LESSON DATA
+    if (!lesson)
+    try{
+      let selectedFields = {
+        extra: 1,
+        hash_code: 1,
+        hosts: 1,
+        id: 1,
+        image: 1,
+        introduction: 1,
+        level: 1,
+        mp3_dialogue: 1,
+        mp3_private: 1,
+        mp3_public: 1,
+        mp3_thefix: 1,
+        pdf1: 1,
+        pdf2: 1,
+        publication_timestamp: 1,
+        saved: 1,
+        slug: 1,
+        sources: 1,
+        studied: 1,
+        title: 1,
+        type: 1,
+        video: 1
+      }
+      lesson = await Lessons.findQuerySelected({slug:inputs.slug},selectedFields)
+      console.log(">>>>>>>>>>> Return lesson data from mongo158");
+    } catch(err) {
+      console.log("==== Mongo ERROR SKIPPED ====");
+    }
     
     
     // CHECK AND UPDATE LESSON DATA WITH USERS RECORDS ABOUT THE LESSON
-    if (false && lesson && lesson.id != '123') {
+    if (lesson && lesson.id != '123') {
       
       // UPDATE MONGO158 
-      Lessons.upsert({id:lesson.id}, lesson);
+      // Lessons.upsert({id:lesson.id}, lesson);
 
       let userLessons = await Lessons.getMysqlProduction(`Select v3_id, saved, studied, created_at as updatedAt 
                                     From user_contents 
@@ -74,8 +107,6 @@ exports.fn = async function(req, res, next) {
         lesson.studied = false
         lesson.saved = false
       }
-
-      console.log(">>>>>>>>>>> Return lesson data from redis");
 
       // RETURN LESSON DATA FROM REDIS
       res.json(lesson)
