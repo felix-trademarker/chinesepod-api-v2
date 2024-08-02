@@ -38,7 +38,7 @@ exports.fn = async function(req, res, next) {
         dialogue: 1
       }
       lesson = await Lessons.findQuerySelected({id:inputs.lessonId},selectedFields)
-      console.log(">>>>>>>>>>> Return lesson data from mongo158");
+      console.log(">>>>>>>>>>> Return dialogue data from mongo158");
     } catch(err) {
       console.log("==== Mongo ERROR SKIPPED ====");
     }

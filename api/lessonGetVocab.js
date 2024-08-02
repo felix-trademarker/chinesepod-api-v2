@@ -1,7 +1,7 @@
 let Lessons = require('../repositories/lessons')
 let LessonsVocabulary = require('../repositories/lessonVocabulary')
-// var ModelRedis = require('../repositories/_modelRedis')
-// let redisClientVocab = new ModelRedis('vocab')
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClientVocab = new ModelRedis('vocab')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
 let NewV3Id = require('../repositories/newV3Id')
@@ -26,14 +26,27 @@ exports.fn = async function(req, res, next) {
 
     // let lessonVocab = await redisClientVocab.get(inputs.lessonId)
     let lessonVocab = {}
-    // try{
-    //   lessonVocab = await redisClientVocab.get(inputs.lessonId)
-    // } catch(err) {
-    //   console.log("==== Redis ERROR Vocab ====", err);
-    // }
-    if (false && lessonVocab){
-
+    try{
+      lessonVocab = await redisClientVocab.get(inputs.lessonId)
       console.log(">>>>>>>>>>> Return Vocab data from redis");
+    } catch(err) {
+      console.log("==== Redis ERROR Vocab ====", err);
+    }
+
+    // GET MONGO158 LESSON DATA
+    if (!lessonVocab)
+    try{
+      let selectedFields = {
+        vocabulary: 1
+      }
+      lessonVocab = await Lessons.findQuerySelected({id:inputs.lessonId},selectedFields)
+      console.log(">>>>>>>>>>> Return vocabulary data from mongo158");
+    } catch(err) {
+      console.log("==== Mongo ERROR SKIPPED ====");
+    }
+
+    if (lessonVocab){
+
       res.json(lessonVocab)
 
     } else {

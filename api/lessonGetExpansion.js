@@ -1,6 +1,6 @@
 let Lessons = require('../repositories/lessons')
-// var ModelRedis = require('../repositories/_modelRedis')
-// let redisClientExpansion = new ModelRedis('expansions')
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClientExpansion = new ModelRedis('expansions')
 let _ = require('lodash')
 const { asyncForEach } = require('../frequent')
 let NewV3Id = require('../repositories/newV3Id')
@@ -23,15 +23,28 @@ exports.fn = async function(req, res, next) {
   } else {
 
     let lessonExpansion = {}
-    // try{
-    //   lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
-    // } catch(err) {
-    //   console.log("==== Redis ERROR Vocab ====", err);
-    // }
-
-    if (false && lessonExpansion) {
-
+    try{
+      lessonExpansion = await redisClientExpansion.get(inputs.lessonId)
       console.log(">>>>>>>>>>> Return Expansion data from redis");
+    } catch(err) {
+      console.log("==== Redis ERROR Vocab ====", err);
+    }
+
+    // GET MONGO158 LESSON DATA
+    if (!lessonExpansion)
+    try{
+      let selectedFields = {
+        expansion: 1
+      }
+      lessonExpansion = await Lessons.findQuerySelected({id:inputs.lessonId},selectedFields)
+      console.log(">>>>>>>>>>> Return expansion data from mongo158");
+    } catch(err) {
+      console.log("==== Mongo ERROR SKIPPED ====");
+    }
+
+    if (lessonExpansion) {
+
+      
       res.json(lessonExpansion);
 
     } else {

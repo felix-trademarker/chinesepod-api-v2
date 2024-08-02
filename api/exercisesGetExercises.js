@@ -1,6 +1,6 @@
 let Lessons = require('../repositories/lessons')
-// var ModelRedis = require('../repositories/_modelRedis')
-// let redisClient = new ModelRedis('exercises')
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClient = new ModelRedis('exercises')
 let _ = require('lodash')
 
 
@@ -10,14 +10,27 @@ exports.fn = async function(req, res, next) {
   let inputs = req.session.inputs
 
   let redisData = {}
-  // try{
-  //   redisData = await redisClient.get(inputs.lessonId)
-  // } catch(err) {
-  //   console.log("==== Redis ERROR exercices ====", err);
-  // }
-
-  if (false && redisData) {
+  try{
+    redisData = await redisClient.get(inputs.lessonId)
     console.log(">>>>>>>>>>> Return questions data from redis");
+  } catch(err) {
+    console.log("==== Redis ERROR exercices ====", err);
+  }
+
+  // GET MONGO158 LESSON DATA
+  if (!redisData)
+  try{
+    let selectedFields = {
+      exercises: 1
+    }
+    redisData = await Lessons.findQuerySelected({id:inputs.lessonId},selectedFields)
+    console.log(">>>>>>>>>>> Return exercises data from mongo158");
+  } catch(err) {
+    console.log("==== Mongo ERROR SKIPPED ====");
+  }
+
+  if (redisData) {
+    
     res.json( redisData )
 
   } else {
