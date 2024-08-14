@@ -1,4 +1,4 @@
-let _table = "users";
+let _table = "user.sessions";
 var Model = require('./_model158')
 var defaultModel = new Model(_table)
 

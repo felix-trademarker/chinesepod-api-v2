@@ -13,6 +13,13 @@ var conCpodProduction = mysql.createConnection({
   database: process.env.DBNAME,
 });
 
+var conCpodProduction2 = mysql.createConnection({
+  host: process.env.DBHOST2,
+  user: process.env.DBUSER,
+  password: process.env.DBPASS,
+  database: process.env.DBNAME,
+});
+
 var conCpodLogging = mysql.createConnection({
     host: 'cpod-testdb-cluster.cluster-cx6o0r5nidjs.us-east-1.rds.amazonaws.com',
     user: process.env.DBUSER,
@@ -73,6 +80,10 @@ module.exports = {
 
   getDbMySqlProduction: function() {
     return conCpodProduction;
+  },
+
+  getDbMySqlProduction2: function() {
+    return conCpodProduction2;
   },
 
   getDbMySqlLogging: function() {

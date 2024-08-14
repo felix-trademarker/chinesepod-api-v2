@@ -1,3 +1,4 @@
+let NySession = require('../repositories/nySession')
 let Users = require('../repositories/users')
 let UsersApi = require('../repositories/users.api')
 let LessonFile = require('../repositories/lessonFiles')
@@ -1033,4 +1034,125 @@ console.log(req.query)
   // console.log(lessons)
 
   res.json(lessons)
+}
+
+exports.syncUsersFromOldToNew = async function() {
+  
+  let dateFrom = "2025-01-4"
+
+  let users = await Users.getMysqlProduction(`Select email from users where created_at > '${dateFrom}'`)
+  let users2 = await Users.getMysqlProduction2(`Select email from users where created_at > '${dateFrom}'`)
+
+  // console.log(users.length, users2.length)
+
+  // console.log(users2[0])
+  // return 
+
+  for (let u=0; u < users2.length; u++){
+    let u2 = users2[u]
+    // console.log(u2.email)
+    let foundUser = (users.filter((value, index, self) =>
+      self.findIndex(v => v.email === u2.email) === index
+    ))[0]
+
+    if (!foundUser){
+      // console.log(u2.email)
+      // add usersitelink
+      let oUser = (await Users.getMysqlProduction2(`Select * from users where email='${u2.email}'`))[0] 
+      if (oUser) {
+        let oUserSiteLinks = await Users.getMysqlProduction2(`Select * from user_site_links where user_id='${oUser.id}'`) 
+        let otransactions = await Users.getMysqlProduction2(`Select * from transactions where user_id = '${oUser.id}'`) 
+        // let otransactionAddress = await Users.getMysqlProduction2(`Select * from transaction_addresses where transaction_id = '${ot.id}'`) 
+        let oSubscriptions = await Users.getMysqlProduction2(`Select * from subscriptions where user_id = '${oUser.id}'`) 
+
+        // inser users data into new DB
+        // duplicate contents
+        let newUser = oUser
+        delete newUser.id
+        let queryUser = (`INSERT INTO users SET ?`)
+        let newInsertUser = await Users.getMysqlProduction( queryUser, newUser )
+        console.log(newInsertUser)
+        
+        // insert user site links
+        for (let sitelinks=0; sitelinks < oUserSiteLinks.length; sitelinks++) {
+
+          let oUserSiteLink = oUserSiteLinks[sitelinks]
+          delete oUserSiteLink.id
+          oUserSiteLink.user_id = newInsertUser.insertId
+          let querySiteLinks = (`INSERT INTO user_site_links SET ?`)
+          let newInsertSiteLinks = await Users.getMysqlProduction( querySiteLinks, oUserSiteLink )
+          console.log("insert site links", newInsertSiteLinks.insertId)
+        }
+
+        // insert transactions
+        for (let tran=0; tran < otransactions.length; tran++) {
+          
+          let otransaction = otransactions[tran]
+
+          let oaddresses = await Users.getMysqlProduction2(`Select * from transaction_addresses where transaction_id = '${otransaction.id}'`) 
+
+          delete otransaction.id
+          otransaction.user_id = newInsertUser.insertId
+          otransaction.created_by = newInsertUser.insertId
+          otransaction.modified_by = newInsertUser.insertId
+          let queryTrans = (`INSERT INTO transactions SET ?`)
+          let newInserttrans = await Users.getMysqlProduction( queryTrans, otransaction )
+          console.log("insert transactions", newInserttrans.insertId)
+          // replicate addresses and subscriptions
+          
+          for (let addr=0; addr < oaddresses.length; addr++) {
+            let oaddress = oaddresses[addr]
+            oaddress.transaction_id = newInserttrans.insertId
+            delete oaddress.id
+
+            let queryaddress = (`INSERT INTO transaction_addresses SET ?`)
+            let newInserttransaddress = await Users.getMysqlProduction( queryaddress, oaddress )
+            console.log("insert transaction addresses", newInserttransaddress.insertId)
+          }
+
+        }
+
+        // insert subscription
+        for (let subs=0; subs < oSubscriptions.length; subs++) {
+          let oSubscription = oSubscriptions[subs]
+          delete oSubscription.id
+          oSubscription.user_id = newInsertUser.insertId
+          let querySubs = (`INSERT INTO subscriptions SET ?`)
+          let newInsertSubs = await Users.getMysqlProduction( querySubs, oSubscription )
+          console.log("insert subscriptions", newInsertSubs.insertId)
+        }
+
+
+        // let queryUser = (`INSERT INTO user_site_links SET ?`)
+        // let newInsertUser = await Users.getMysqlProduction( queryUser, newUser )
+
+      }
+      
+      console.log("not in live", oUser.email)
+      // transaction
+      // subscription
+      // u = users2.length
+    } else {
+      // console.log(">>",u2.email)
+    }
+
+  }
+  
+}
+
+exports.syncUsersNySession = async function(req, res, next) {
+
+  let moment = require('moment')
+  // console.log(moment().subtract(20, "minutes").format())
+  // console.log(moment().format())
+  let nySessions = await Users.getMysqlProduction(`Select * from ny_session where last_access_date > '${moment().subtract(10, "minutes").format()}'`)
+
+  console.log(nySessions.length)
+  for (let i=0; i < nySessions.length; i++) {
+    let nySession = nySessions[i]
+    await NySession.upsert({session_id:nySession.session_id},nySession)
+  }
+
+  console.log("-end-")
+
 }

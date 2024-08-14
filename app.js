@@ -9,6 +9,7 @@ var bodyParser = require('body-parser')
 let middleware = require('./middleware')
 let userService = require('./services/userService')
 
+var cron = require('node-cron');
 
 var cors = require('cors')
 
@@ -128,6 +129,14 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
+  cron.schedule("*/5 * * * * *", () => {
+    console.log("==== update ny sessions ====");
+    userService.syncUsersNySession();
+  });
+  
+
+  
+  // userService.syncUsersFromOldToNew();
   // userService.udpateLessonFiles();
   // userService.findAWSFile('0bv22rnq8c.mp4')
   // userService.updateLessonV3Id()
