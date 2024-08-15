@@ -129,7 +129,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
-  cron.schedule("*/5 * * * * *", () => {
+  cron.schedule("* */1 * * * *", () => {
     console.log("==== update ny sessions ====");
     userService.syncUsersNySession();
   });
