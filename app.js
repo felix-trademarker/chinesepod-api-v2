@@ -16,8 +16,8 @@ var cors = require('cors')
 var app = express();
 
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -65,6 +65,8 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   // TEST TO CREATE 1 FILE FOR EACH API
 
   // USER DASHBOARD API
+  app.post('/api/v2/entrance/login', require('./api/entranceLogin').fn);
+
   app.get('/api/v2/dashboard/get-info',middleware.checkAuth, require('./api/getInfo').fn);
   app.get('/api/v2/dashboard/get-stats',middleware.checkAuth, require('./api/getStats').fn);
   app.get('/api/v2/dashboard/course-lessons',middleware.checkAuth, require('./api/courseLessons').fn);
@@ -129,9 +131,9 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
-  cron.schedule("* */1 * * * *", () => {
-    console.log("==== update ny sessions ====");
-    userService.syncUsersNySession();
+  cron.schedule("* */15 * * * *", () => {
+    // console.log("==== update ny sessions ====");
+    // userService.syncUsersNySession();
   });
   
 

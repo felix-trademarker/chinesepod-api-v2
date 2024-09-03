@@ -6,16 +6,16 @@ exports.fn = async function(req, res, next) {
   
   let randomToken = require('rand-token');
 
-    sails.log.info({inputs: inputs});
-
+    let inputs = req.body
+    // console.log(req.params, req.body)
     // Look up by the email address.
     // (note that we lowercase it to ensure the lookup is always case-insensitive,
     // regardless of which database we're using)
-    var userRecord = await User.findOne({
+    var userRecord = (await Users.findQuery({
       email: inputs.emailAddress.toLowerCase(),
-    });
+    }))[0];
 
-    sails.log.info({userRecord: userRecord});
+    console.log({userRecord: userRecord});
 
     // If there was no matching user, respond thru the "badCombo" exit.
     if(!userRecord) {
@@ -27,10 +27,11 @@ exports.fn = async function(req, res, next) {
     // await sails.helpers.passwords.checkPassword(inputs.password, userRecord.password)
     // .intercept('incorrect', 'badCombo');
 
-    const submittedPass = await sails.helpers.passwordHash(inputs.password);
+    const submittedPass = res.app.locals.helpers.passwordHash(inputs);
+    console.log(submittedPass)
     if (submittedPass !== userRecord.password){
-      sails.log.warn(`badCombo - ${this.req.ip} - ${inputs.emailAddress} - ${this.req.headers['user-agent']}`);
-      throw 'badCombo';
+      // sails.log.warn(`badCombo - ${this.req.ip} - ${inputs.emailAddress} - ${this.req.headers['user-agent']}`);
+      // throw 'badCombo';
     }
 
     // If "Remember Me" was enabled, then keep the session alive for
@@ -40,13 +41,13 @@ exports.fn = async function(req, res, next) {
     // this to work.)
     if (inputs.rememberMe) {
       if (this.req.isSocket) {
-        sails.log.warn(
-          'Received `rememberMe: true` from a virtual request, but it was ignored\n'+
-          'because a browser\'s session cookie cannot be reset over sockets.\n'+
-          'Please use a traditional HTTP request instead.'
-        );
+        // sails.log.warn(
+        //   'Received `rememberMe: true` from a virtual request, but it was ignored\n'+
+        //   'because a browser\'s session cookie cannot be reset over sockets.\n'+
+        //   'Please use a traditional HTTP request instead.'
+        // );
       } else {
-        this.req.session.cookie.maxAge = sails.config.custom.rememberMeCookieMaxAge;
+        req.session.cookie.maxAge = sails.config.custom.rememberMeCookieMaxAge;
       }
     }
 

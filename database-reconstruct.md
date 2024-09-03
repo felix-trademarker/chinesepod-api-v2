@@ -3,6 +3,82 @@ Reconstruct content data from mysql to mongo database
 
 ### MYSQL LESSON TABLES ###
 **Contents**: This table contains the main content of each lesson. This also holds the old wistia video ID’s which is already replaced by S3, and links on each video are in mongo158 on lessons.new.sources collection.
+**Fields:**
+- content_id
+- created_at
+- updated_at
+- status_comments
+- status_locked
+- status_published
+- created_by
+- updated_by
+- popularity
+- rank
+- slug
+- type
+- series_id
+- channel_id
+- maturity
+- title
+- introduction
+- theme
+- channel
+- level
+- hosts
+- v3_id
+- hash_code
+- publication_timestamp
+- time_offset
+- image
+- transcription1
+- transcription2
+- mp3_dialogue
+- mp3_media
+- mp3_mobile
+- mp3_public
+- mp3_private
+- mp3_thefix
+- pdf1
+- pdf2
+- pdf3
+- pdf4
+- ppt
+- ppt_size
+- video_fix
+- link_source
+- link_related
+- exercises_exercise1
+- exercises_exercise2
+- exercises_exercise3
+- exercises_exercise4
+- xml_file_name
+- mp3_dialogue_size
+- mp3_media_size
+- mp3_mobile_size
+- mp3_public_size
+- mp3_private_size
+- mp3_thefix_size
+- mp3_thefix_length
+- mp3_public_length
+- mp3_private_length
+- mp3_mobile_length
+- mp3_media_length
+- mp3_dialogue_length
+- video_flv
+- video_flv_size
+- video_flv_length
+- video_mp4
+- video_mp4_size
+- video_mp4_length
+- video_m4v
+- video_m4v_size
+- video_m4v_length
+- last_comment_id
+- last_comment_time
+- is_private
+- video
+- lesson_plan
+- lesson_assignment
 
 **content_rates**: This table contains the ratings on each lesson from users. Content_rates links data from contents and users by using a foreign key user_id and v3_id.
 
