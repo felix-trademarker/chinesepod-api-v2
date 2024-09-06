@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-  secret: 'qweasdzxcrtyfghvbn',
+  secret: '71e0aba070df4892e7384da1828fbfff',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: true }
@@ -66,6 +66,8 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   // USER DASHBOARD API
   app.post('/api/v2/entrance/login', require('./api/entranceLogin').fn);
+
+  app.get('/api/v2/user-data', middleware.checkAuth, require('./api/userData').fn);
 
   app.get('/api/v2/dashboard/get-info',middleware.checkAuth, require('./api/getInfo').fn);
   app.get('/api/v2/dashboard/get-stats',middleware.checkAuth, require('./api/getStats').fn);

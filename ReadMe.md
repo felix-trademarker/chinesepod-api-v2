@@ -196,4 +196,4 @@ _userId is fetch via headers request with token, function can be seen in middlew
  <br>
  <br>
  <br>
-*NOTE: server update needs to install xml-js
+*NOTE: server update needs to install jsonwebtoken, rand-token, crypto-js
