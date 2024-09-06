@@ -16,7 +16,7 @@ exports.fn = async function(req, res, next) {
       },{email:1, password: 1, id: 1, code: 1}))[0];
 
     } catch (err) {
-      userRecord = (await Users.getMysqlProduction(`SELECT email, password, code, id WHERE email='${inputs.emailAddress.toLowerCase()}'`))[0];
+      userRecord = (await Users.getMysqlProduction(`SELECT email, password, code, id FROM users WHERE email='${inputs.emailAddress.toLowerCase()}'`))[0];
     }
 
     if ( !inputs.emailAddress 
@@ -52,21 +52,40 @@ exports.fn = async function(req, res, next) {
       emailAddress: userRecord.email,
       password: userRecord.password,
       code: userRecord.code,
+      id: userRecord.id
     }
-    // send user Id for syncing users session
-    let axiosOptions = {
-      'method': req.method,
-      'url': 'http://localhost:1337/api/v1/entrance/hash/login',
-      'headers': {
-        'Authorization': 'Bearer ' + token,
-        'Cookie': req.headers.cookies,
-        'Content-Type': 'text/plain; charset=utf-8',
-      },
-      'body': JSON.stringify(syncData) 
-    };
-    let syncDataResponse = await axios(axiosOptions)
 
-    console.log(syncDataResponse)
+    // try {
+    //   // send user Id for syncing users session
+    //   let axiosOptions = {
+    //     'method': 'POST',
+    //     'url': 'http://localhost:1337/api/v1/entrance/hash/login',
+    //     'headers': {
+    //       'Authorization': 'Bearer ' + token,
+    //       'Cookie': req.headers.cookies,
+    //       'Content-Type': 'text/plain; charset=utf-8',
+    //     },
+    //     'body': JSON.stringify(syncData) 
+    //   };
+    //   axios(axiosOptions)
+
+    //   const response = await axios.post('https://www.chinesepod.com/api/v1/entrance/hash/login', {
+    //     id: userRecord.id,
+    //     emailAddress: userRecord.email
+    //   }, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': 'Bearer yourToken',
+    //       'Authorization': 'Bearer ' + token,
+    //     }
+    //   });
+    // } catch (e) {
+    //   console.log("==FAILED TO LOGIN USER IN OTHER SERVER==")
+    // }
+    
+    
+
+    // console.log(syncDataResponse)
 
     res.json ({
       token: token,

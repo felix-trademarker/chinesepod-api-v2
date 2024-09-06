@@ -66,6 +66,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   // USER DASHBOARD API
   app.post('/api/v2/entrance/login', require('./api/entranceLogin').fn);
+  app.get('/api/v2/entrance/code/:code', require('./api/codeLogin').fn);
 
   app.get('/api/v2/user-data', middleware.checkAuth, require('./api/userData').fn);
 
