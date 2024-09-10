@@ -23,11 +23,18 @@ exports.fn = async function(req, res, next) {
       problems.push("\"password\" is required, but it was not defined.")
     }
 
-    res.json({
-      "code": "E_MISSING_OR_INVALID_PARAMS",
-      "problems": problems,
-      "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to "+problems.length+" missing or invalid parameter."
-    })
+    res.status(401).json({
+      error: "Missing or Invalid parameters",
+      code: "E_MISSING_OR_INVALID_PARAMS",
+      problems: problems,
+      message: "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to "+problems.length+" missing or invalid parameter."
+    });
+
+    // res.json({
+    //   "code": "E_MISSING_OR_INVALID_PARAMS",
+    //   "problems": problems,
+    //   "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to "+problems.length+" missing or invalid parameter."
+    // })
     
   } else {
 
@@ -49,7 +56,18 @@ exports.fn = async function(req, res, next) {
     const submittedPass = res.app.locals.helpers.passwordHash(inputs);
 
     if (userRecord && submittedPass !== userRecord.password){
-      res.send('Unauthorized')
+
+      res.status(401).json({
+        error: "Invalid credentials",
+        code: "INVALID_CREDENTIALS",
+        message: "The email or password you entered is incorrect"
+      });
+
+      // res.json({
+      //   "code": "INVALID_CREDENTIALS",
+      //   "problems": "The email or password you entered is incorrect",
+      //   "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to email or password is incorrect"
+      // })
     } else {
       const refreshToken = randomToken.uid(128);
       // console.log(refreshToken)
