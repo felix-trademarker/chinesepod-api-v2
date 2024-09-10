@@ -6,23 +6,43 @@ exports.fn = async function(req, res, next) {
   
   let randomToken = require('rand-token');
 
-    let inputs = req.body
+  let inputs = req.body
 
-    var userRecord = null
+  var userRecord = null
+
+  // console.log(inputs)
+  if (!inputs.emailAddress || !inputs.password ) {
+    // send json format missing parameters
+    let problems = []
+
+    if (!inputs.emailAddress) {
+      problems.push("\"emailAddress\" is required, but it was not defined.")
+    }
+
+    if (!inputs.password) {
+      problems.push("\"password\" is required, but it was not defined.")
+    }
+
+    res.json({
+      "code": "E_MISSING_OR_INVALID_PARAMS",
+      "problems": problems,
+      "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to 1 missing or invalid parameter."
+    })
+    
+  } else {
+
+    let emailAddress = inputs.emailAddress ? inputs.emailAddress.toLowerCase() : '';
 
     try {
       userRecord = (await Users.findQuerySelected({
-        email: inputs.emailAddress.toLowerCase(),
+        email: emailAddress,
       },{email:1, password: 1, id: 1, code: 1}))[0];
 
     } catch (err) {
-      userRecord = (await Users.getMysqlProduction(`SELECT email, password, code, id FROM users WHERE email='${inputs.emailAddress.toLowerCase()}'`))[0];
+      userRecord = (await Users.getMysqlProduction(`SELECT email, password, code, id FROM users WHERE email='${emailAddress}'`))[0];
     }
 
-    if ( !inputs.emailAddress 
-      || !inputs.password 
-      || !userRecord
-    ) {
+    if ( !userRecord ) {
       res.send('Unauthorized')
     }
 
@@ -91,6 +111,7 @@ exports.fn = async function(req, res, next) {
       token: token,
       refreshToken: refreshToken
     });
+  }
     
 }
 
