@@ -131,12 +131,11 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   app.get('/api/v2/lesson/popularity', userService.getlessonstats);
 
-  
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
   cron.schedule("* */15 * * * *", () => {
     // console.log("==== update ny sessions ====");
-    // userService.syncUsersNySession();
+    userService.syncUsersNySession();
   });
   
 
@@ -172,8 +171,6 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
       // res.redirect("/")
     }
   });
-
-
   
 }); // AWS MONGO CLOSE
 }); // AWS MONGO CLOSE

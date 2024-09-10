@@ -26,7 +26,7 @@ exports.fn = async function(req, res, next) {
     res.json({
       "code": "E_MISSING_OR_INVALID_PARAMS",
       "problems": problems,
-      "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to 1 missing or invalid parameter."
+      "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to "+problems.length+" missing or invalid parameter."
     })
     
   } else {
