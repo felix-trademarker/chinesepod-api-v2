@@ -84,7 +84,13 @@ exports.fn = async function(req, res, next) {
       } )
   
       // generate token
-      let token = jwToken.sign({userId: userRecord.id, isTeam: (userRecord && userRecord.email && userRecord.email.endsWith('@chinesepod.com'))}, process.env.jwtSecret)
+      let token = jwToken.sign(
+        {
+          data : {
+            userId: userRecord.id, 
+            isTeam: (userRecord && userRecord.email && userRecord.email.endsWith('@chinesepod.com'))
+          }
+        }, process.env.jwtSecret)
       let syncData = {
         emailAddress: userRecord.email,
         password: userRecord.password,
