@@ -46,12 +46,15 @@ exports.fn = async function(req, res, next) {
     let lesson = {}
 
     // GET REDIS LESSON DATA
-    try{
-      lesson = await redisClientLesson.get(inputs.slug)
-      console.log(">>>>>>>>>>> Return lesson data from redis");
-    } catch(err) {
-      console.log("==== Redis ERROR SKIPPED ====");
+    if (inputs.slug) {
+      try{
+        lesson = await redisClientLesson.get(inputs.slug)
+        console.log(">>>>>>>>>>> Return lesson data from redis");
+      } catch(err) {
+        console.log("==== Redis ERROR SKIPPED ====");
+      }
     }
+    
 
     // GET MONGO158 LESSON DATA
     if (!lesson)
@@ -79,7 +82,12 @@ exports.fn = async function(req, res, next) {
         type: 1,
         video: 1
       }
-      lesson = await Lessons.findQuerySelected({slug:inputs.slug},selectedFields)
+      if (inputs.slug) {
+        lesson = await Lessons.findQuerySelected({slug:inputs.slug},selectedFields)
+      } else if (inputs.lessonId) {
+        lesson = await Lessons.findQuerySelected({id:inputs.lessonId},selectedFields)
+      }
+      
       console.log(">>>>>>>>>>> Return lesson data from mongo158");
     } catch(err) {
       console.log("==== Mongo ERROR SKIPPED ====");

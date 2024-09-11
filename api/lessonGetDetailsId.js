@@ -26,11 +26,11 @@ exports.fn = async function(req, res, next) {
 
     let lessonData;
     if (inputs.id) {
-      lessonData = await LessonData
+      lessonData = await Lessons
         .findOne(inputs.id)
         .select(['title', 'image', 'level', 'type', 'hash_code', 'introduction', 'publication_timestamp', 'hosts']);
     } else {
-      lessonData = await LessonData
+      lessonData = await Lessons
         .findOne({slug: encodeURI(inputs.slug)})
         .select(['title', 'image', 'level', 'type', 'hash_code', 'introduction', 'publication_timestamp', 'hosts']);
     }
