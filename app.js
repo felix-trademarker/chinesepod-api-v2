@@ -26,7 +26,7 @@ app.use(session({
   secret: '71e0aba070df4892e7384da1828fbfff',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: { secure: false }
 }))
 
 app.set('view engine', 'ejs');

@@ -12,8 +12,8 @@ exports.checkAuth = async function(req, res, next){
     } else if (req.query.userId) {
         req.session.userId = req.query.userId 
     } else if (req.headers && req.headers.authorization) {
-        let userDataToken = res.app.locals.helpers.extractToken(req)
-        req.session.userId = userDataToken.userId
+        // let userDataToken = res.app.locals.helpers.extractToken(req)
+        // req.session = userDataToken
     } else if (req.session.userId) {
         req.session.userId = req.session.userId
     } else {
@@ -27,9 +27,9 @@ exports.checkAuth = async function(req, res, next){
         if (token && token.length > 0) {
             // console.log(token);
             var jsonPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
-
+            console.log(jsonPayload)
             req.session.token = token
-            req.session.userId= jsonPayload.data.userId
+            req.session.userId= jsonPayload.data ? jsonPayload.data.userId : jsonPayload.userId
         }
 
     }

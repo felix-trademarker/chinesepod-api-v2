@@ -146,6 +146,17 @@ exports.extractToken = function(req){
   token = token.replace("Bearer ","")
 
   let data =  JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+  console.log(data)
+  if (data && data.data) {
+    data.data.token = token
+    return data.data
+  }
+
+  if (data && data.userId) {
+    data.token = token
+    return data
+  }
+
   return data.data
 
 }
