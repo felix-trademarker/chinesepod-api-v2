@@ -1,10 +1,13 @@
 let Users = require('../repositories/users')
 // let axios = require('axios')
 const jwToken = require('jsonwebtoken');
+let randomToken = require('rand-token');
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClient = new ModelRedis('users.login')
 
 exports.fn = async function(req, res, next) {
   
-  let randomToken = require('rand-token');
+  
 
   let inputs = req.body
 
@@ -40,15 +43,24 @@ exports.fn = async function(req, res, next) {
 
     let emailAddress = inputs.emailAddress ? inputs.emailAddress.toLowerCase() : '';
 
+    // FETCH FROM REDIS RECORDS
+    try {
+      userRecord = await redisClient.get(emailAddress)
+    } catch (err) {
+      console.log("Failed to fetch Redis Records")
+    }
+
+    // FETCH FROM MONGO RECORDS
+    if (!userRecord) 
     try {
       userRecord = (await Users.findQuerySelected({
         email: emailAddress,
       },{email:1, password: 1, id: 1, code: 1}))[0];
-
     } catch (err) {
       userRecord = (await Users.getMysqlProduction(`SELECT email, password, code, id FROM users WHERE email='${emailAddress}'`))[0];
     }
 
+    // FETCH FROM MYSQL RECORDS
     if ( !userRecord ) {
       userRecord = (await Users.getMysqlProduction(`SELECT email, password, code, id FROM users WHERE email='${emailAddress}'`))[0];
     }
@@ -57,50 +69,54 @@ exports.fn = async function(req, res, next) {
 
     if (userRecord && submittedPass !== userRecord.password){
 
+      // ADD EVENT LOGS
+      // TODO
+
       res.status(401).json({
         error: "Invalid credentials",
         code: "INVALID_CREDENTIALS",
         message: "The email or password you entered is incorrect"
       });
 
-      // res.json({
-      //   "code": "INVALID_CREDENTIALS",
-      //   "problems": "The email or password you entered is incorrect",
-      //   "message": "The server could not fulfill this request (`POST /api/v2/entrance/login`) due to email or password is incorrect"
-      // })
     } else {
-      const refreshToken = randomToken.uid(128);
-      // console.log(refreshToken)
-  
-      // STORE REFRESH TOKEN IN MYSQL 
-      let query = (`INSERT INTO refresh_tokens SET ?`)
-      await Users.getMysqlProduction( query, {
-        user_id: userRecord.id,
-        refresh_token: refreshToken,
-        expiry: new Date(Date.now() + (process.env.jwtRefreshExpiry * 1) ), // 3months expiry
-        client_id: inputs.clientId,
-        ip_address: req.ip,
-        user_agent: req.headers['user-agent']
-      } )
-  
-      // generate token
-      let token = jwToken.sign(
-        {
-          data : {
-            userId: userRecord.id, 
-            isTeam: (userRecord && userRecord.email && userRecord.email.endsWith('@chinesepod.com'))
-          }
-        }, process.env.jwtSecret)
-      let syncData = {
-        emailAddress: userRecord.email,
-        password: userRecord.password,
-        code: userRecord.code,
-        id: userRecord.id
+
+      if (!userRecord.token) {
+
+        const refreshToken = randomToken.uid(128);
+        // console.log(refreshToken)
+    
+        // STORE REFRESH TOKEN IN MYSQL 
+        let query = (`INSERT INTO refresh_tokens SET ?`)
+        Users.getMysqlProduction( query, {
+          user_id: userRecord.id,
+          refresh_token: refreshToken,
+          expiry: new Date(Date.now() + (process.env.jwtRefreshExpiry * 1) ), // 3months expiry
+          client_id: inputs.clientId,
+          ip_address: req.ip,
+          user_agent: req.headers['user-agent']
+        } )
+    
+        // generate token
+        let token = jwToken.sign(
+          {
+            data : {
+              userId: userRecord.id, 
+              isTeam: (userRecord && userRecord.email && userRecord.email.endsWith('@chinesepod.com'))
+            }
+          }, process.env.jwtSecret
+        )
+
+        if (userRecord) {
+          userRecord.token = token
+          userRecord.refreshToken = refreshToken
+          redisClient.set(emailAddress, JSON.stringify(userRecord))
+        }
+
       }
   
       res.json ({
-        token: token,
-        refreshToken: refreshToken
+        token: userRecord.token,
+        refreshToken: userRecord.refreshToken
       });
     }
 

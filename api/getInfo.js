@@ -2,6 +2,8 @@ let userService = require('../services/userService')
 let Users = require('../repositories/users')
 let crmUsersMongoAws = require('../repositories/crmUsersMongoAWS')
 let _ = require('lodash')
+var ModelRedis = require('../repositories/_modelRedis')
+let redisClient = new ModelRedis('users.info')
 
 exports.fn = async function(req, res, next) {
 
@@ -19,49 +21,88 @@ exports.fn = async function(req, res, next) {
     // save userData in mongo158
     userService.getUserStats(userId)
 
-    let userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
+    let userData;
 
-    if (!userData) res.json({})
+    // FETCH FROM REDIS RECORDS
+    try {
+      userData = await redisClient.get(userId)
+      console.log("fetch userdata from redis")
+    } catch (err) {
+      console.log("Failed to fetch Redis Records")
+    }
+
+    // FETCH MONGO
+    if (!userData){
+      try {
+        userData = (await Users.findQuerySelected({
+          id: userId,
+        },{ 
+          email:1, 
+          id: 1, 
+          code: 1,
+          trial: 1,
+          name: 1,
+          username: 1,
+          confirmStatus: 1,
+          createdAt: 1
+        }))[0];
+
+        userData.confirm_status = userData.confirmStatus
+        userData.createdAt = userData.created_at
+      } catch (err) {
+        userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
+      }
+  
+    }
+
+    // FETCH MYSQL
+    if (!userData){
+      userData = (await Users.getMysqlProduction(`Select * From users WHERE id=${userId}`))[0]
+    }
+
+    if (!userData){
+      res.json({})
+    }
 
     try {
 
-        let userOptions = await Users.getMysqlProduction(`Select * From user_options 
-                                                        WHERE user_id=${userId} 
-                                                        AND option_key IN ( 
-                                                                'level',
-                                                                'charSet',
-                                                                'interests',
-                                                                'autoMarkStudied',
-                                                                'pinyin',
-                                                                'newDash',
-                                                                'timezone',
-                                                                'currentLesson',
-                                                                'weeklyGoal'
-                                                    )`);
+      let userOptions = await Users.getMysqlProduction(`Select * From user_options 
+                                                      WHERE user_id=${userId} 
+                                                      AND option_key IN ( 
+                                                              'level',
+                                                              'charSet',
+                                                              'interests',
+                                                              'autoMarkStudied',
+                                                              'pinyin',
+                                                              'newDash',
+                                                              'timezone',
+                                                              'currentLesson',
+                                                              'weeklyGoal'
+                                                  )`);
 
-        userOptions = res.app.locals.helpers.toObject(userOptions)
+      userOptions = res.app.locals.helpers.toObject(userOptions)
 
-        let charSet = userOptions['charSet']
-            ? userOptions['charSet']
-            : 'simplified'
-        let level = userOptions['level']
-            ? res.app.locals.helpers.intToLevel(userOptions['level'])
-            : 'newbie'
+      let charSet = userOptions['charSet']
+          ? userOptions['charSet']
+          : 'simplified'
+      let level = userOptions['level']
+          ? res.app.locals.helpers.intToLevel(userOptions['level'])
+          : 'newbie'
 
       //CONVERT SOME OPTIONS TO Boolean
-        userOptions['pinyin'] = userOptions['pinyin'] === 'true'
-        userOptions['autoMarkStudied'] = !(
-            userOptions['autoMarkStudied'] === 'false'
-        )
-        userOptions['newDash'] = !(userOptions['newDash'] === 'false')
+      userOptions['pinyin'] = userOptions['pinyin'] === 'true'
+      userOptions['autoMarkStudied'] = !(
+          userOptions['autoMarkStudied'] === 'false'
+      )
+      userOptions['newDash'] = !(userOptions['newDash'] === 'false')
 
-        let userPreferences = (await Users.getMysqlProduction(`Select * From user_preferences WHERE user_id=${userId} ORDER BY updated_at DESC`))[0]
+      let userPreferences = (await Users.getMysqlProduction(`Select * From user_preferences WHERE user_id=${userId} ORDER BY updated_at DESC`))[0]
 
-        let accessInfo = await userService.getAccessTypeAndExpiry(userId)
+      let accessInfo = await userService.getAccessTypeAndExpiry(userId)
 
-        let access = accessInfo.type
+      let access = accessInfo.type
 
-        let trial = userData.trial
+      let trial = userData.trial
 
         // console.log(access, res.app.locals)
           // console.log("generated access =========== >>>>>",accessInfo, userId);
@@ -118,10 +159,10 @@ exports.fn = async function(req, res, next) {
       let newLastLogin = 0
       let oldLastLogin = 0
 
-      if (userData.admin_note && Number.isInteger(userData.admin_note)) {
-        newLastLogin = new Date(userData.admin_note)
-        // newLastLogin = res.app.locals.moment(userData.admin_note).format("L")
-      }
+      // if (userData.admin_note && Number.isInteger(userData.admin_note)) {
+      //   newLastLogin = new Date(userData.admin_note)
+      //   // newLastLogin = res.app.locals.moment(userData.admin_note).format("L")
+      // }
       // console.log(userData.admin_note, res.app.locals.moment.unix('1707881416').format());
 
       if (userPreferences && userPreferences['last_login_ip']) {
@@ -130,24 +171,43 @@ exports.fn = async function(req, res, next) {
 
       let lastLogin = newLastLogin > oldLastLogin ? newLastLogin : oldLastLogin
 
-      let szStudentLinks = await Users.getMysqlProduction(`Select * From sz_students WHERE user_id=${userId} AND confirmed=0`)
+      let szStudentLinks
+      let szTeacherLinks
+
+      if (!userData.szStudentLinks){
+        szStudentLinks = await Users.getMysqlProduction(`Select * From sz_students WHERE user_id=${userId} AND confirmed=0`)
+      } else {
+        szStudentLinks = userData.szStudentLinks
+      }
+      
       if (szStudentLinks && szStudentLinks.length) {
         returnData.szStudentLinks = szStudentLinks.map((i) =>
           _.pick(i, ['id', 'createdAt'])
         )
+        userData.szStudentLinks = returnData.szStudentLinks
       }
 
-      let szTeacherLinks = await Users.getMysqlProduction(`Select * From sz_org_staff WHERE user_id=${userId} AND confirmed=0`)
+      if (!userData.szTeacherLinks){
+        szTeacherLinks = await Users.getMysqlProduction(`Select * From sz_org_staff WHERE user_id=${userId} AND confirmed=0`)
+      } else {
+        szTeacherLinks = userData.szTeacherLinks
+      }
+
       if (szTeacherLinks && szTeacherLinks.length) {
         returnData.szTeacherLinks = szTeacherLinks.map((i) =>
           _.pick(i, ['id', 'createdAt'])
         )
       }
-      const isTeam = (await Users.getMysql2015(`Select * From Users WHERE email='${userData.email}' AND status=1`))[0]
 
-      if (isTeam) {
-        await crmUsersMongoAws.upsert({ id: isTeam.id }, { ...isTeam })
+      if (!userData.isTeam) {
+        const isTeam = (await Users.getMysql2015(`Select * From Users WHERE email='${userData.email}' AND status=1`))[0]
+
+        if (isTeam) {
+          userData.isTeam = isTeam
+          await crmUsersMongoAws.upsert({ id: isTeam.id }, { ...isTeam })
+        }
       }
+      
 
       // add hook to update user collection with user_contents
       userService.updateUserContents(userId)
@@ -156,7 +216,7 @@ exports.fn = async function(req, res, next) {
         ...returnData,
         ...userOptions,
         ...{
-          isTeam: !!isTeam,
+          isTeam: !!userData.isTeam,
           userId: userId,
           name: userData.name,
           email: userData.email,
@@ -175,6 +235,8 @@ exports.fn = async function(req, res, next) {
           expiry: accessInfo.expiry,
         },
       }
+
+      redisClient.set(userId, JSON.stringify(userData))
 
       // res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       // res.setHeader("Pragma", "no-cache");
