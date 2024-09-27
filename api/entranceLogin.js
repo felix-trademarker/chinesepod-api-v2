@@ -5,6 +5,10 @@ let randomToken = require('rand-token');
 var ModelRedis = require('../repositories/_modelRedis')
 let redisClient = new ModelRedis('users.login')
 
+var Model = require('./../repositories/_model158')
+let userService = require('./../services/userService')
+
+
 exports.fn = async function(req, res, next) {
   
   
@@ -71,6 +75,7 @@ exports.fn = async function(req, res, next) {
 
       // ADD EVENT LOGS
       // TODO
+      userService.logLoginAttempt()
 
       res.status(401).json({
         error: "Invalid credentials",

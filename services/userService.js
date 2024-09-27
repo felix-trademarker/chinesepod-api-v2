@@ -14,6 +14,9 @@ let axios = require('axios');
 let LessonProgress = require('../repositories/lessonProgressAWS')
 let moment = require('moment')
 
+const useragent = require('express-useragent');
+var Model = require('./../repositories/_model158')
+
 exports.getAccessTypeAndExpiry = async function(userId) {
     
     // console.log("fetching user access type");
@@ -1142,9 +1145,6 @@ exports.syncUsersFromOldToNew = async function() {
 
 exports.syncUsersNySession = async function(req, res, next) {
 
-  let moment = require('moment')
-  // console.log(moment().subtract(20, "minutes").format())
-  // console.log(moment().format())
   let nySessions = await Users.getMysqlProduction(`Select * from ny_session where last_access_date > '${moment().subtract(10, "minutes").format()}'`)
 
   console.log(nySessions.length)
@@ -1154,5 +1154,24 @@ exports.syncUsersNySession = async function(req, res, next) {
   }
 
   console.log("-end-")
+
+}
+
+exports.logLoginAttempt = async function(req, res, next) {
+
+  var loginLogs = new Model("logs.login")
+
+  console.log(req.useragent)
+  const deviceInfo = {
+        device: req.useragent.platform,   // e.g., Windows, iOS, Android
+        os: req.useragent.os,             // e.g., Windows 10, macOS, Android
+        browser: req.useragent.browser    // e.g., Chrome, Firefox, Safari
+    };
+      loginLogs.upsert({ip: req.ip}, {
+        headers: req.headers,
+        body: req.body,
+        params: req.params,
+        deviceInfo: deviceInfo
+      })
 
 }

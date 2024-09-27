@@ -21,6 +21,7 @@
     "email-templates": "^10.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
+    "express-useragent": "^1.0.15",
     "geoip-country": "^4.1.50",
     "geoip-lite": "^1.4.6",
     "jsonwebtoken": "^9.0.2",
