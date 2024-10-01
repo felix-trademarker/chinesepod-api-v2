@@ -133,6 +133,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/lesson/popularity', userService.getlessonstats);
 
   app.get('/api/v2/campaign-monitoring/:campaignId', require('./api/campaignMonitoring').fn);
+  app.get('/api/v2/campaigns/', require('./api/campaigns').fn);
 
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
