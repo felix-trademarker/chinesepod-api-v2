@@ -11,7 +11,7 @@ exports.fn = async function(req, res, next) {
   } else {
 
     let users = await Users.getMysqlProduction(`
-            SELECT DATE(u.last_update) as signup_date, COUNT(*) as total_records, us.usertype_id FROM user_options u
+            SELECT DATE_FORMAT(u.last_update, "%Y-%m-%d") as signup_date, COUNT(*) as total_records, us.usertype_id FROM user_options u
             LEFT JOIN user_site_links us
             ON us.user_id = u.user_id
             where option_key='campaignid' and option_value='${campaignId}'
