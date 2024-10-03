@@ -133,9 +133,16 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/lesson/popularity', userService.getlessonstats);
 
   app.get('/api/v2/campaign-monitoring/:campaignId', require('./api/campaignMonitoring').fn);
-  app.get('/api/v2/campaigns/', require('./api/campaigns').fn);
+
+  app.get('/api/v2/campaigns/', require('./api/campaigns').get);
+  app.delete('/api/v2/campaigns/', require('./api/campaigns').delete);
+  app.put('/api/v2/campaigns/', require('./api/campaigns').put);
+  app.post('/api/v2/campaigns/:id', require('./api/campaigns').edit);
 
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
+
+
+  app.all('/api/v2/1.0.0(/*)?', require('./api.1.0.0/redirector').fn)
 
   cron.schedule("* */15 * * * *", () => {
     // console.log("==== update ny sessions ====");
