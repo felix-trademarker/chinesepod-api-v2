@@ -149,12 +149,11 @@ class Model{
     put(data) {
         var this_ = this
         return new Promise(function(resolve, reject) {
-            console.log('this');
+
 			this_.db.getDb158().collection(this_.table).insertOne(data, 
 				function(err, result) {
 					if (err) reject(err);
                     
-                    console.log('inserted', result);
 					resolve(result);
 				}
 			);
@@ -190,10 +189,10 @@ class Model{
 
 			this_.db.getDb158().collection(this_.table).deleteOne(query, function(err, result) {
 				if (result) {
-					console.log('ok');
+		
 					resolve(result)
 				} else {
-					console.log('err', err.message);
+			
 					reject(err);
 				}
 			});
