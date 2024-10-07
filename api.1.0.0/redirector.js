@@ -3,7 +3,7 @@ let Model = require('../repositories/_model158')
 var apilog = new Model('apilogv2')
 
 exports.fn = async function(req, res, next) {
-    
+    console.log("API FORWARDER", req.url)
   url = `https://ws.chinesepod.com:444${req.url.replace('api/v2/','')}`;
 
   try {

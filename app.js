@@ -137,7 +137,7 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.get('/api/v2/campaigns/', require('./api/campaigns').get);
   app.delete('/api/v2/campaigns/', require('./api/campaigns').delete);
   app.put('/api/v2/campaigns/', require('./api/campaigns').put);
-  app.post('/api/v2/campaigns/:id', require('./api/campaigns').edit);
+  app.post('/api/v2/campaigns/', require('./api/campaigns').edit);
 
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 

@@ -23,7 +23,7 @@ exports.get = async function(req, res, next) {
   if (results)
   for (let i=0; i < results.length; i++) {
     results[i].users = await Users.getMysqlProduction(`
-            SELECT u.last_update as signup_date, COUNT(*) as total_records, us.usertype_id FROM user_options u
+            SELECT DATE_FORMAT(u.last_update, "%Y-%m-%d") as signup_date, COUNT(*) as total_records, us.usertype_id FROM user_options u
             LEFT JOIN user_site_links us
             ON us.user_id = u.user_id
             where option_key='campaignid' and option_value='${results[i].trackingID}'
@@ -51,9 +51,13 @@ exports.put = async function(req, res, next) {
 exports.edit = async function(req, res, next) {
 
   let ObjectID = require('mongodb').ObjectID;
-  console.log(req.body)
+  
 
-  let results = await defaultModel.upsert({ _id: ObjectID(req.params.id) },req.body)
+  // let updateData = req.body
+  let id = req.body._id
+  delete req.body._id
+  console.log("EDIT",id,req.body)
+  let results = await defaultModel.update(id,req.body)
 
   res.json(results)
 
@@ -64,7 +68,7 @@ exports.delete = async function(req, res, next) {
 
   console.log(req.body)
 
-  let results = await defaultModel.remove(req.body.id)
+  let results = await defaultModel.remove(req.body._id)
 
   res.json(results)
 
