@@ -8,7 +8,7 @@ exports.fn = async function(req, res, next) {
 
   try {
     // The URL of the server you're relaying to
-    console.log(url, req.method)
+    console.log("API FORWARDER",url, req.method)
     // Forward the request body, headers, etc.
     let response = await axios.post(url, req.body, {
       headers: {
