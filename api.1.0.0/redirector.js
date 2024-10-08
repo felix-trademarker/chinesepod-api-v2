@@ -4,7 +4,8 @@ var apilog = new Model('apilogv2')
 var apilogUrl = new Model('apilogv2.url')
 
 exports.fn = async function(req, res, next) {
-  console.log("API FORWARDER", req.url)
+  console.log("<< API FORWARDER >>")
+  console.log(req.headers["x-forwarded-server"], req.headers["x-original-request"])
   url = `https://ws.chinesepod.com:444${req.url.replace('api/v2/','')}`;
 
   // log api urls
