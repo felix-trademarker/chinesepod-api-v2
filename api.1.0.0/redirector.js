@@ -10,7 +10,7 @@ exports.fn = async function(req, res, next) {
 
   // log api urls
   try {
-    apilogUrl.put({
+    let urlData = {
       timestamp: new Date (),
       req: req.headers["x-forwarded-server"],
       originalReq: req.headers["x-original-request"],
@@ -20,7 +20,11 @@ exports.fn = async function(req, res, next) {
       params: req.params,
       query: req.query,
       method: req.method
-    })
+    }
+    apilogUrl.upsert({
+      url: urlData.url,
+      method: urlData.method
+    },urlData)
   } catch (err) {
     console.log("<< Failed to log API URL request >>")
   }
