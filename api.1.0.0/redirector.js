@@ -12,7 +12,8 @@ exports.fn = async function(req, res, next) {
     apilogUrl.put({
       timestamp: new Date (),
       req: req.headers["x-forwarded-server"],
-      url: req.params ? req.params[0],
+      originalReq: req.headers["x-original-request"],
+      url: req.params ? req.params[0] : req.headers["x-original-request"],
       headers: req.headers,
       body: req.body,
       params: req.params,
