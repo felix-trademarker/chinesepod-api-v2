@@ -10,13 +10,43 @@ exports.fn = async function(req, res, next) {
     // The URL of the server you're relaying to
     console.log(url, req.method)
     // Forward the request body, headers, etc.
-    const response = await axios.post(url, req.body, {
+    let response = await axios.post(url, req.body, {
       headers: {
-        'Content-Type': 'application/json',
-        // Forward original headers if needed (e.g. authentication tokens)
         ...req.headers
       }
     });
+
+    switch(req.method) {
+      case 'GET': 
+        response = await axios.get(url, req.body, {
+          headers: {
+            ...req.headers
+          }
+        });
+      break;
+      case 'POST':
+        response = await axios.post(url, req.body, {
+          headers: {
+            ...req.headers
+          }
+        });
+      break;
+      case 'PUT':
+        response = await axios.put(url, req.body, {
+          headers: {
+            ...req.headers
+          }
+        });
+      break;
+      case 'DELETE':
+        response = await axios.delete(url, req.body, {
+          headers: {
+            ...req.headers
+          }
+        });
+      break;
+    }
+
 
     apilog.put({
       timestamp: new Date (),

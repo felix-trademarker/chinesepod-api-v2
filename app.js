@@ -144,10 +144,12 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
 
   app.all('/api/v2/1.0.0(/*)?', require('./api.1.0.0/redirector').fn)
 
-  cron.schedule("* */15 * * * *", () => {
-    // console.log("==== update ny sessions ====");
-    userService.syncUsersNySession();
-  });
+  app.get('/api/v2/2.1.0/instances/prod/cpodroot/slider-home', require('./api.2.1.0/cpodroot-slider-home').fn)
+
+  // create this function to a separate app
+  // cron.schedule("* */15 * * * *", () => {
+  //   userService.syncUsersNySession();
+  // });
   
 
   
