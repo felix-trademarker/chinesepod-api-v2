@@ -1175,3 +1175,17 @@ exports.logLoginAttempt = async function(req, res, next) {
       })
 
 }
+
+exports.validateLogin = async function(req, res) {
+  // console.log(req.query)
+  // console.log(req.body)
+  let inputs;
+  if (req.method == 'GET') {
+    inputs = req.query
+  } else {
+    inputs = req.body
+  }
+
+
+  console.log(inputs.username)
+}

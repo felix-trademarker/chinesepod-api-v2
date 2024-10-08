@@ -145,6 +145,8 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.all('/api/v2/1.0.0(/*)?', require('./api.1.0.0/redirector').fn)
 
   app.get('/api/v2/2.1.0/instances/prod/cpodroot/slider-home', require('./api.2.1.0/cpodroot-slider-home').fn)
+  app.get('/api/v2/2.1.0/instances/prod/main/login', require('./api.2.1.0/cpodroot-login').fn)
+  app.post('/api/v2/2.1.0/instances/prod/main/login', require('./api.2.1.0/cpodroot-login').fn)
 
   // create this function to a separate app
   // cron.schedule("* */15 * * * *", () => {
