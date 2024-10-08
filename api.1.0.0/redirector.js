@@ -1,10 +1,28 @@
 const axios = require('axios');
 let Model = require('../repositories/_model158')
 var apilog = new Model('apilogv2')
+var apilogUrl = new Model('apilogv2.url')
 
 exports.fn = async function(req, res, next) {
-    console.log("API FORWARDER", req.url)
+  console.log("API FORWARDER", req.url)
   url = `https://ws.chinesepod.com:444${req.url.replace('api/v2/','')}`;
+
+  // log api urls
+  try {
+    apilogUrl.put({
+      timestamp: new Date (),
+      req: req.headers["x-forwarded-server"],
+      url: req.params ? req.params[0],
+      headers: req.headers,
+      body: req.body,
+      params: req.params,
+      query: req.query,
+      method: req.method
+    })
+  } catch (err) {
+    console.log("<< Failed to log API URL request >>")
+  }
+  
 
   try {
     // The URL of the server you're relaying to
@@ -60,8 +78,16 @@ exports.fn = async function(req, res, next) {
       status: response.status
     })
 
+    if (response.status != 200) {
+      res.status(403).json({
+        error: 'Forbidden'
+      });
+    } else {
+      res.status(response.status).json(response.data);
+    }
+
     // Send back the response received from the other server
-    res.status(response.status).json(response.data);
+    // res.status(response.status).json(response.data);
   } catch (error) {
     // Handle error from the other server
     console.error('Error relaying the request:', error.message);
