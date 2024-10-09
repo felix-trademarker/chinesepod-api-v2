@@ -11,7 +11,10 @@ let userService = require('./../services/userService')
 
 exports.fn = async function(req, res, next) {
   
-  
-  userService.validateLogin(req, res)
-  
+  let loginValidate;
+
+  loginValidate = await userService.validateLogin(req, res)
+
+  console.log(loginValidate)
+
 }

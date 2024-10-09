@@ -222,6 +222,37 @@ exports.passwordHash = function(inputs){
 
 }
 
+exports.getAuthInputs = function(req){
+  let inputs; 
+  let token;
+  let sessionId;
+  // needed inputs
+  // emailaddress 
+  // password
+  // secret
+  // token
+  // sessionId
+
+  // find token or sessionID first and grant access
+  if (req.headers && req.headers.Authorization) {
+    token = req.headers.Authorization.replace("Bearer ", "")
+  }
+  console.log("query", req.query)
+  // get body or query
+  if (req.method == 'GET') {
+    inputs = req.query
+  } else {
+    inputs = req.body
+  }
+
+  // find sessionId and return
+  if (token && !inputs.token) {
+    inputs.token = token
+  }
+
+  return inputs
+
+}
 // exports.createPhpSession = function(inputs){
 //   let userId = inputs.userId;
 //   let currentTime = new Date();
