@@ -77,33 +77,32 @@ exports.delete = async function(req, res, next) {
 
 exports.addUserWithCampaign = async function(req, res, next) {
 
-  console.log(req.body)
+  // console.log(req.body)
   let user = (await Users.getMysqlProduction(`SELECT id, username, password, email, code, name, come FROM users WHERE email='${req.body.emailAddress}'`))[0]
   // let results = await defaultModel.put(req.body)
   if (user) {
-    console.log(user)
+    // console.log(user)
     let userOptions = (await Users.getMysqlProduction(`SELECT id FROM user_options WHERE user_id='${user.id}' AND option_key='campaignId'`))[0]
-    console.log(userOptions)
+    // console.log(userOptions)
     // insert only if user doesn't register to any campaign
     if (req.body.campaignId) {
+      user.campaignId = req.body.campaignId.toUpperCase()
       if (!userOptions) {
         console.log("adding user in campaign")
         let query = (`INSERT INTO user_options SET ?`)
-        let resuseroptions = await Users.getMysqlProduction( query, {
+        Users.getMysqlProduction( query, {
           user_id: user.id,
           option_key: 'campaignId',
-          option_value: req.body.campaignId
+          option_value: user.campaignId
         } )
     
-        console.log(resuseroptions)
       } else {
         // update campaign ID
-        await Users.getMysqlProduction(`UPDATE user_options
-        SET option_value = '${req.body.campaignId}'
+        Users.getMysqlProduction(`UPDATE user_options
+        SET option_value = '${user.campaignId}'
         WHERE user_id='${user.id}' AND option_key='campaignId'`)
       }
 
-      user.campaignId = req.body.campaignId
     }
 
     if (req.body.aboutsignup) {
