@@ -78,7 +78,7 @@ exports.delete = async function(req, res, next) {
 exports.addUserWithCampaign = async function(req, res, next) {
 
   console.log(req.body)
-  let user = (await Users.getMysqlProduction(`SELECT id FROM users WHERE email='${req.body.emailAddress}'`))[0]
+  let user = (await Users.getMysqlProduction(`SELECT id, username, password, email, code, name, come FROM users WHERE email='${req.body.emailAddress}'`))[0]
   // let results = await defaultModel.put(req.body)
   if (user) {
     console.log(user)
@@ -102,16 +102,23 @@ exports.addUserWithCampaign = async function(req, res, next) {
         SET option_value = '${req.body.campaignId}'
         WHERE user_id='${user.id}' AND option_key='campaignId'`)
       }
+
+      user.campaignId = req.body.campaignId
     }
 
     if (req.body.aboutsignup) {
       let query = (`INSERT INTO user_options SET ?`)
-      let resuseroptions = await Users.getMysqlProduction( query, {
+      Users.getMysqlProduction( query, {
         user_id: user.id,
         option_key: 'userAboutSignup',
         option_value: req.body.aboutsignup.join(",")
       } )
+
+      user.aboutsignup = req.body.aboutsignup
     }
+
+    // save in mongo 
+    Users.upsert({id: user.id}, user)
     
     
   } else {
