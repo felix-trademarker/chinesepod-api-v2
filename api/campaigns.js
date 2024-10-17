@@ -85,17 +85,34 @@ exports.addUserWithCampaign = async function(req, res, next) {
     let userOptions = (await Users.getMysqlProduction(`SELECT id FROM user_options WHERE user_id='${user.id}' AND option_key='campaignId'`))[0]
     console.log(userOptions)
     // insert only if user doesn't register to any campaign
-    if (!userOptions) {
-      console.log("adding user in campaign")
+    if (req.body.campaignId) {
+      if (!userOptions) {
+        console.log("adding user in campaign")
+        let query = (`INSERT INTO user_options SET ?`)
+        let resuseroptions = await Users.getMysqlProduction( query, {
+          user_id: user.id,
+          option_key: 'campaignId',
+          option_value: req.body.campaignId
+        } )
+    
+        console.log(resuseroptions)
+      } else {
+        // update campaign ID
+        await Users.getMysqlProduction(`UPDATE user_options
+        SET option_value = '${req.body.campaignId}'
+        WHERE user_id='${user.id}' AND option_key='campaignId'`)
+      }
+    }
+
+    if (req.body.aboutsignup) {
       let query = (`INSERT INTO user_options SET ?`)
       let resuseroptions = await Users.getMysqlProduction( query, {
         user_id: user.id,
-        option_key: 'campaignId',
-        option_value: req.body.campaignId
+        option_key: 'userAboutSignup',
+        option_value: req.body.aboutsignup.join(",")
       } )
-  
-      console.log(resuseroptions)
     }
+    
     
   } else {
     console.log("user not found")
