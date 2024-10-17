@@ -139,6 +139,8 @@ conn.connectToServer158( async function( err, client ) { // MAIN MONGO START
   app.put('/api/v2/campaigns/', require('./api/campaigns').put);
   app.post('/api/v2/campaigns/', require('./api/campaigns').edit);
 
+  app.post('/api/v2/add-user-campaigns/', require('./api/campaigns').addUserWithCampaign);
+
   // app.use('/api/v2',middleware.checkAuth, apiRouter);
 
 

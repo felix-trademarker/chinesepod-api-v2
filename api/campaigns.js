@@ -74,3 +74,33 @@ exports.delete = async function(req, res, next) {
 
   
 }
+
+exports.addUserWithCampaign = async function(req, res, next) {
+
+  console.log(req.body)
+  let user = (await Users.getMysqlProduction(`SELECT id FROM users WHERE email='${req.body.emailAddress}'`))[0]
+  // let results = await defaultModel.put(req.body)
+  if (user) {
+    console.log(user)
+    let userOptions = (await Users.getMysqlProduction(`SELECT id FROM user_options WHERE user_id='${user.id}' AND option_key='campaignId'`))[0]
+    console.log(userOptions)
+    // insert only if user doesn't register to any campaign
+    if (!userOptions) {
+      console.log("adding user in campaign")
+      let query = (`INSERT INTO user_options SET ?`)
+      let resuseroptions = await Users.getMysqlProduction( query, {
+        user_id: user.id,
+        option_key: 'campaignId',
+        option_value: req.body.campaignId
+      } )
+  
+      console.log(resuseroptions)
+    }
+    
+  } else {
+    console.log("user not found")
+  }
+  res.json(user)
+
+  
+}
